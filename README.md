@@ -30,9 +30,13 @@ The course follows the topics of Harvard's [CS50x](https://cs50.harvard.edu/x/),
 
 Instead of asking "have you coded before?", setup asks real questions ([src/content/placement.ts](src/content/placement.ts)): one per unit for units 0–6, easiest first. Each right answer skips that unit; the first wrong answer or "I don't know" ends the test, so a beginner is out after one question. Brand-new learners can skip it entirely. Skipped units show as dashed stations on the path, stay open for review, and don't count as finished lessons.
 
-## Pip
+## Pip and avatars
 
-Pip is the mascot ([src/ui/Pip.tsx](src/ui/Pip.tsx)): a round cobalt creature whose antenna light follows its mood. One SVG, seven moods: happy, wave, cheer, oops, think, sleepy and celebrate. Pip shows up on the welcome screen, the placement test, right and wrong answers, the lesson-done screen, message banners and the profile. The Messaging lab lists every mood and where it's used.
+Pip is the mascot ([src/ui/Pip.tsx](src/ui/Pip.tsx)): a pixel-art red panda with seven moods (happy, wave, cheer, oops, think, sleepy, celebrate). Pip shows up on the welcome screen, the placement test, right and wrong answers, the lesson-done screen, message banners and the profile. The Messaging lab lists every mood and where it's used.
+
+Learners can make a **pixel avatar** in the same style ([src/ui/Avatar.tsx](src/ui/Avatar.tsx)): a red panda, cat, bunny or bear, with six fur colours, five expressions, six accessories and six backgrounds. It shows in the top bar and on the profile. The app doesn't ask for it during sign-up, where every extra step costs first-lesson completions. Instead an in-app banner suggests it once the first lesson is done, and it can be made or changed from the profile at any time.
+
+All sprites are drawn in code as pixel grids ([src/ui/pixel/sprites.ts](src/ui/pixel/sprites.ts)): heads are drawn as half rows and mirrored, with faces, paws, accessories and effects layered on top.
 
 ## Habit loop
 
@@ -59,11 +63,11 @@ Sound can be turned off from the speaker button in any lesson or in Settings.
 
 ## Targeted messaging
 
-All reminders come from one rules engine ([src/engine/messaging.ts](src/engine/messaging.ts)): 18 pure rules over a snapshot of the learner. Learners are grouped as `new`, `active`, `casual`, `slipping` or `dormant`, and each rule reads things like streak, days away, daily-goal progress, wrong answers in the current lesson, and why they joined.
+All reminders come from one rules engine ([src/engine/messaging.ts](src/engine/messaging.ts)): 19 pure rules over a snapshot of the learner. Learners are grouped as `new`, `active`, `casual`, `slipping` or `dormant`, and each rule reads things like streak, days away, daily-goal progress, wrong answers in the current lesson, and why they joined.
 
 | Channel | Examples |
 |---|---|
-| In-app | first lesson, a freeze saved your streak, your streak ended (fresh start), welcome back with a review, stuck on a lesson, unit finished, streak milestones, close to daily goal, buy a freeze |
+| In-app | first lesson, make your avatar (after lesson one), a freeze saved your streak, your streak ended (fresh start), welcome back with a review, stuck on a lesson, unit finished, streak milestones, close to daily goal, buy a freeze |
 | Push | first lesson (days 1–3), streak at risk at the learner's chosen hour, days 2–4 away, days 5–6 away |
 | Email | welcome, Sunday recap, 7 days away, 14 days away (suggests a smaller goal), 30 days away (last message) |
 

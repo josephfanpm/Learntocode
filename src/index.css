@@ -163,7 +163,7 @@ h3 {
 }
 @keyframes pip-wave {
   0%, 100% { transform: rotate(0deg); }
-  50% { transform: rotate(-16deg); }
+  50% { transform: rotate(-5deg); }
 }
 @keyframes pip-sparkle {
   0%, 100% { opacity: 1; }
@@ -171,11 +171,10 @@ h3 {
 }
 .pip-bounce { animation: pip-bounce 700ms cubic-bezier(0.3, 0.7, 0.4, 1) 2; }
 .pip-breathe { animation: pip-breathe 3s ease-in-out infinite; }
-.pip-wave { transform-box: fill-box; transform-origin: 0% 100%; animation: pip-wave 600ms ease-in-out 3; }
-.pip-sparkle { animation: pip-sparkle 900ms ease-in-out infinite; }
+.pip-sway { animation: pip-wave 700ms ease-in-out 2; }
 
 @media (prefers-reduced-motion: reduce) {
-  .pip-bounce, .pip-breathe, .pip-wave, .pip-sparkle { animation: none; }
+  .pip-bounce, .pip-breathe, .pip-sway { animation: none; }
   .anim-pop, .anim-rise, .anim-pulse, .anim-shake { animation: none; }
   .btn, .tile { transition: none; }
 }

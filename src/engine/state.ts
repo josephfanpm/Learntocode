@@ -1,5 +1,13 @@
 import { addDays, dayKey, daysBetween } from './dates'
 
+export interface AvatarSpec {
+  animal: 'redpanda' | 'cat' | 'bunny' | 'bear'
+  fur: 'ginger' | 'grey' | 'cream' | 'brown' | 'black' | 'white'
+  face: 'happy' | 'cheer' | 'think' | 'sleepy' | 'oops'
+  accessory: 'none' | 'glasses' | 'beanie' | 'headphones' | 'bow' | 'crown'
+  bg: string
+}
+
 export type Motivation = 'career' | 'curious' | 'build' | 'work'
 
 export interface DayActivity {
@@ -40,6 +48,8 @@ export interface LearnerState {
   placedUnit?: number
   /** Prototype setting: every lesson is open. Off by default. */
   unlockAll?: boolean
+  /** Pixel-art profile picture; unset until the learner makes one. */
+  avatar?: AvatarSpec
   /** Interface sounds. Missing (older saves) means on. */
   sound?: boolean
   xp: number

@@ -1,4 +1,4 @@
-import { Award, Flame, Gem, Snowflake } from 'lucide-react'
+import { Award, Flame, Gem, Pencil, Snowflake } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { units } from '../content'
 import { addDays, dayKey, parseDay } from '../engine/dates'
@@ -6,6 +6,7 @@ import { badges } from '../engine/progress'
 import { buyFreeze, FREEZE_PRICE, longestStreak, MAX_FREEZES, practicedToday, reset, streak } from '../engine/state'
 import { play, setSoundEnabled } from '../sound'
 import { useStore } from '../store'
+import { Avatar } from './Avatar'
 import { Pip } from './Pip'
 import { GOALS, HOURS, hourLabel } from './Onboarding'
 import type { Go } from './Home'
@@ -46,11 +47,20 @@ export function Profile({ go }: { go: Go }) {
   return (
     <div className="mx-auto max-w-xl space-y-8 px-4 py-6 pb-20">
       <div className="flex items-center gap-4">
-        <Pip mood={practicedToday(s, today) ? 'happy' : 'sleepy'} size={72} />
-        <div>
+        <button onClick={() => go('/avatar')} className="group relative rounded-[28%]" aria-label={s.avatar ? 'Edit your avatar' : 'Make your avatar'}>
+          <Avatar avatar={s.avatar} size={84} className="border-4 border-white shadow-[0_5px_0_var(--color-rule)]" />
+          <span className="absolute -right-1 -bottom-1 grid size-7 place-items-center rounded-full border-2 border-white bg-cobalt text-white">
+            <Pencil size={13} />
+          </span>
+        </button>
+        <div className="min-w-0 flex-1">
           <h1 className="text-3xl font-bold">{s.name || 'Your progress'}</h1>
           <p className="text-ink-2">{practicedToday(s, today) ? 'Practiced today.' : 'No lesson yet today.'}</p>
+          {!s.avatar && (
+            <button className="mt-1 text-sm font-semibold text-cobalt" onClick={() => go('/avatar')}>Make your avatar</button>
+          )}
         </div>
+        <Pip mood={practicedToday(s, today) ? 'happy' : 'sleepy'} size={64} className="hidden sm:inline-block" />
       </div>
 
       <section className="grid grid-cols-2 gap-3">

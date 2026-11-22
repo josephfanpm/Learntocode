@@ -61,6 +61,7 @@ export interface Facts {
   justFinishedUnit?: string
   pushEnabled: boolean
   reminderHour: number
+  hasAvatar: boolean
 }
 
 export function facts(s: LearnerState, units: Unit[], now: Date): Facts {
@@ -120,10 +121,11 @@ export function facts(s: LearnerState, units: Unit[], now: Date): Facts {
     justFinishedUnit: finishedToday ? lastDone.title : undefined,
     pushEnabled: s.pushEnabled,
     reminderHour: s.reminderHour,
+    hasAvatar: !!s.avatar,
   }
 }
 
-export type Action = 'lesson' | 'review' | 'shop' | 'settings'
+export type Action = 'lesson' | 'review' | 'shop' | 'settings' | 'avatar'
 
 export interface Message {
   rule: string
@@ -290,6 +292,21 @@ export const RULES: Rule[] = [
       body: `A streak freeze covers one missed day. You have ${f.gems} gems; it costs ${FREEZE_PRICE}.`,
       cta: { label: 'Get a freeze', action: 'shop' },
       why: `Streak ${f.streak}, no freezes, enough gems.`,
+    }),
+  },
+
+  {
+    id: 'avatar_prompt',
+    channel: 'banner',
+    priority: 45,
+    about: 'After the first finished lesson, invites the learner to make a pixel avatar. Asked after the first win, not during sign-up.',
+    when: (f) => f.lessonsDone >= 1 && !f.hasAvatar,
+    key: () => 'avatar_prompt',
+    copy: () => ({
+      title: 'Make your avatar',
+      body: 'Pick an animal, a look and an accessory. It shows on your profile.',
+      cta: { label: 'Make my avatar', action: 'avatar' },
+      why: 'Finished a lesson, no avatar yet.',
     }),
   },
 

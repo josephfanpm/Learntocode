@@ -6,6 +6,7 @@ import type { Message } from '../engine/messaging'
 import { path, unitProgress } from '../engine/progress'
 import { practicedToday, streak } from '../engine/state'
 import { useStore } from '../store'
+import { Avatar } from './Avatar'
 import { Pip, type Mood } from './Pip'
 
 /** One transit-line colour per unit. */
@@ -45,6 +46,9 @@ export function TopBar({ go }: { go: Go }) {
           </svg>
           {pct >= 1 && <Check size={14} strokeWidth={3} className="absolute inset-0 m-auto text-flame" />}
         </button>
+        <button onClick={() => go('/me')} className="ml-1 rounded-[28%]" aria-label="Your profile">
+          <Avatar avatar={s.avatar} size={34} />
+        </button>
       </div>
     </header>
   )
@@ -60,6 +64,7 @@ const BANNER_MOOD: Record<string, Mood> = {
   streak_milestone: 'celebrate',
   goal_close: 'cheer',
   freeze_offer: 'think',
+  avatar_prompt: 'wave',
 }
 
 export function Banner({ m, go, onDismiss }: { m: Message; go: Go; onDismiss: () => void }) {
@@ -67,6 +72,7 @@ export function Banner({ m, go, onDismiss }: { m: Message; go: Go; onDismiss: ()
     if (!m.cta) return
     if (m.cta.action === 'lesson' || m.cta.action === 'review') go(`/lesson/${m.cta.lessonId}`)
     else if (m.cta.action === 'shop') go('/me#shop')
+    else if (m.cta.action === 'avatar') go('/avatar')
     else go('/me#settings')
   }
   const tone = m.rule === 'streak_milestone' || m.rule === 'unit_done' ? 'bg-flame-soft border-flame/30' : 'bg-white border-rule'
