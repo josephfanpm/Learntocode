@@ -104,7 +104,6 @@ export function Profile({ go }: { go: Go }) {
             <Gem size={15} /> {FREEZE_PRICE}
           </button>
         </div>
-        <p className="mt-2 text-xs text-ink-3">Earn 5 gems per lesson and 20 for reaching your daily goal. You have {s.gems}.</p>
       </section>
 
       <section aria-labelledby="badges">
