@@ -1,7 +1,9 @@
 import type { Lesson, Unit } from '../content/types'
 import type { LearnerState } from './state'
 
-export type NodeStatus = 'done' | 'current' | 'locked'
+/** skipped: in a unit the placement test skipped; open for review, not counted as done. */
+/** open: would be locked, but the prototype "unlock all" setting is on. */
+export type NodeStatus = 'done' | 'skipped' | 'current' | 'locked' | 'open'
 
 export interface PathLesson {
   lesson: Lesson
@@ -12,21 +14,25 @@ export interface PathLesson {
 /**
  * Lessons unlock strictly in order across the whole course: the first
  * lesson not yet completed is "current", everything after it is locked.
- * Finishing a unit's last lesson opens the next unit.
+ * Finishing a unit's last lesson opens the next unit. Units skipped by the
+ * placement test are open but don't hold the current lesson.
  */
 export function path(units: Unit[], s: LearnerState): PathLesson[] {
   const out: PathLesson[] = []
   let foundCurrent = false
-  for (const unit of units)
+  const placed = s.placedUnit ?? 0
+  units.forEach((unit, ui) => {
     for (const lesson of unit.lessons) {
       let status: NodeStatus
       if (s.completed[lesson.id]) status = 'done'
+      else if (ui < placed) status = 'skipped'
       else if (!foundCurrent) {
         status = 'current'
         foundCurrent = true
-      } else status = 'locked'
+      } else status = s.unlockAll ? 'open' : 'locked'
       out.push({ lesson, unit, status })
     }
+  })
   return out
 }
 

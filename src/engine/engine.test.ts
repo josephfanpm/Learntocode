@@ -89,6 +89,19 @@ describe('lessons and unlocks', () => {
   })
 })
 
+describe('placement and unlock all', () => {
+  it('skipped units are open but not done, and the next unit holds the current lesson', () => {
+    const s = { ...newLearner(at('2026-11-01')), placedUnit: 1 }
+    expect(path(units, s).map((x) => x.status)).toEqual(['skipped', 'skipped', 'skipped', 'current', 'locked'])
+    expect(Object.keys(s.completed)).toHaveLength(0)
+  })
+
+  it('unlock all opens every locked lesson without marking anything done', () => {
+    const s = { ...newLearner(at('2026-11-01')), unlockAll: true }
+    expect(path(units, s).map((x) => x.status)).toEqual(['current', 'open', 'open', 'open', 'open'])
+  })
+})
+
 describe('messaging', () => {
   const send = (s: LearnerState, when: Date) => decide(facts(s, units, when), s.messages)
 

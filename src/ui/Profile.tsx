@@ -3,9 +3,10 @@ import { useEffect, useState } from 'react'
 import { units } from '../content'
 import { addDays, dayKey, parseDay } from '../engine/dates'
 import { badges } from '../engine/progress'
-import { buyFreeze, FREEZE_PRICE, longestStreak, MAX_FREEZES, reset, streak } from '../engine/state'
+import { buyFreeze, FREEZE_PRICE, longestStreak, MAX_FREEZES, practicedToday, reset, streak } from '../engine/state'
 import { play, setSoundEnabled } from '../sound'
 import { useStore } from '../store'
+import { Pip } from './Pip'
 import { GOALS, HOURS, hourLabel } from './Onboarding'
 import type { Go } from './Home'
 
@@ -44,7 +45,13 @@ export function Profile({ go }: { go: Go }) {
 
   return (
     <div className="mx-auto max-w-xl space-y-8 px-4 py-6 pb-20">
-      <h1 className="text-3xl font-bold">{s.name || 'Your progress'}</h1>
+      <div className="flex items-center gap-4">
+        <Pip mood={practicedToday(s, today) ? 'happy' : 'sleepy'} size={72} />
+        <div>
+          <h1 className="text-3xl font-bold">{s.name || 'Your progress'}</h1>
+          <p className="text-ink-2">{practicedToday(s, today) ? 'Practiced today.' : 'No lesson yet today.'}</p>
+        </div>
+      </div>
 
       <section className="grid grid-cols-2 gap-3">
         {stat('Current streak', streak(s, today), <Flame className="text-flame" fill="currentColor" size={24} />)}
@@ -140,6 +147,15 @@ export function Profile({ go }: { go: Go }) {
           </div>
           <button role="switch" aria-checked={s.pushEnabled} aria-label="Reminders" onClick={togglePush} className={`relative h-8 w-14 rounded-full transition-colors ${s.pushEnabled ? 'bg-good' : 'bg-rule'}`}>
             <span className={`absolute top-1 size-6 rounded-full bg-white transition-[left] ${s.pushEnabled ? 'left-7' : 'left-1'}`} />
+          </button>
+        </div>
+        <div className="flex items-center justify-between gap-4 rounded-2xl border-2 border-dashed border-rule bg-white p-4">
+          <div>
+            <p className="font-medium">Prototype: unlock all lessons</p>
+            <p className="text-sm text-ink-2">Open every lesson on the path so you can try any of them.</p>
+          </div>
+          <button role="switch" aria-checked={!!s.unlockAll} aria-label="Unlock all lessons" onClick={() => update((p) => ({ ...p, unlockAll: !p.unlockAll }))} className={`relative h-8 w-14 shrink-0 rounded-full transition-colors ${s.unlockAll ? 'bg-good' : 'bg-rule'}`}>
+            <span className={`absolute top-1 size-6 rounded-full bg-white transition-[left] ${s.unlockAll ? 'left-7' : 'left-1'}`} />
           </button>
         </div>
         {notice && <p className="text-sm text-bad">{notice}</p>}

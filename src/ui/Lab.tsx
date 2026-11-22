@@ -6,11 +6,22 @@ import { decide, facts, RULES, TIER_INFO, type Message, type Tier } from '../eng
 import { PERSONAS, simulate } from '../engine/simulate'
 import { useStore } from '../store'
 import { hourLabel, HOURS } from './Onboarding'
+import { MOODS, Pip, type Mood } from './Pip'
 
 const CH: Record<Channel, { icon: typeof Bell; label: string; color: string }> = {
   banner: { icon: PanelTop, label: 'In-app', color: '#2d5be3' },
   push: { icon: Bell, label: 'Push', color: '#ff7a1a' },
   email: { icon: Mail, label: 'Email', color: '#7a4ff0' },
+}
+
+const PIP_USES: Record<Mood, string> = {
+  happy: 'Profile on a day you’ve practiced, freeze saved your streak',
+  wave: 'Welcome screen, first lesson, welcome back',
+  cheer: 'Right answer, close to your daily goal',
+  oops: 'Wrong answer, leaving a lesson, lost streak',
+  think: 'Placement test, stuck on a lesson',
+  sleepy: 'Profile when you haven’t practiced today',
+  celebrate: 'Lesson done, placement result, milestones',
 }
 
 const TIER_COLOR: Record<Tier, string> = {
@@ -210,6 +221,20 @@ export function Lab() {
             ))}
           </ul>
         )}
+      </section>
+
+      <section aria-labelledby="pip">
+        <h2 id="pip" className="text-2xl font-bold">Pip’s expressions</h2>
+        <p className="mt-1 text-sm text-ink-2">The mascot, and where each mood shows up.</p>
+        <ul className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {MOODS.map((m) => (
+            <li key={m} className="flex flex-col items-center rounded-2xl border-2 border-rule bg-white p-4 text-center">
+              <Pip mood={m} size={84} />
+              <p className="mt-2 font-display font-bold capitalize">{m}</p>
+              <p className="text-xs text-ink-3">{PIP_USES[m]}</p>
+            </li>
+          ))}
+        </ul>
       </section>
 
       <section aria-labelledby="rules">

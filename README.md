@@ -26,6 +26,14 @@ The course follows the topics of Harvard's [CS50x](https://cs50.harvard.edu/x/),
 
 **Code runs in the browser.** Python runs in [Pyodide](https://pyodide.org) inside a Web Worker, so an endless loop is stopped after 6 seconds instead of freezing the page. SQL runs in [sql.js](https://sql.js.org) (SQLite). HTML is checked by CSS selectors against a sandboxed preview. Python errors are translated into one plain sentence ("Line 3: Python doesn't know the name "nme"…").
 
+## Placement test
+
+Instead of asking "have you coded before?", setup asks real questions ([src/content/placement.ts](src/content/placement.ts)): one per unit for units 0–6, easiest first. Each right answer skips that unit; the first wrong answer or "I don't know" ends the test, so a beginner is out after one question. Brand-new learners can skip it entirely. Skipped units show as dashed stations on the path, stay open for review, and don't count as finished lessons.
+
+## Pip
+
+Pip is the mascot ([src/ui/Pip.tsx](src/ui/Pip.tsx)): a round cobalt creature whose antenna light follows its mood. One SVG, seven moods: happy, wave, cheer, oops, think, sleepy and celebrate. Pip shows up on the welcome screen, the placement test, right and wrong answers, the lesson-done screen, message banners and the profile. The Messaging lab lists every mood and where it's used.
+
 ## Habit loop
 
 - **Streaks** count the learner's own calendar days. A day stays "alive" until midnight.
@@ -74,7 +82,7 @@ npm test           # streak, unlock and messaging tests
 npx tsx scripts/check-content.ts   # validates every exercise; runs each Python/SQL solution against its tests
 ```
 
-Jump to any exercise for review with `#/lesson/<lesson-id>?at=<index>`. This doesn't save progress.
+Settings has a **Prototype: unlock all lessons** switch (off by default) that opens every lesson on the path. You can also jump to any exercise with `#/lesson/<lesson-id>?at=<index>`. This doesn't save progress.
 
 Stack: Vite, React 19, TypeScript, Tailwind 4. Progress is saved in `localStorage`.
 

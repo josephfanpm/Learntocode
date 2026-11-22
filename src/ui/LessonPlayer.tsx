@@ -1,4 +1,4 @@
-import { Check, Flame, Volume2, VolumeX, X } from 'lucide-react'
+import { Flame, Volume2, VolumeX, X } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { Lesson, Unit } from '../content/types'
 import { dayKey } from '../engine/dates'
@@ -7,6 +7,7 @@ import { warmPython } from '../runners'
 import { play } from '../sound'
 import { useStore } from '../store'
 import { ExerciseView, type Grader } from './exercises'
+import { Pip } from './Pip'
 import { Inline } from './text'
 
 type Status = 'answering' | 'right' | 'wrong'
@@ -158,7 +159,7 @@ export function LessonPlayer({ lesson, unit, color, startAt = 0, onExit }: { les
           <div className="flex-1" aria-live="polite">
             {status === 'right' && (
               <div className="flex gap-3">
-                <span className="anim-pop grid size-9 shrink-0 place-items-center rounded-full bg-good text-white"><Check size={22} strokeWidth={3} /></span>
+                <Pip key={`c${idx}-${attempt}`} mood="cheer" size={54} className="-my-2 shrink-0" />
                 <div>
                   <p className="font-display text-xl font-bold text-good">{praise.current}</p>
                   {'explain' in ex && <p className="mt-0.5 text-sm text-ink-2"><Inline text={ex.explain} /></p>}
@@ -167,7 +168,7 @@ export function LessonPlayer({ lesson, unit, color, startAt = 0, onExit }: { les
             )}
             {status === 'wrong' && (
               <div className="anim-shake flex gap-3">
-                <span className="grid size-9 shrink-0 place-items-center rounded-full bg-bad text-white"><X size={22} strokeWidth={3} /></span>
+                <Pip mood="oops" size={54} className="-my-2 shrink-0" />
                 <div>
                   <p className="font-display text-xl font-bold text-bad">{ex.kind === 'write' ? 'Not quite yet' : 'Not quite'}</p>
                   <p className="mt-0.5 text-sm text-ink-2">
@@ -208,6 +209,7 @@ export function LessonPlayer({ lesson, unit, color, startAt = 0, onExit }: { les
       {confirmQuit && (
         <div className="fixed inset-0 z-10 grid place-items-end bg-ink/40 sm:place-items-center" onClick={() => setConfirmQuit(false)}>
           <div className="anim-rise w-full max-w-md rounded-t-3xl bg-white p-6 sm:rounded-3xl" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="quit-title">
+            <Pip mood="oops" size={72} className="mb-3" />
             <h2 id="quit-title" className="text-2xl font-bold">Leave this lesson?</h2>
             <p className="mt-2 text-ink-2">You’ll lose progress in this lesson. Finished lessons are saved.</p>
             <div className="mt-6 grid gap-3">
@@ -235,6 +237,7 @@ function LessonDone({ result, lesson, onDone, streakNow }: { result: { r: Lesson
   return (
     <div className="mx-auto flex min-h-dvh max-w-md flex-col px-5 py-10">
       <div className="flex flex-1 flex-col items-center justify-center text-center">
+        <Pip mood="celebrate" size={130} className="mb-4" />
         <p className="text-ink-3">{lesson.title}</p>
         <h1 className="anim-pop mt-1 text-5xl font-extrabold">Lesson done</h1>
         <div className="mt-10 grid w-full grid-cols-2 gap-3">

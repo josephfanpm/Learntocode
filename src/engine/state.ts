@@ -36,6 +36,10 @@ export interface LearnerState {
   /** Hour (0–23, local) for the streak reminder. */
   reminderHour: number
   pushEnabled: boolean
+  /** Units skipped by the placement test (0 = start at the beginning). */
+  placedUnit?: number
+  /** Prototype setting: every lesson is open. Off by default. */
+  unlockAll?: boolean
   /** Interface sounds. Missing (older saves) means on. */
   sound?: boolean
   xp: number

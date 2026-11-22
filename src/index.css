@@ -151,7 +151,31 @@ h3 {
 .anim-pulse { animation: pulse-ring 1.6s ease-out infinite; }
 .anim-shake { animation: shake 260ms ease; }
 
+/* Pip, the mascot */
+@keyframes pip-bounce {
+  0%, 100% { transform: translateY(0) scaleY(1); }
+  30% { transform: translateY(-7px) scaleY(1.03); }
+  55% { transform: translateY(0) scaleY(0.96); }
+}
+@keyframes pip-breathe {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(0.97); }
+}
+@keyframes pip-wave {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(-16deg); }
+}
+@keyframes pip-sparkle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+.pip-bounce { animation: pip-bounce 700ms cubic-bezier(0.3, 0.7, 0.4, 1) 2; }
+.pip-breathe { animation: pip-breathe 3s ease-in-out infinite; }
+.pip-wave { transform-box: fill-box; transform-origin: 0% 100%; animation: pip-wave 600ms ease-in-out 3; }
+.pip-sparkle { animation: pip-sparkle 900ms ease-in-out infinite; }
+
 @media (prefers-reduced-motion: reduce) {
+  .pip-bounce, .pip-breathe, .pip-wave, .pip-sparkle { animation: none; }
   .anim-pop, .anim-rise, .anim-pulse, .anim-shake { animation: none; }
   .btn, .tile { transition: none; }
 }
