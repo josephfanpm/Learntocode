@@ -2,7 +2,9 @@
 // Keys: o outline, a main colour, b highlight, c shade, w white, . empty.
 import type { Pixel } from './sprites'
 
-export type BadgeIcon = 'flame' | 'sword' | 'shield' | 'trophy' | 'star' | 'gem'
+export type BadgeIcon =
+  | 'flame' | 'sword' | 'shield' | 'trophy' | 'star' | 'gem'
+  | 'target' | 'moon' | 'sun' | 'bolt' | 'scroll' | 'wrench' | 'robot' | 'potion' | 'snow' | 'compass' | 'heart'
 export type Tier = 'locked' | 'bronze' | 'silver' | 'gold'
 
 const ART: Record<BadgeIcon, string[]> = {
@@ -90,6 +92,160 @@ const ART: Record<BadgeIcon, string[]> = {
     '.....oo.....',
     '............',
   ],
+  target: [
+    '............',
+    '...oooooo...',
+    '..oaaaaaao..',
+    '.oaawwwwaao.',
+    'oaawwaawwaao',
+    'oaawaccawaao',
+    'oaawaccawaao',
+    'oaawwaawwaao',
+    '.oaawwwwaao.',
+    '..oaaaaaao..',
+    '...oooooo...',
+    '............',
+  ],
+  moon: [
+    '....oooo....',
+    '..ooaaao....',
+    '.oaaaao.....',
+    '.oaaao......',
+    'oaaaao......',
+    'oaaaao......',
+    'oaaaao...o..',
+    'oaaaaao.oao.',
+    '.oaaaaaoaao.',
+    '.oaaaaaaao..',
+    '..ooaaaoo...',
+    '....ooo.....',
+  ],
+  sun: [
+    '.....oo.....',
+    '.o...oo...o.',
+    '..o.oooo.o..',
+    '...oabbao...',
+    '..oabbbbao..',
+    'oooabwbbaooo',
+    'oooabbbbaooo',
+    '..oabbbbao..',
+    '...oaaaao...',
+    '..o.oooo.o..',
+    '.o...oo...o.',
+    '.....oo.....',
+  ],
+  bolt: [
+    '......oooo..',
+    '.....oabo...',
+    '....oabo....',
+    '...oabo.....',
+    '..oabboooo..',
+    '.oaabbbbao..',
+    '..ooooabo...',
+    '.....oabo...',
+    '....oabo....',
+    '...oabo.....',
+    '...oao......',
+    '...oo.......',
+  ],
+  scroll: [
+    '.oooooooooo.',
+    'obbbbbbbbbbo',
+    'oboooooooobo',
+    '.obbbbbbbbo.',
+    '.obccccccbo.',
+    '.obbbbbbbbo.',
+    '.obcccccbbo.',
+    '.obbbbbbbbo.',
+    '.obccccccbo.',
+    'oboooooooobo',
+    'obbbbbbbbbbo',
+    '.oooooooooo.',
+  ],
+  wrench: [
+    '.....oooo...',
+    '....oaao.o..',
+    '...oaao.oao.',
+    '...oaaoooao.',
+    '...oaaaaaao.',
+    '....oaaaao..',
+    '...oabaoo...',
+    '..oabao.....',
+    '.oabao......',
+    'oabao.......',
+    'oaao........',
+    '.oo.........',
+  ],
+  robot: [
+    '.....oo.....',
+    '.....oo.....',
+    '..oooooooo..',
+    '.oaaaaaaaao.',
+    '.oawwaawwao.',
+    '.oawoaawoao.',
+    '.oaaaaaaaao.',
+    '.oacccccaao.',
+    '.oaaaaaaaao.',
+    '..oooooooo..',
+    '..oao..oao..',
+    '..ooo..ooo..',
+  ],
+  potion: [
+    '....oooo....',
+    '....obbo....',
+    '....oooo....',
+    '....obbo....',
+    '...oobbboo..',
+    '..obbbbbbbo.',
+    '.obbaaaaaao.',
+    '.oaaaawaaao.',
+    '.oaaaaaaaao.',
+    '.oaaaaaaaao.',
+    '..oaaaaaao..',
+    '...oooooo...',
+  ],
+  snow: [
+    '.....aa.....',
+    '..a..aa..a..',
+    '...a.aa.a...',
+    '....aaaa....',
+    '.aaaaaaaaaa.',
+    'aaaaawwaaaaa',
+    'aaaaawwaaaaa',
+    '.aaaaaaaaaa.',
+    '....aaaa....',
+    '...a.aa.a...',
+    '..a..aa..a..',
+    '.....aa.....',
+  ],
+  compass: [
+    '...oooooo...',
+    '..obbbbbbo..',
+    '.obbbbbbaao.',
+    'obbbbbbaabbo',
+    'obbbbccabbbo',
+    'obbbcwwcbbbo',
+    'obbbcwwcbbbo',
+    'obbbaccbbbbo',
+    'obbaabbbbbbo',
+    '.oaabbbbbbo.',
+    '..obbbbbbo..',
+    '...oooooo...',
+  ],
+  heart: [
+    '............',
+    '..ooo..ooo..',
+    '.oaaaooaaao.',
+    'oabwaaaaaaao',
+    'oabaaaaaaaao',
+    'oaaaaaaaaaao',
+    '.oaaaaaaaao.',
+    '..oaaaaaao..',
+    '...oaaaao...',
+    '....oaao....',
+    '.....oo.....',
+    '............',
+  ],
 }
 
 const TIERS: Record<Tier, { a: string; b: string; c: string; bg: string }> = {
@@ -102,11 +258,16 @@ const TIERS: Record<Tier, { a: string; b: string; c: string; bg: string }> = {
 /** Icons that keep their own colours once earned (a flame should look like fire). */
 const OWN: Partial<Record<BadgeIcon, { a: string; b: string; c: string }>> = {
   flame: { a: '#ff7a1a', b: '#ffc531', c: '#d6481a' },
+  snow: { a: '#3a9ad9', b: '#bfe3f7', c: '#2b78ad' },
+  heart: { a: '#e0483e', b: '#ff9b93', c: '#a82a22' },
 }
 
 export function badgeBackground(tier: Tier): string {
   return TIERS[tier].bg
 }
+
+/** Every icon, for tests. */
+export const BADGE_ART = ART
 
 export function badgePixels(icon: BadgeIcon, tier: Tier): Pixel[] {
   const t = tier !== 'locked' && OWN[icon] ? OWN[icon]! : TIERS[tier]

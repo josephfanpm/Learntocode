@@ -1,6 +1,12 @@
-# ByteQuest: learning to code as a daily habit
+# ByteQuest: learning to code, and to build with AI, as a daily habit
 
-ByteQuest teaches people who have never coded, a few minutes a day. It takes the content of Harvard's CS50 and delivers it the way a habit app would: short lessons, a streak, a mascot, and reminders that respond to how each learner is doing. Two more courses go further: Developer skills covers the day-to-day craft CS50 leaves out, and Building with AI covers language models, agents and Claude Code from the ground up. It is a working prototype that runs entirely in the browser.
+ByteQuest teaches programming a few minutes a day, the way a habit app would: short lessons, real code that runs in the browser, a streak, a mascot, and reminders that respond to how each learner is doing. It has three courses, for three starting points:
+
+- **Computer science**, for people who have never coded: Harvard's CS50, rewritten in small steps.
+- **Developer skills**, for people who can program but haven't worked as developers: Git, testing, JavaScript, shipping, teamwork.
+- **Building with AI**, for working developers: language models, the Claude API, agents and Claude Code, from the ground up.
+
+It is a working prototype that runs entirely in the browser.
 
 **[Try the live demo](https://josephfanpm.github.io/Learntocode/)**
 
@@ -12,11 +18,11 @@ This is an independent portfolio project. It is not affiliated with or endorsed 
 
 | | |
 |---|---|
-| **Problem** | The best free way to learn computer science is a university course built from long lectures and multi-hour problem sets. People with jobs and no background start it and stop. |
-| **User** | An adult with no coding experience who wants to change careers, get more done at work, build something, or understand how technology works, and has minutes a day rather than hours. |
-| **Solution** | CS50's full arc, rewritten as 112 three-minute lessons with real code that runs in the browser, plus 60-lesson courses on Developer skills and Building with AI, wrapped in a habit loop: streaks, a daily goal, a placement quiz, and reminders timed to when the learner usually practices. |
-| **Result** | A working prototype: three courses, 38 units, 232 lessons and 2,244 exercises, 28 tests on the streak, unlock, reminder, hint, badge and save logic, and a checker that runs every code exercise's answer. No real-world result: nobody has been measured using it. |
-| **My role** | Product and build: the problem, the course structure, the habit and reminder rules, the trade-offs, and the prototype. |
+| **Problem** | The best free ways to learn programming are built for students: long lectures, multi-hour assignments, documentation written for people who already know the field. People with jobs start them and stop. |
+| **User** | Adults with minutes a day rather than hours, at one of three points: no coding experience; able to program but never employed as a developer; or a working developer who has not yet built with AI. |
+| **Solution** | Three courses of three-minute lessons with real code that runs in the browser: CS50's full arc (112 lessons), Developer skills (60) and Building with AI (60). Setup suggests a course and places the learner in it. A habit loop holds it together: streaks, a daily goal, hints, badges, and reminders timed to when the learner usually practices. |
+| **Result** | A working prototype: three courses, 38 units, 232 lessons and 2,244 exercises, 31 tests on the streak, unlock, reminder, hint, badge and save logic, and a checker that runs every code exercise's answer. No real-world result: nobody has been measured using it. |
+| **My role** | Product and build: the problem, the three-course structure and who each is for, the habit and reminder rules, the trade-offs, and the prototype. |
 
 ## Problem
 
@@ -31,13 +37,17 @@ CS50 is one of the most popular introductions to computer science, and it is fre
 
 Language-learning apps solved the same shape of problem with short sessions, immediate feedback and a streak. ByteQuest asks what CS50 looks like with that treatment.
 
+The same gap shows up later. Someone who finishes a computer science course still cannot work on a team: nothing taught them Git, testing or how code gets shipped. And a working developer who wants to build with AI finds documentation written for people already doing it. The second and third courses take those two audiences through the same small-step treatment.
+
 <!-- TODO(Joseph): add real evidence for the problem if you have it (online course completion rates, conversations with people who started and stopped a coding course). None is claimed here. -->
 
 ## Target users
 
-- **Career changers and upskillers** who want real programming ability, not a toy, and can give it a few minutes on most days.
-- **Curious non-technical people** who use software and AI at work and want to understand what is underneath.
-- **People who have coded before** are served by the placement quiz, which lets them skip what they already know.
+- **Beginners**: career changers and curious non-technical people who want real programming ability, not a toy, and can give it a few minutes on most days. They start with Computer science.
+- **People who can program but have not worked as developers**: students, self-taught coders and graduates of an intro course. They start with Developer skills.
+- **Working developers** who have not yet built with language models or coding agents. They start with Building with AI.
+
+In every course a placement quiz lets people skip what they already know.
 
 <!-- TODO(Joseph): no user research was done for this prototype. Add any conversations with learners here if you have them. -->
 
@@ -46,7 +56,7 @@ Language-learning apps solved the same shape of problem with short sessions, imm
 - **The whole of CS50, in small steps.** Fourteen units follow the course week by week, from binary to web apps, AI and cybersecurity, then a systems design unit that goes beyond CS50, and a final project. Each unit covers that week's lecture ideas and the ideas behind its labs and problem sets, rewritten as original lessons of 7 to 10 exercises.
 - **A second course for the job.** Developer skills is twelve chapters on what an entry-level developer needs beyond computer science: Git, testing, real JavaScript, frameworks and TypeScript, the developer's setup, shipping, APIs, working in existing code, databases in practice, teamwork, accessibility, and everyday tools. It has its own path, switched from the top of the Learn tab, and can be started at any time.
 - **A third course on AI.** Building with AI is twelve chapters: how language models work, prompting, the Claude API, context, reliable output, tools, agents, Claude Code, MCP, working with coding agents, and building responsibly. Product facts were checked against the official documentation; prices and limits are left out because they change.
-- **Real code, no setup.** Python, JavaScript and SQL run in the browser tab, and web pages are checked as they are built. A program that loops forever is stopped after six seconds, and error messages are rewritten as one plain sentence.
+- **Real code, no setup.** Python, JavaScript and SQL run in the browser tab, and web pages are checked as they are built. A program that loops forever is stopped after a few seconds, and error messages are rewritten as one plain sentence.
 - **Ten kinds of exercise.** Beyond multiple choice: put lines in order by dragging, match pairs, fill gaps, write code, tap the line with the bug, flip switches to make a binary number, act out an algorithm by tapping the box it would check next, and type what a program prints.
 - **Two-step hints on every question.** The first press recaps the idea being tested; the second gives a specific nudge, such as ruling out two wrong options or revealing which line goes first. Hints are free.
 - **Setup that ends in a lesson.** Pip, the mascot, asks one question per screen. The first lesson comes before any profile details; name and avatar are asked after it and can be skipped.
@@ -54,10 +64,10 @@ Language-learning apps solved the same shape of problem with short sessions, imm
 - **A habit loop.** A daily streak, streak freezes for missed days, a daily goal, lessons that unlock in order, and wrong answers that come back at the end of the lesson.
 - **Reminders that adapt.** In-app banners, browser notifications and email (simulated) come from one set of rules that read the learner's activity. See below.
 - **A character.** Pip is a pixel-art red panda who reacts to answers, and every learner gets a pixel-art avatar in the same style.
-- **Badges that level up.** Six pixel-art badges (sword, flame, shield, star, gem, trophy) climb from bronze to silver to gold, each with a progress bar toward the next tier.
+- **Badges that level up.** Seventeen pixel-art badges climb from bronze to silver to gold, each with a progress bar toward the next tier. They reward more than volume: hitting the daily goal, writing code, repeating lessons, coming back after a week away, and progress in each course.
 - **Progress that can be kept.** Progress lives in the browser; a backup file or a save code moves it to another device.
 
-### The course
+### The Computer science course
 
 | Unit | CS50 week | Topics | Labs and projects |
 |---|---|---|---|
@@ -145,7 +155,7 @@ This is a static site, so notifications only arrive while the tab is open and em
 
 ## My role
 
-I built ByteQuest with Claude Code as a pair programmer. I set the product direction: basing the course on CS50, the habit mechanics, placing learners with questions rather than asking about experience, asking for profile details only after the first lesson, giving every learner a starting avatar, timing reminders to when people actually practice, the pixel-art direction for the mascot, and what to cut. I reviewed the prototype screen by screen and directed the changes.
+I built ByteQuest with Claude Code as a pair programmer. I set the product direction: basing the first course on CS50, adding the Developer skills and Building with AI courses and deciding who each is for, the habit mechanics, placing learners with questions rather than asking about experience, asking for profile details only after the first lesson, giving every learner a starting avatar, timing reminders to when people actually practice, the pixel-art direction for the mascot, and what to cut. I reviewed the prototype screen by screen and directed the changes.
 
 <!-- TODO(Joseph): confirm this matches what you'd say in an interview, and add a line on your background if you want it here. -->
 

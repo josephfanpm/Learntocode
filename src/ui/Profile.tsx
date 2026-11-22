@@ -17,6 +17,7 @@ export function Profile({ go }: { go: Go }) {
   const today = dayKey(new Date())
   const best = longestStreak(s)
   const xpToday = s.activity[today]?.xp ?? 0
+  const all = badges(units, s, best)
 
   useEffect(() => {
     const id = location.hash.split('#')[2]
@@ -107,9 +108,12 @@ export function Profile({ go }: { go: Go }) {
       </section>
 
       <section aria-labelledby="badges">
-        <h2 id="badges" className="mb-3 text-xl font-bold">Badges</h2>
+        <div className="mb-3 flex items-baseline justify-between">
+          <h2 id="badges" className="text-xl font-bold">Badges</h2>
+          <p className="text-sm text-ink-2">{all.filter((b) => b.tier !== 'locked').length} of {all.length} earned</p>
+        </div>
         <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-          {badges(units, s, best).map((b) => {
+          {[...all.filter((b) => b.tier !== 'locked'), ...all.filter((b) => b.tier === 'locked')].map((b) => {
             const maxed = b.tier === 'gold' && b.value >= b.goal
             return (
               <li key={b.id} className={`flex flex-col items-center rounded-2xl border-2 p-3 text-center ${b.tier === 'locked' ? 'border-rule bg-white' : 'border-rule bg-white'}`}>

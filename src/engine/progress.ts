@@ -75,7 +75,7 @@ export type BadgeTier = 'locked' | 'bronze' | 'silver' | 'gold'
 
 export interface Badge {
   id: string
-  icon: 'flame' | 'sword' | 'shield' | 'trophy' | 'star' | 'gem'
+  icon: 'flame' | 'sword' | 'shield' | 'trophy' | 'star' | 'gem' | 'target' | 'moon' | 'sun' | 'bolt' | 'scroll' | 'wrench' | 'robot' | 'potion' | 'snow' | 'compass' | 'heart'
   name: string
   /** What earns the next tier, or what earned the top one. */
   goalText: string
@@ -101,14 +101,50 @@ export function badges(units: Unit[], s: LearnerState, bestStreak: number): Badg
   const records = Object.values(s.completed)
   const lessons = records.length
   const perfect = records.filter((r) => r.bestAccuracy === 1).length
-  const core = units.filter((u) => (u.course ?? 'cs') === 'cs')
-  const unitsDone = core.filter((u) => isUnitDone(u, s)).length
+  const inCourse = (c: 'cs' | 'dev' | 'ai') => units.filter((u) => (u.course ?? 'cs') === c)
+  const doneIn = (c: 'cs' | 'dev' | 'ai') => inCourse(c).filter((u) => isUnitDone(u, s)).length
+  const cs = inCourse('cs')
+
+  const days = Object.entries(s.activity)
+  const goalDays = days.filter(([, a]) => a.xp >= s.dailyGoal).length
+  const busiestDay = Math.max(0, ...days.map(([, a]) => a.lessons))
+  const frozenDays = days.filter(([, a]) => a.frozen).length
+  const hours = records.map((r) => new Date(r.lastAt).getHours())
+  const early = hours.filter((h) => h < 8).length
+  const late = hours.filter((h) => h >= 21).length
+  const repeats = records.reduce((n, r) => n + Math.max(0, r.times - 1), 0)
+
+  // Lessons finished that include at least one write-code exercise.
+  const writers = new Set(units.flatMap((u) => u.lessons).filter((l) => l.exercises.some((e) => e.kind === 'write')).map((l) => l.id))
+  const codeLessons = Object.keys(s.completed).filter((id) => writers.has(id)).length
+
+  // Comebacks: a practice day at least a week after the one before it.
+  const practiced = days.filter(([, a]) => a.xp > 0).map(([d]) => d).sort()
+  let comebacks = 0
+  for (let i = 1; i < practiced.length; i++) {
+    const gap = Math.round((new Date(practiced[i]).getTime() - new Date(practiced[i - 1]).getTime()) / 86_400_000)
+    if (gap >= 7) comebacks++
+  }
+
+  const started = (['cs', 'dev', 'ai'] as const).filter((c) => inCourse(c).some((u) => u.lessons.some((l) => s.completed[l.id]))).length
+
   return [
     tiered('quest', 'sword', 'First Quest', lessons, [1], () => 'Finish your first lesson'),
     tiered('streak', 'flame', 'On Fire', bestStreak, [3, 7, 30], (n) => `Reach a ${n}-day streak`),
     tiered('lessons', 'shield', 'Adventurer', lessons, [10, 30, 100], (n) => `Finish ${n} lessons`),
     tiered('perfect', 'star', 'Flawless', perfect, [1, 10, 30], (n) => `Finish ${n} ${n === 1 ? 'lesson' : 'lessons'} with no mistakes`),
     tiered('xp', 'gem', 'Treasure Hunter', s.xp, [100, 500, 1500], (n) => `Earn ${n.toLocaleString('en-US')} XP`),
-    tiered('units', 'trophy', 'Boss Slayer', unitsDone, [1, 5, core.length], (n) => `Complete ${n} ${n === 1 ? 'unit' : 'units'}`),
+    tiered('goal', 'target', 'Goal Getter', goalDays, [3, 10, 30], (n) => `Hit your daily goal on ${n} days`),
+    tiered('marathon', 'bolt', 'Marathon', busiestDay, [3, 5, 10], (n) => `Finish ${n} lessons in one day`),
+    tiered('code', 'scroll', 'Code Writer', codeLessons, [5, 25, 75], (n) => `Finish ${n} lessons where you write code`),
+    tiered('repeat', 'potion', 'Practice Makes Perfect', repeats, [3, 10, 30], (n) => `Repeat lessons ${n} times`),
+    tiered('early', 'sun', 'Early Bird', early, [1, 5, 20], (n) => `Finish ${n} ${n === 1 ? 'lesson' : 'lessons'} before 8am`),
+    tiered('late', 'moon', 'Night Owl', late, [1, 5, 20], (n) => `Finish ${n} ${n === 1 ? 'lesson' : 'lessons'} after 9pm`),
+    tiered('comeback', 'heart', 'Comeback', comebacks, [1, 3, 5], (n) => `Come back after a week away${n === 1 ? '' : `, ${n} times`}`),
+    tiered('freeze', 'snow', 'Ice Cold', frozenDays, [1, 3, 7], (n) => `Have a freeze save ${n} ${n === 1 ? 'day' : 'days'}`),
+    tiered('explorer', 'compass', 'Explorer', started, [1, 2, 3], (n) => (n === 1 ? 'Start a course' : `Start ${n} courses`)),
+    tiered('units', 'trophy', 'Boss Slayer', doneIn('cs'), [1, 5, cs.length], (n) => `Complete ${n} Computer science ${n === 1 ? 'unit' : 'units'}`),
+    tiered('dev', 'wrench', 'Craftsperson', doneIn('dev'), [1, 6, 12], (n) => `Complete ${n} Developer skills ${n === 1 ? 'chapter' : 'chapters'}`),
+    tiered('ai', 'robot', 'AI Builder', doneIn('ai'), [1, 6, 12], (n) => `Complete ${n} Building with AI ${n === 1 ? 'chapter' : 'chapters'}`),
   ]
 }

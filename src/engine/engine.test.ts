@@ -145,6 +145,40 @@ describe('badges', () => {
   })
 })
 
+describe('more badges', () => {
+  const byId = (st: LearnerState) => Object.fromEntries(badges(units, st, 0).map((b) => [b.id, b]))
+
+  it('counts goal days, the busiest day, repeats and late lessons', () => {
+    let s: LearnerState = { ...newLearner(at('2026-11-01')), dailyGoal: 20 }
+    for (const id of ['u0-l1', 'u0-l2', 'u0-l3']) [s] = completeLesson(s, id, 1, at('2026-11-01', 22))
+    ;[s] = completeLesson(s, 'u0-l1', 1, at('2026-11-02', 7))
+    const b = byId(s)
+    expect(b.marathon).toMatchObject({ tier: 'bronze', value: 3 })
+    expect(b.goal.value).toBe(1) // 45 XP on the first day, 5 on the second
+    expect(b.repeat.value).toBe(1)
+    expect(b.late.value).toBe(2) // two lessons last finished after 9pm
+    expect(b.early.value).toBe(1) // one re-done before 8am
+    expect(b.explorer).toMatchObject({ tier: 'bronze', value: 1 })
+  })
+
+  it('counts a comeback after a week away, and freeze days', () => {
+    const s = practicedOn(['2026-11-01', '2026-11-09', '2026-11-10'])
+    expect(byId(s).comeback).toMatchObject({ tier: 'bronze', value: 1 })
+    const frozen = reconcile(practicedOn(['2026-11-01', '2026-11-02'], { freezes: 1 }), '2026-11-04')
+    expect(byId(frozen).freeze).toMatchObject({ tier: 'bronze', value: 1 })
+  })
+
+  it('every badge icon is a 12 by 12 grid', async () => {
+    const { BADGE_ART } = await import('../ui/pixel/icons')
+    for (const [name, rows] of Object.entries(BADGE_ART)) {
+      expect(rows.length, name).toBe(12)
+      for (const r of rows) expect(r.length, name).toBe(12)
+    }
+    const ids = badges(units, newLearner(at('2026-11-01')), 0).map((b) => b.icon)
+    for (const icon of ids) expect(Object.keys(BADGE_ART)).toContain(icon)
+  })
+})
+
 describe('save codes', () => {
   it('a save code restores the same progress', () => {
     const s = { ...practicedOn(['2026-11-01', '2026-11-02']), name: 'Zoë' }
