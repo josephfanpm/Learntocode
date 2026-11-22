@@ -104,7 +104,18 @@ export function Placement({ course, onDone, onSwitch }: { course: CourseId; onDo
             ? `You’ll start at ${word === 'unit' ? 'Unit' : 'Chapter'} ${start.week}: ${start.title}. Skipped ${word}s stay open if you want to review.`
             : `You’ll start with ${start.title}.${course === 'cs' ? ' It moves fast once the basics click.' : ''}`}
         </p>
-        <button className="btn mt-8 w-full" onClick={() => onDone(placed)}>Continue</button>
+        {course === 'cs' && placed === questions.length && onSwitch ? (
+          <>
+            <p className="mt-4 rounded-2xl bg-flame-soft p-3 text-sm">You got every question right. One of the other courses may suit you better.</p>
+            <div className="mt-5 grid w-full gap-3">
+              <button className="btn w-full" onClick={() => onSwitch('ai')}>Try Building with AI</button>
+              <button className="btn btn-ghost w-full" onClick={() => onSwitch('dev')}>Try Developer skills</button>
+              <button className="btn btn-ghost w-full" onClick={() => onDone(placed)}>Stay in Computer science</button>
+            </div>
+          </>
+        ) : (
+          <button className="btn mt-8 w-full" onClick={() => onDone(placed)}>Continue</button>
+        )}
       </div>
     )
   }

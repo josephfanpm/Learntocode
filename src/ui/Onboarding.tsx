@@ -33,7 +33,17 @@ export const GOALS = [
 export const HOURS = [8, 12, 17, 19, 21]
 export const hourLabel = (h: number) => `${h % 12 || 12}${h < 12 ? 'am' : 'pm'}`
 
-const STEPS = 8
+type Level = 'new' | 'some' | 'can' | 'pro'
+
+/** How much coding the learner says they have done, and the course it points to. */
+const LEVELS: { id: Level; label: string; note: string; course: CourseId }[] = [
+  { id: 'new', label: 'None yet', note: 'I’m starting from zero', course: 'cs' },
+  { id: 'some', label: 'Some', note: 'A course, a tutorial or hobby projects', course: 'cs' },
+  { id: 'can', label: 'I can program', note: 'But I haven’t worked as a developer', course: 'dev' },
+  { id: 'pro', label: 'I write code for work', note: 'I’m a working developer', course: 'ai' },
+]
+
+const STEPS = 9
 
 export function Onboarding({ go }: { go: Go }) {
   const { update } = useStore()
@@ -43,6 +53,9 @@ export function Onboarding({ go }: { go: Go }) {
   const [goal, setGoal] = useState(20)
   const [push, setPush] = useState(false)
   const [course, setCourse] = useState<CourseId>('cs')
+  const [level, setLevel] = useState<Level | null>(null)
+  // The answer only sets the suggested course; the placement quiz decides where in it to start.
+  const suggested = LEVELS.find((l) => l.id === level)?.course ?? 'cs'
   const next = () => setStep((s) => s + 1)
 
   // Tap sound on every option tile in setup, including the placement quiz.
@@ -178,12 +191,31 @@ export function Onboarding({ go }: { go: Go }) {
       )}
 
       {step === 7 && (
-        <Talk key={7} mood="think" say="What do you want to learn first?" onNext={next}>
+        <Talk key={7} mood="think" say="How much coding have you done?" onNext={next} canNext={!!level}>
+          {LEVELS.map((l) => (
+            <button
+              key={l.id}
+              aria-pressed={level === l.id}
+              onClick={() => {
+                setLevel(l.id)
+                setCourse(l.course)
+              }}
+              className="tile w-full px-4 py-3 text-left"
+            >
+              <span className="block font-semibold">{l.label}</span>
+              <span className="text-sm text-ink-2">{l.note}</span>
+            </button>
+          ))}
+        </Talk>
+      )}
+
+      {step === 8 && (
+        <Talk key={8} mood="think" say={level === 'pro' ? 'You already code, so I’d start with AI. Your call.' : level === 'can' ? 'You can program, so I’d start with the job skills. Your call.' : 'What do you want to learn first?'} onNext={next}>
           {COURSES.map((c) => (
             <button key={c.id} aria-pressed={course === c.id} onClick={() => setCourse(c.id)} className="tile w-full px-4 py-3 text-left">
               <span className="flex flex-wrap items-center gap-2 font-semibold">
                 {c.title}
-                {c.id === 'cs' && <span className="rounded-md bg-cobalt-soft px-1.5 py-0.5 text-xs font-semibold text-cobalt-deep">Start here if you’re new to coding</span>}
+                {c.id === suggested && <span className="rounded-md bg-cobalt-soft px-1.5 py-0.5 text-xs font-semibold text-cobalt-deep">{level === 'pro' || level === 'can' ? 'Suggested for you' : 'Start here if you’re new to coding'}</span>}
               </span>
               <span className="text-sm text-ink-2">{c.blurb}</span>
             </button>
@@ -192,7 +224,7 @@ export function Onboarding({ go }: { go: Go }) {
         </Talk>
       )}
 
-      {step === 8 && (
+      {step === 9 && (
         <Placement
           key={course}
           course={course}
