@@ -1,9 +1,9 @@
-import { Award, Flame, Gem, Pencil, Snowflake } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { Award, Copy, Download, Flame, Gem, Pencil, Snowflake, Upload } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
 import { units } from '../content'
 import { addDays, dayKey, parseDay } from '../engine/dates'
 import { badges } from '../engine/progress'
-import { buyFreeze, FREEZE_PRICE, longestStreak, MAX_FREEZES, practicedToday, reset, streak } from '../engine/state'
+import { buyFreeze, exportSave, FREEZE_PRICE, importSave, longestStreak, MAX_FREEZES, practicedToday, reset, streak } from '../engine/state'
 import { play, setSoundEnabled } from '../sound'
 import { useStore } from '../store'
 import { Avatar } from './Avatar'
@@ -114,6 +114,8 @@ export function Profile({ go }: { go: Go }) {
         </ul>
       </section>
 
+      <SaveProgress />
+
       <section id="settings" aria-labelledby="set" className="space-y-5">
         <h2 id="set" className="text-xl font-bold">Settings</h2>
         <label className="block">
@@ -174,7 +176,6 @@ export function Profile({ go }: { go: Go }) {
         </div>
         {notice && <p className="text-sm text-bad">{notice}</p>}
         <div className="flex flex-wrap gap-3 pt-2">
-          <button className="btn btn-ghost text-sm" onClick={() => go('/lab')}>Open messaging lab</button>
           {!confirmReset ? (
             <button className="btn btn-ghost text-sm" onClick={() => setConfirmReset(true)}>Reset progress</button>
           ) : (
@@ -183,5 +184,79 @@ export function Profile({ go }: { go: Go }) {
         </div>
       </section>
     </div>
+  )
+}
+
+/** Back up progress to a file or a save code, and restore it on any device. */
+function SaveProgress() {
+  const { s, update } = useStore()
+  const [code, setCode] = useState('')
+  const [note, setNote] = useState<{ ok: boolean; text: string } | null>(null)
+  const file = useRef<HTMLInputElement>(null)
+  const lessons = Object.keys(s.completed).length
+
+  const download = () => {
+    const blob = new Blob([JSON.stringify(s, null, 2)], { type: 'application/json' })
+    const a = document.createElement('a')
+    a.href = URL.createObjectURL(blob)
+    a.download = `bytequest-save-${new Date().toISOString().slice(0, 10)}.json`
+    a.click()
+    URL.revokeObjectURL(a.href)
+    setNote({ ok: true, text: 'Backup file downloaded.' })
+  }
+
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(exportSave(s))
+      setNote({ ok: true, text: 'Save code copied. Paste it into ByteQuest on another device.' })
+    } catch {
+      setCode(exportSave(s))
+      setNote({ ok: true, text: 'Copy the code from the box below.' })
+    }
+  }
+
+  const restore = (text: string) => {
+    const next = importSave(text)
+    if (!next) return setNote({ ok: false, text: 'That isn’t a ByteQuest save. Check you copied the whole code.' })
+    const n = Object.keys(next.completed).length
+    if (lessons > n && !confirm(`This save has ${n} finished lessons; this device has ${lessons}. Replace this device’s progress?`)) return
+    update(() => next)
+    setCode('')
+    setNote({ ok: true, text: `Restored: ${n} ${n === 1 ? "lesson" : "lessons"}, ${next.xp} XP.` })
+  }
+
+  return (
+    <section id="save" aria-labelledby="save-h">
+      <h2 id="save-h" className="mb-1 text-xl font-bold">Save your progress</h2>
+      <p className="mb-3 text-sm text-ink-2">Progress is kept in this browser. Back it up, or move it to another device.</p>
+      <div className="grid gap-2 sm:grid-cols-3">
+        <button className="btn btn-ghost !py-2.5 text-sm" onClick={download}><Download size={16} /> Backup file</button>
+        <button className="btn btn-ghost !py-2.5 text-sm" onClick={copy}><Copy size={16} /> Copy save code</button>
+        <button className="btn btn-ghost !py-2.5 text-sm" onClick={() => file.current?.click()}><Upload size={16} /> Restore from file</button>
+      </div>
+      <input
+        ref={file}
+        type="file"
+        accept="application/json,.json,.txt"
+        className="hidden"
+        onChange={async (e) => {
+          const f = e.target.files?.[0]
+          if (f) restore(await f.text())
+          e.target.value = ''
+        }}
+      />
+      <div className="mt-3 flex gap-2">
+        <input
+          value={code}
+          onChange={(e) => setCode(e.target.value)}
+          placeholder="Paste a save code"
+          aria-label="Save code"
+          spellCheck={false}
+          className="min-w-0 flex-1 rounded-xl border-2 border-rule bg-white px-3 py-2.5 font-mono text-sm outline-none focus:border-cobalt"
+        />
+        <button className="btn !py-2.5 text-sm" disabled={!code.trim()} onClick={() => restore(code)}>Restore</button>
+      </div>
+      {note && <p className={`mt-2 text-sm ${note.ok ? 'text-good' : 'text-bad'}`} role="status">{note.text}</p>}
+    </section>
   )
 }

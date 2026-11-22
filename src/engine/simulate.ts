@@ -1,5 +1,5 @@
 // Plays a learner persona through N days and records what the messaging
-// engine would send each day. Powers the timeline in the Messaging lab.
+// engine would send each day. Used by the tests to check whole message sequences.
 
 import type { Unit } from '../content/types'
 import { dayKey } from './dates'

@@ -4,7 +4,7 @@ import { addDays } from './dates'
 import { decide, facts } from './messaging'
 import { path } from './progress'
 import { PERSONAS, simulate } from './simulate'
-import { completeLesson, longestStreak, newLearner, reconcile, streak, type LearnerState } from './state'
+import { completeLesson, exportSave, importSave, longestStreak, newLearner, reconcile, streak, type LearnerState } from './state'
 
 const units: Unit[] = [
   {
@@ -86,6 +86,21 @@ describe('lessons and unlocks', () => {
     for (const id of ['u0-l1', 'u0-l2', 'u0-l3']) [s] = completeLesson(s, id, 1, at('2026-11-01'))
     const p = path(units, s)
     expect(p.map((x) => x.status)).toEqual(['done', 'done', 'done', 'current', 'locked'])
+  })
+})
+
+describe('save codes', () => {
+  it('a save code restores the same progress', () => {
+    const s = { ...practicedOn(['2026-11-01', '2026-11-02']), name: 'Zoë' }
+    const back = importSave(exportSave(s))
+    expect(back).toEqual(s)
+    expect(streak(back!, '2026-11-02')).toBe(2)
+  })
+
+  it('rejects text that is not a save', () => {
+    expect(importSave('hello')).toBeNull()
+    expect(importSave('BQ1.not-base64!')).toBeNull()
+    expect(importSave('{"version":2}')).toBeNull()
   })
 })
 

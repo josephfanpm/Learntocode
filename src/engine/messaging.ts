@@ -1,6 +1,6 @@
 // Engagement messaging. Every rule is a pure function of a snapshot of the
 // learner ("facts"), so the same engine drives in-app banners, browser
-// notifications and the simulator in the Messaging lab.
+// notifications.
 //
 // Policy:
 // - Each rule has a dedupe key; a key is only ever sent once.
@@ -139,7 +139,7 @@ export interface Message {
   title: string
   body: string
   cta?: { label: string; action: Action; lessonId?: string }
-  /** Plain-language reason, shown in the Messaging lab. */
+  /** Plain-language reason, kept for debugging and tests. */
   why: string
 }
 
@@ -147,7 +147,7 @@ interface Rule {
   id: string
   channel: Channel
   priority: number
-  /** What the rule is for, shown in the lab. */
+  /** What the rule is for. */
   about: string
   when: (f: Facts) => boolean
   /** Sent even if another push already went out today (the late streak saver). */

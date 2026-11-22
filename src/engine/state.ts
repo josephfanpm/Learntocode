@@ -271,6 +271,32 @@ export function save(s: LearnerState) {
   }
 }
 
+/** A save code: the whole learner state as text that can be pasted on another device. */
+export function exportSave(s: LearnerState): string {
+  const bytes = new TextEncoder().encode(JSON.stringify(s))
+  let bin = ''
+  for (const b of bytes) bin += String.fromCharCode(b)
+  return 'BQ1.' + btoa(bin)
+}
+
+/** Read a save code or backup file. Returns null if it isn't a valid save. */
+export function importSave(text: string): LearnerState | null {
+  try {
+    const t = text.trim()
+    let json = t
+    if (t.startsWith('BQ1.')) {
+      const bin = atob(t.slice(4))
+      json = new TextDecoder().decode(Uint8Array.from(bin, (c) => c.charCodeAt(0)))
+    }
+    const s = JSON.parse(json) as LearnerState
+    const ok =
+      s && s.version === 1 && typeof s.xp === 'number' && typeof s.completed === 'object' && s.completed !== null && typeof s.activity === 'object' && s.activity !== null
+    return ok ? s : null
+  } catch {
+    return null
+  }
+}
+
 export function reset() {
   try {
     localStorage.removeItem(KEY)

@@ -4,7 +4,6 @@ import { findLesson } from './engine/progress'
 import { StoreProvider, useStore } from './store'
 import { Home, LINE_COLORS, TopBar, type Go } from './ui/Home'
 import { AvatarBuilder } from './ui/Avatar'
-import { Lab } from './ui/Lab'
 import { LessonPlayer } from './ui/LessonPlayer'
 import { Onboarding } from './ui/Onboarding'
 import { Profile } from './ui/Profile'
@@ -28,13 +27,6 @@ function Screens() {
   const { s } = useStore()
   const [route, go] = useRoute()
 
-  if (route === '/lab')
-    return (
-      <>
-        <TopBar go={go} />
-        <Lab />
-      </>
-    )
   if (!s.onboarded && !route.startsWith('/lesson/')) return <Onboarding go={go} />
 
   const m = route.match(/^\/lesson\/([^?]+)(?:\?at=(\d+))?$/)
