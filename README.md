@@ -2,7 +2,7 @@
 
 Learn to code from zero, a few minutes a day. Bite-sized lessons, daily streaks, unlocks, and reminders that respond to how each learner is actually doing.
 
-**Live:** https://josephfanpm.github.io/learntocode/
+**Live:** https://josephfanpm.github.io/Learntocode/
 
 The course follows the topics of Harvard's [CS50x](https://cs50.harvard.edu/x/), week by week, rewritten for people who have never coded. Code is written and run in the browser: no installs, no accounts.
 
