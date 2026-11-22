@@ -53,11 +53,13 @@ Sounds are synthesised in the browser ([src/sound.ts](src/sound.ts)), so there a
 
 | Moment | Sound | Why |
 |---|---|---|
-| Tap an answer | Tiny filtered tick, no pitch | Confirms the touch without being musical or distracting |
-| Right answer | A crisp snap, then two quick notes rising a fifth, with a sparkle on top. Under half a second. Climbs a semitone for each answer in a row (up to 5) | Rising, consonant and short reads as "yes"; the climb makes a run feel like it's building |
-| Wrong answer | Two soft, low notes stepping down | Clearly different from right, but gentle: no buzzer, in line with supportive feedback copy |
-| Lesson done | Major arpeggio up to the octave, like a station arrival chime | The biggest moment gets the fullest sound |
-| Streak extended | A higher, sparkling rise after the lesson chime | Marks the habit win separately from the lesson |
+| Tap an answer | A tiny soft blip | Confirms the touch without being musical or distracting |
+| Right answer | Two quick square-wave notes rising a fifth, the second ringing briefly. Climbs a semitone for each answer in a row (up to 5) | Rising and short reads as "yes"; the climb makes a run feel like it's building |
+| Wrong answer | A soft downward "bwomp" on a triangle wave | Clearly different from right, but round rather than harsh: no buzzer |
+| Lesson done | A short level-clear jingle: quick run up, a pause, a held finish over a bass note | The biggest moment gets the fullest sound |
+| Streak extended | A fast climbing power-up staircase | Marks the habit win separately from the lesson |
+
+The sounds are chip-style (square and triangle waves with fast pitch steps and slides, as on old consoles) to match the pixel art. They're original to ByteQuest and made in code, so there are no audio files.
 
 Sound can be turned off from the speaker button in any lesson or in Settings.
 
