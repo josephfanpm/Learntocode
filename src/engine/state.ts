@@ -49,7 +49,9 @@ export interface LearnerState {
    */
   reminderMode?: 'smart' | 'fixed'
   pushEnabled: boolean
-  /** Units skipped by the placement test (0 = start at the beginning). */
+  /** Chapters skipped by each course's placement quiz (0 or missing = start at the beginning). */
+  placed?: { cs?: number; dev?: number; ai?: number }
+  /** Older saves stored the Computer science placement here. */
   placedUnit?: number
   /** Prototype setting: every lesson is open. Off by default. */
   unlockAll?: boolean

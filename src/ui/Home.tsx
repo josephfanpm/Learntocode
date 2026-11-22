@@ -144,6 +144,11 @@ export function Home({ go }: { go: Go }) {
       <p className="mt-3 text-sm text-ink-2">
         {COURSES.find((c) => c.id === course)!.blurb}.{COURSES.find((c) => c.id === course)!.note ? ` ${COURSES.find((c) => c.id === course)!.note}` : ''}
       </p>
+      {!p.some((x) => x.status === 'done') && s.placed?.[course] === undefined && !(course === 'cs' && s.placedUnit !== undefined) && (
+        <button className="mt-2 text-sm font-semibold text-cobalt" onClick={() => go(`/place/${course}`)}>
+          Know some of this already? Find my level
+        </button>
+      )}
       {banners.length > 0 && (
         <div className="mt-4 space-y-3">
           {banners.map((m) => (

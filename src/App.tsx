@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
-import { units } from './content'
+import { courseUnits, units, type CourseId } from './content'
 import { findLesson } from './engine/progress'
 import { StoreProvider, useStore } from './store'
 import { BottomNav, Home, LINE_COLORS, TopBar, type Go } from './ui/Home'
 import { AvatarBuilder } from './ui/Avatar'
 import { LessonPlayer } from './ui/LessonPlayer'
 import { Onboarding } from './ui/Onboarding'
+import { Placement } from './ui/Placement'
 import { Profile, Settings } from './ui/Profile'
 
 function useRoute(): [string, Go] {
@@ -24,10 +25,27 @@ function useRoute(): [string, Go] {
 }
 
 function Screens() {
-  const { s } = useStore()
+  const { s, update } = useStore()
   const [route, go] = useRoute()
 
   if (!s.onboarded && !route.startsWith('/lesson/')) return <Onboarding go={go} />
+
+  const place = route.match(/^\/place\/(cs|dev|ai)$/)
+  if (place) {
+    const course = place[1] as CourseId
+    const start = (placed: number, c: CourseId) => {
+      const cu = courseUnits(c)
+      update((p) => ({ ...p, course: c, placed: { ...p.placed, [c]: placed } }))
+      // Skipping chapters lands on the first lesson not yet finished; otherwise back to the path.
+      if (placed > 0) go(`/lesson/${cu[Math.min(placed, cu.length - 1)].lessons[0].id}`)
+      else go('/')
+    }
+    return (
+      <div className="mx-auto flex min-h-dvh max-w-md flex-col px-5 py-6">
+        <Placement key={course} course={course} onDone={(n) => start(n, course)} onSwitch={(to) => start(0, to)} />
+      </div>
+    )
+  }
 
   const m = route.match(/^\/lesson\/([^?]+)(?:\?at=(\d+))?$/)
   if (m) {

@@ -167,6 +167,27 @@ describe('placement and unlock all', () => {
     expect(Object.keys(s.completed)).toHaveLength(0)
   })
 
+  it('each course has its own starting point', () => {
+    const dev: Unit[] = [1, 2, 3].map((n) => ({ id: `d${n}`, week: n, course: 'dev' as const, title: `D${n}`, summary: '', lessons: [{ id: `d${n}-a`, title: 'a', exercises: [] }] }))
+    const s = { ...newLearner(at('2026-11-01')), placed: { cs: 1, dev: 2 } }
+    expect(path(dev, s).map((x) => x.status)).toEqual(['skipped', 'skipped', 'current'])
+    expect(path(units, s).map((x) => x.status)).toEqual(['skipped', 'skipped', 'skipped', 'current', 'locked'])
+    // A course with no placement starts at its first lesson, whatever the others say.
+    expect(path(dev, { ...s, placed: { cs: 1 } }).map((x) => x.status)).toEqual(['current', 'locked', 'locked'])
+  })
+
+  it('every placement question points at the right chapter of its course', async () => {
+    const { courseUnits } = await import('../content')
+    const { PLACEMENTS } = await import('../content/placement')
+    for (const c of ['cs', 'dev', 'ai'] as const) {
+      const cu = courseUnits(c)
+      PLACEMENTS[c].forEach((q, i) => {
+        expect(q.unit).toBe(cu[i].id)
+        expect(q.answer).toBeLessThan(q.options.length)
+      })
+    }
+  })
+
   it('unlock all opens every locked lesson without marking anything done', () => {
     const s = { ...newLearner(at('2026-11-01')), unlockAll: true }
     expect(path(units, s).map((x) => x.status)).toEqual(['current', 'open', 'open', 'open', 'open'])

@@ -1,8 +1,6 @@
 import { ArrowLeft, Bell, Code2, Flame, Globe } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { courseUnits } from '../content'
-
-const units = courseUnits('cs')
+import { COURSES, courseUnits, type CourseId } from '../content'
 import type { Motivation } from '../engine/state'
 import { play } from '../sound'
 import { useStore } from '../store'
@@ -35,7 +33,7 @@ export const GOALS = [
 export const HOURS = [8, 12, 17, 19, 21]
 export const hourLabel = (h: number) => `${h % 12 || 12}${h < 12 ? 'am' : 'pm'}`
 
-const STEPS = 7
+const STEPS = 8
 
 export function Onboarding({ go }: { go: Go }) {
   const { update } = useStore()
@@ -44,6 +42,7 @@ export function Onboarding({ go }: { go: Go }) {
   const [why, setWhy] = useState<Motivation | null>(null)
   const [goal, setGoal] = useState(20)
   const [push, setPush] = useState(false)
+  const [course, setCourse] = useState<CourseId>('cs')
   const next = () => setStep((s) => s + 1)
 
   // Tap sound on every option tile in setup, including the placement quiz.
@@ -57,6 +56,7 @@ export function Onboarding({ go }: { go: Go }) {
   }, [])
 
   const finish = (placed: number) => {
+    const units = courseUnits(course)
     update((s) => ({
       ...s,
       onboarded: true,
@@ -64,12 +64,13 @@ export function Onboarding({ go }: { go: Go }) {
       dailyGoal: goal,
       reminderMode: 'smart',
       pushEnabled: push,
-      placedUnit: placed,
+      course,
+      placed: { ...s.placed, [course]: placed },
       source: source ?? undefined,
       // Everyone starts with a random pixel avatar; they can change it after lesson one.
       avatar: s.avatar ?? randomAvatar(),
     }))
-    go(`/lesson/${units[placed].lessons[0].id}`)
+    go(`/lesson/${units[Math.min(placed, units.length - 1)].lessons[0].id}`)
   }
 
   const askPush = async () => {
@@ -176,7 +177,29 @@ export function Onboarding({ go }: { go: Go }) {
         </Talk>
       )}
 
-      {step === 7 && <Placement onDone={finish} />}
+      {step === 7 && (
+        <Talk key={7} mood="think" say="What do you want to learn first?" onNext={next}>
+          {COURSES.map((c) => (
+            <button key={c.id} aria-pressed={course === c.id} onClick={() => setCourse(c.id)} className="tile w-full px-4 py-3 text-left">
+              <span className="flex flex-wrap items-center gap-2 font-semibold">
+                {c.title}
+                {c.id === 'cs' && <span className="rounded-md bg-cobalt-soft px-1.5 py-0.5 text-xs font-semibold text-cobalt-deep">Start here if you’re new to coding</span>}
+              </span>
+              <span className="text-sm text-ink-2">{c.blurb}</span>
+            </button>
+          ))}
+          <p className="text-sm text-ink-3">You can switch courses any time.</p>
+        </Talk>
+      )}
+
+      {step === 8 && (
+        <Placement
+          key={course}
+          course={course}
+          onDone={finish}
+          onSwitch={(to) => setCourse(to)}
+        />
+      )}
     </div>
   )
 }
