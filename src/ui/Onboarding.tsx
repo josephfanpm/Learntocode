@@ -7,6 +7,7 @@ import { useStore } from '../store'
 import { randomAvatar } from './Avatar'
 import type { Go } from './Home'
 import { Pip, type Mood } from './Pip'
+import { Scene, Sparkles } from './scene'
 import { Placement } from './Placement'
 
 // Setup, in the order that gets people to a first lesson fastest:
@@ -93,12 +94,22 @@ export function Onboarding({ go }: { go: Go }) {
 
   if (step === 0)
     return (
-      <div className="mx-auto flex min-h-dvh max-w-md flex-col items-center justify-center px-5 py-8 text-center">
-        <Pip mood="wave" size={150} className="mb-6" />
-        <h1 className="text-5xl leading-[1.02] font-extrabold">Learn to code from zero.</h1>
-        <p className="mt-4 text-lg text-ink-2">Free, fun, and a few minutes a day.</p>
-        <button className="btn mt-10 w-full" onClick={next}>Get started</button>
-      </div>
+      <Scene kind="mountain" className="h-dvh w-full">
+        <Sparkles />
+        <div className="relative mx-auto flex h-full max-w-md flex-col items-center px-5 pt-[16vh] pb-10 text-center">
+          <p className="pixel rise-in text-[0.6rem] tracking-[0.3em] text-[#ffe9b0]">START YOUR</p>
+          <h1 className="pixel rise-in mt-3 text-[1.9rem] text-white sm:text-[2.4rem]" style={{ ['--i' as string]: 1, textShadow: '0 4px 0 #060817, 4px 0 0 #060817, -4px 0 0 #060817, 0 -4px 0 #060817, 0 8px 0 #c2410c' }}>
+            <span className="px-float inline-block">
+              <span className="text-gold">Byte</span>Quest
+            </span>
+          </h1>
+          <p className="rise-in mt-5 text-lg font-medium text-white" style={{ ['--i' as string]: 3, textShadow: '0 2px 0 #060817' }}>Learn to code, a few minutes a day.</p>
+          <button className="btn px-glow rise-in mt-6 w-full max-w-xs" style={{ ['--i' as string]: 5 }} onClick={next}>Get started</button>
+          <div className="rise-in mt-auto self-start" style={{ ['--i' as string]: 4 }}>
+            <Pip mood="wave" size={110} />
+          </div>
+        </div>
+      </Scene>
     )
 
   const whyReply = WHYS.find((w) => w.id === why)?.reply
@@ -148,7 +159,7 @@ export function Onboarding({ go }: { go: Go }) {
             { icon: Globe, title: 'Understand how tech works', note: 'Apps, websites, databases and AI, following Harvard’s CS50' },
             { icon: Flame, title: 'Build a habit that sticks', note: 'Short lessons, a daily streak, and reminders when you want them' },
           ].map(({ icon: Icon, title, note }, i) => (
-            <div key={title} className="rise-in flex items-start gap-3 rounded-2xl border-2 border-rule bg-white p-4" style={{ ['--i' as string]: i + 1 }}>
+            <div key={title} className="rise-in flex items-start gap-3 rounded-2xl border-2 border-rule bg-card p-4" style={{ ['--i' as string]: i + 1 }}>
               <Icon className="mt-0.5 shrink-0 text-cobalt" size={24} />
               <div>
                 <p className="font-semibold">{title}</p>
@@ -183,7 +194,7 @@ export function Onboarding({ go }: { go: Go }) {
           onSkip={canPush ? next : undefined}
           skipLabel="Not now"
         >
-          <div className="flex items-center gap-3 rounded-2xl border-2 border-rule bg-white p-4">
+          <div className="flex items-center gap-3 rounded-2xl border-2 border-rule bg-card p-4">
             <Bell className="shrink-0 text-flame" size={24} />
             <p className="text-sm text-ink-2">One reminder a day, around the time you usually practice, and only if you haven’t yet.</p>
           </div>

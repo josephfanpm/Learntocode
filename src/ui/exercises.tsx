@@ -230,7 +230,7 @@ function Output({ result, ex }: { result: RunResult; ex: WriteExercise }) {
       {result.error && <div className="rounded-xl bg-bad-soft p-3 whitespace-pre-wrap">{result.error}</div>}
       {!result.pass && test?.stdin && test.stdin.length > 0 && (
         <p className="text-ink-2">
-          Typed in: {test.stdin.map((s, i) => <code key={i} className="mx-1 rounded bg-white px-1.5 font-mono">{s}</code>)}
+          Typed in: {test.stdin.map((s, i) => <code key={i} className="mx-1 rounded bg-card px-1.5 font-mono">{s}</code>)}
         </p>
       )}
       {!result.pass && (
@@ -302,7 +302,7 @@ export function Write({ ex, locked, reveal, register }: ExProps<WriteExercise>) 
       {tables.length > 0 && (
         <div className="flex flex-wrap gap-2 text-sm">
           {tables.map((t) => (
-            <div key={t.name} className="rounded-xl border-2 border-rule bg-white px-3 py-2">
+            <div key={t.name} className="rounded-xl border-2 border-rule bg-card px-3 py-2">
               <span className="font-mono font-semibold">{t.name}</span>
               <span className="font-mono text-ink-2"> ({t.cols.join(', ')})</span>
             </div>
@@ -324,7 +324,7 @@ export function Write({ ex, locked, reveal, register }: ExProps<WriteExercise>) 
         <div className="space-y-2 text-sm">
           {scratch.error && <div className="rounded-xl bg-bad-soft p-3 whitespace-pre-wrap">{scratch.error}</div>}
           {scratch.table && !scratch.error && (
-            <div className="overflow-x-auto rounded-xl border-2 border-rule bg-white">
+            <div className="overflow-x-auto rounded-xl border-2 border-rule bg-card">
               <table className="w-full font-mono text-[0.82rem]">
                 <thead>
                   <tr>{scratch.table.columns.map((c) => <th key={c} className="border-b-2 border-rule px-3 py-1.5 text-left">{c}</th>)}</tr>
@@ -342,7 +342,7 @@ export function Write({ ex, locked, reveal, register }: ExProps<WriteExercise>) 
         </div>
       )}
       {ex.language === 'html' && (
-        <iframe title="Preview" sandbox="" srcDoc={code} className="h-48 w-full rounded-xl border-2 border-rule bg-white" />
+        <iframe title="Preview" sandbox="" srcDoc={code} className="h-48 w-full rounded-xl border-2 border-rule bg-card" />
       )}
       {result && <Output result={result} ex={ex} />}
       {reveal && (

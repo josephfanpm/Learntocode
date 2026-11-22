@@ -59,14 +59,14 @@ function avatarPixels(a: AvatarSpec): Pixel[] {
 }
 
 /** Grey silhouette shown until the learner makes an avatar. */
-const PLACEHOLDER: Pixel[] = critter({ animal: 'redpanda', fur: 'grey', face: 'happy', body: true, effects: false }).map(([x, y]) => [x, y, '#c3cad8'])
+const PLACEHOLDER: Pixel[] = critter({ animal: 'redpanda', fur: 'grey', face: 'happy', body: true, effects: false }).map(([x, y]) => [x, y, '#3a4580'])
 
 export function Avatar({ avatar, size = 40, className = '', label }: { avatar?: AvatarSpec; size?: number; className?: string; label?: string }) {
   const pixels = useMemo(() => (avatar ? avatarPixels(avatar) : PLACEHOLDER), [avatar])
   return (
     <span
       className={`relative inline-flex shrink-0 items-end justify-center overflow-hidden rounded-[28%] ${className}`}
-      style={{ width: size, height: size, background: avatar?.bg ?? '#e4e9f2' }}
+      style={{ width: size, height: size, background: avatar?.bg ?? '#1c2552' }}
     >
       <PixelSprite pixels={pixels} view={VIEW} width={size * 0.98} label={label ?? (avatar ? 'Your avatar' : 'No avatar yet')} />
     </span>

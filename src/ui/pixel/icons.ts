@@ -249,10 +249,10 @@ const ART: Record<BadgeIcon, string[]> = {
 }
 
 const TIERS: Record<Tier, { a: string; b: string; c: string; bg: string }> = {
-  locked: { a: '#c3cad8', b: '#dde2ec', c: '#a4adc0', bg: '#eef1f6' },
-  bronze: { a: '#d0803a', b: '#f3b57c', c: '#94511c', bg: '#fbe9d8' },
-  silver: { a: '#a3aec2', b: '#e6ebf3', c: '#6b768c', bg: '#e9edf5' },
-  gold: { a: '#ffc531', b: '#fff0a8', c: '#c98a12', bg: '#fff3cc' },
+  locked: { a: '#3a4580', b: '#4a5699', c: '#2b3570', bg: '#101638' },
+  bronze: { a: '#d0803a', b: '#f3b57c', c: '#94511c', bg: '#3a2313' },
+  silver: { a: '#a3aec2', b: '#e6ebf3', c: '#6b768c', bg: '#252d5c' },
+  gold: { a: '#ffc531', b: '#fff0a8', c: '#c98a12', bg: '#3d3210' },
 }
 
 /** Icons that keep their own colours once earned (a flame should look like fire). */
@@ -271,7 +271,7 @@ export const BADGE_ART = ART
 
 export function badgePixels(icon: BadgeIcon, tier: Tier): Pixel[] {
   const t = tier !== 'locked' && OWN[icon] ? OWN[icon]! : TIERS[tier]
-  const colors: Record<string, string> = { o: tier === 'locked' ? '#8691ad' : '#241a2e', a: t.a, b: t.b, c: t.c, w: '#ffffff' }
+  const colors: Record<string, string> = { o: tier === 'locked' ? '#1a2150' : '#060817', a: t.a, b: t.b, c: t.c, w: '#ffffff' }
   const px: Pixel[] = []
   ART[icon].forEach((row, y) =>
     [...row].forEach((ch, x) => {

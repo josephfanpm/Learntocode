@@ -244,7 +244,7 @@ export function LessonPlayer({ lesson, unit, color, startAt = 0, onExit, onAvata
 
       {confirmQuit && (
         <div className="fixed inset-0 z-10 grid place-items-end bg-ink/40 sm:place-items-center" onClick={() => setConfirmQuit(false)}>
-          <div className="anim-rise w-full max-w-md rounded-t-3xl bg-white p-6 sm:rounded-3xl" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="quit-title">
+          <div className="anim-rise w-full max-w-md rounded-t-3xl bg-card p-6 sm:rounded-3xl" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="quit-title">
             <Pip mood="oops" size={72} className="mb-3" />
             <h2 id="quit-title" className="text-2xl font-bold">Leave this lesson?</h2>
             <p className="mt-2 text-ink-2">You’ll lose progress in this lesson. Finished lessons are saved.</p>

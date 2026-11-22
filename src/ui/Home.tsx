@@ -7,11 +7,12 @@ import { path, unitProgress } from '../engine/progress'
 import { practicedToday, streak } from '../engine/state'
 import { useDeviceReduces } from '../motion'
 import { useStore } from '../store'
+import { Scene, worldLook } from './scene'
 import { Avatar } from './Avatar'
 import { Pip, type Mood } from './Pip'
 
 /** One transit-line colour per unit. */
-export const LINE_COLORS = ['#2d5be3', '#ff7a1a', '#0f9fae', '#7a4ff0', '#c2378b', '#12935a', '#d6a200', '#e0483e', '#3a7bd5', '#8a5a2b', '#16213e']
+export const LINE_COLORS = ['#5b8cff', '#ff8a2a', '#25c4d4', '#a98bff', '#f062b0', '#3ddc84', '#ffc531', '#ff6b72', '#69b0ff', '#e0a36a', '#9bd1c0']
 
 export type Go = (route: string) => void
 
@@ -23,19 +24,19 @@ export function TopBar({ go }: { go: Go }) {
   return (
     <header className="sticky top-0 z-10 border-b-2 border-rule bg-paper/95 backdrop-blur">
       <div className="mx-auto flex max-w-xl items-center gap-2 px-4 py-2.5">
-        <button onClick={() => go('/')} className="mr-auto font-display text-xl font-extrabold tracking-tight">
-          ByteQuest
+        <button onClick={() => go('/')} className="pixel mr-auto text-[0.8rem] text-white">
+          <span className="text-gold">Byte</span>Quest
         </button>
-        <button onClick={() => go('/me')} className="flex items-center gap-1.5 rounded-xl px-2 py-1.5 font-semibold hover:bg-white" aria-label={`${st}-day streak${lit ? '' : ', not yet extended today'}`}>
+        <button onClick={() => go('/me')} className="flex items-center gap-1.5 rounded-xl px-2 py-1.5 font-semibold hover:bg-cobalt-soft" aria-label={`${st}-day streak${lit ? '' : ', not yet extended today'}`}>
           <Flame size={22} className={lit ? 'text-flame' : 'text-ink-3'} fill={lit ? 'currentColor' : 'none'} />
           {st}
         </button>
         {s.freezes > 0 && (
-          <span className="flex items-center gap-1 px-1 font-semibold text-[#3a9ad9]" aria-label={`${s.freezes} streak freezes`}>
+          <span className="flex items-center gap-1 px-1 font-semibold text-[#7cc4f5]" aria-label={`${s.freezes} streak freezes`}>
             <Snowflake size={18} /> {s.freezes}
           </span>
         )}
-        <button onClick={() => go('/me')} className="flex items-center gap-1.5 rounded-xl px-2 py-1.5 font-semibold hover:bg-white" aria-label={`${s.gems} gems`}>
+        <button onClick={() => go('/me')} className="flex items-center gap-1.5 rounded-xl px-2 py-1.5 font-semibold hover:bg-cobalt-soft" aria-label={`${s.gems} gems`}>
           <Gem size={19} className="text-gem" /> {s.gems}
         </button>
         <button onClick={() => go('/me')} className="ml-1 rounded-[28%]" aria-label="Your profile">
@@ -89,7 +90,7 @@ export function Banner({ m, go, onDismiss }: { m: Message; go: Go; onDismiss: ()
     else if (m.cta.action === 'avatar') go('/avatar')
     else go('/settings')
   }
-  const tone = m.rule === 'streak_milestone' || m.rule === 'unit_done' ? 'bg-flame-soft border-flame/30' : 'bg-white border-rule'
+  const tone = m.rule === 'streak_milestone' || m.rule === 'unit_done' ? 'bg-flame-soft border-flame/30' : 'bg-card border-rule'
   return (
     <div className={`relative flex gap-3 rounded-2xl border-2 p-4 pr-11 ${tone}`}>
       <Pip mood={BANNER_MOOD[m.rule] ?? 'happy'} size={52} className="shrink-0" />
@@ -127,7 +128,7 @@ export function Home({ go }: { go: Go }) {
   return (
     <div className="mx-auto max-w-xl px-4 pb-28">
       {deviceSaysReduce && s.motion === undefined && (
-        <div className="mt-4 flex items-center gap-3 rounded-2xl border-2 border-rule bg-white p-3 text-sm">
+        <div className="mt-4 flex items-center gap-3 rounded-2xl border-2 border-rule bg-card p-3 text-sm">
           <p className="flex-1 text-ink-2">Animations are off because your device is set to reduce motion.</p>
           <button className="btn !min-h-0 shrink-0 !px-3 !py-2 text-sm" onClick={() => update((p) => ({ ...p, motion: 'on' }))}>Turn on</button>
           <button className="shrink-0 font-semibold text-ink-3" onClick={() => update((p) => ({ ...p, motion: 'off' }))}>Keep off</button>
@@ -172,19 +173,19 @@ export function Home({ go }: { go: Go }) {
         const unitLocked = stations.every((x) => x.status === 'locked')
         const unitSkipped = stations.every((x) => x.status === 'skipped' || x.status === 'done') && stations.some((x) => x.status === 'skipped')
         return (
-          <section key={unit.id} className="mt-8" aria-labelledby={`h-${unit.id}`}>
-            <div className="flex items-stretch gap-3 rounded-2xl p-4 text-white" style={{ background: unitLocked ? '#8691ad' : color }}>
-              <div className="grid w-12 shrink-0 place-items-center rounded-xl bg-white/20 font-display text-2xl font-extrabold">
-                {unit.week}
-              </div>
-              <div className="min-w-0">
-                <h2 id={`h-${unit.id}`} className="text-xl leading-tight font-bold">{unit.title}</h2>
-                <p className="text-sm text-white/85">{unit.summary}</p>
-                <p className="mt-1 text-xs text-white/75">
+          <section key={unit.id} className="mt-8" style={{ contentVisibility: 'auto', containIntrinsicSize: '600px' }} aria-labelledby={`h-${unit.id}`}>
+            <Scene {...worldLook(allUnits.indexOf(unit))} dim={unitLocked} className="aspect-[16/7] w-full rounded-2xl border-[3px] border-outline">
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#060817] via-[#060817]/80 to-transparent px-4 pt-10 pb-3">
+                <p className="pixel text-[0.55rem] tracking-[0.2em]" style={{ color: unitLocked ? 'var(--color-ink-3)' : 'var(--color-gold)' }}>
+                  {(unit.course ?? 'cs') === 'cs' ? 'WORLD' : 'CHAPTER'} {unit.week}
+                </p>
+                <h2 id={`h-${unit.id}`} className="mt-1.5 text-xl leading-tight font-bold text-white">{unit.title}</h2>
+                <p className="text-sm text-white/80">{unit.summary}</p>
+                <p className="mt-1 text-xs text-white/65">
                   {unitSkipped ? 'Skipped by your placement test · open to review' : `${(unit.course ?? 'cs') !== 'cs' ? `Chapter ${unit.week} of ${units.length}` : unit.week <= 10 ? `Week ${unit.week} of CS50` : unit.week === 11 ? "CS50’s cybersecurity lecture" : unit.week === 12 ? "Beyond CS50" : "CS50’s final project"} · ${prog.done}/${prog.total} lessons`}
                 </p>
               </div>
-            </div>
+            </Scene>
             <ol className="relative py-6">
               {/* The line itself */}
               <div aria-hidden className="absolute top-0 bottom-0 left-1/2 w-2 -translate-x-1/2 rounded-full" style={{ background: unitLocked ? 'var(--color-rule)' : color, opacity: unitLocked ? 1 : 0.25 }} />
@@ -201,8 +202,8 @@ export function Home({ go }: { go: Go }) {
                         onClick={() => go(`/lesson/${st.lesson.id}`)}
                         aria-label={`${st.lesson.title}${st.status === 'done' ? ', done, practice again' : st.status === 'locked' ? ', locked' : st.status === 'skipped' ? ', skipped, open to review' : st.status === 'open' ? ', open' : ', start'}`}
                         className={`grid place-items-center rounded-full border-4 transition-transform active:translate-y-1 ${
-                          isCur ? 'anim-pulse size-20 bg-white' : 'size-16'
-                        } ${st.status === 'done' ? 'text-white' : ''} ${st.status === 'locked' ? 'border-rule bg-paper text-ink-3' : ''} ${st.status === 'skipped' ? 'border-dashed bg-white' : ''} ${st.status === 'open' ? 'bg-white' : ''}`}
+                          isCur ? 'anim-pulse size-20 bg-card' : 'size-16'
+                        } ${st.status === 'done' ? 'text-white' : ''} ${st.status === 'locked' ? 'border-rule bg-card text-ink-3' : ''} ${st.status === 'skipped' ? 'border-dashed bg-card' : ''} ${st.status === 'open' ? 'bg-card' : ''}`}
                         style={
                           st.status === 'done'
                             ? { background: color, borderColor: color, boxShadow: `0 5px 0 color-mix(in srgb, ${color} 70%, black)` }

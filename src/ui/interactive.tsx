@@ -77,16 +77,16 @@ export function Bits({ ex, locked, reveal, register }: ExProps<BitsExercise>) {
                 aria-label={`The ${place}s bit`}
                 disabled={locked}
                 onClick={() => flip(i)}
-                className={`relative h-16 w-9 rounded-xl border-2 border-b-4 transition-colors sm:w-11 ${b ? 'border-cobalt-deep bg-cobalt' : 'border-rule bg-white'}`}
+                className={`relative h-16 w-9 rounded-xl border-2 border-b-4 transition-colors sm:w-11 ${b ? 'border-cobalt-deep bg-cobalt' : 'border-rule bg-card'}`}
               >
-                <span className={`absolute left-1/2 size-6 -translate-x-1/2 rounded-lg transition-[top] duration-150 ${b ? 'top-1 bg-white' : 'top-7 bg-rule'}`} />
+                <span className={`absolute left-1/2 size-6 -translate-x-1/2 rounded-lg transition-[top] duration-150 ${b ? 'top-1 bg-[#fff]' : 'top-7 bg-rule'}`} />
               </button>
               <span className={`font-mono text-xl font-bold ${b ? 'text-ink' : 'text-ink-3'}`}>{b ? 1 : 0}</span>
             </div>
           )
         })}
       </div>
-      <div className="flex items-center justify-center gap-3 rounded-2xl border-2 border-rule bg-white p-3" aria-live="polite">
+      <div className="flex items-center justify-center gap-3 rounded-2xl border-2 border-rule bg-card p-3" aria-live="polite">
         <span className="text-sm text-ink-2">Your number</span>
         <span className={`font-display text-3xl font-bold tabular-nums ${locked ? (value === ex.target ? 'text-good' : 'text-bad') : ''}`}>{value}</span>
       </div>
@@ -182,7 +182,7 @@ export function TypeAnswer({ ex, locked, reveal, register }: ExProps<TypeExercis
         spellCheck={false}
         aria-label="Your answer"
         placeholder="Type your answer"
-        className={`w-full rounded-xl border-2 border-b-4 bg-white px-4 py-3.5 font-mono text-lg outline-none focus:border-cobalt ${
+        className={`w-full rounded-xl border-2 border-b-4 bg-card px-4 py-3.5 font-mono text-lg outline-none focus:border-cobalt ${
           locked ? (right ? '!border-good !bg-good-soft' : '!border-bad !bg-bad-soft') : 'border-rule'
         }`}
       />

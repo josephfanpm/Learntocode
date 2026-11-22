@@ -32,7 +32,7 @@ export function Profile({ go }: { go: Go }) {
   const days = Array.from({ length: 35 }, (_, i) => addDays(start, i))
 
   const stat = (label: string, value: React.ReactNode, icon: React.ReactNode) => (
-    <div className="rounded-2xl border-2 border-rule bg-white p-4">
+    <div className="rounded-2xl border-2 border-rule bg-card p-4">
       <div className="flex items-center gap-2 font-display text-2xl font-bold">{icon}{value}</div>
       <p className="text-sm text-ink-3">{label}</p>
     </div>
@@ -54,7 +54,7 @@ export function Profile({ go }: { go: Go }) {
             <button className="mt-1 text-sm font-semibold text-cobalt" onClick={() => go('/avatar')}>Make your avatar</button>
           )}
         </div>
-        <button onClick={() => go('/settings')} aria-label="Settings" className="self-start rounded-xl p-2 text-ink-2 hover:bg-white hover:text-ink">
+        <button onClick={() => go('/settings')} aria-label="Settings" className="self-start rounded-xl p-2 text-ink-2 hover:bg-cobalt-soft hover:text-ink">
           <SettingsIcon size={26} />
         </button>
       </div>
@@ -66,7 +66,7 @@ export function Profile({ go }: { go: Go }) {
         {stat('Lessons done', Object.keys(s.completed).length, <Award className="text-good" size={24} />)}
       </section>
 
-      <section aria-label="Daily goal" className="rounded-2xl border-2 border-rule bg-white p-4">
+      <section aria-label="Daily goal" className="rounded-2xl border-2 border-rule bg-card p-4">
         <div className="flex justify-between text-sm">
           <span className="font-medium">Today’s goal</span>
           <span className="text-ink-2 tabular-nums">{Math.min(xpToday, s.dailyGoal)} / {s.dailyGoal} XP</span>
@@ -78,12 +78,12 @@ export function Profile({ go }: { go: Go }) {
 
       <section aria-labelledby="cal">
         <h2 id="cal" className="mb-3 text-xl font-bold">Last five weeks</h2>
-        <div className="grid grid-cols-7 gap-1.5 rounded-2xl border-2 border-rule bg-white p-3">
+        <div className="grid grid-cols-7 gap-1.5 rounded-2xl border-2 border-rule bg-card p-3">
           {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d, i) => <span key={i} className="text-center text-xs text-ink-3">{d}</span>)}
           {days.map((d) => {
             const a = s.activity[d]
             const future = d > today
-            const cls = future ? 'bg-transparent' : a?.xp ? (a.xp >= s.dailyGoal ? 'bg-flame text-white' : 'bg-flame/40') : a?.frozen ? 'bg-[#cfe6f7] text-[#3a9ad9]' : 'bg-paper'
+            const cls = future ? 'bg-transparent' : a?.xp ? (a.xp >= s.dailyGoal ? 'bg-flame text-white' : 'bg-flame/40') : a?.frozen ? 'bg-[#16385a] text-[#7cc4f5]' : 'bg-paper'
             return (
               <span key={d} title={`${d}: ${a?.xp ?? 0} XP${a?.frozen ? ' (freeze)' : ''}`} className={`grid aspect-square place-items-center rounded-lg text-xs ${cls} ${d === today ? 'ring-2 ring-ink' : ''}`}>
                 {a?.frozen ? <Snowflake size={12} /> : future ? '' : parseDay(d).getDate()}
@@ -96,8 +96,8 @@ export function Profile({ go }: { go: Go }) {
 
       <section id="shop" aria-labelledby="shop-h">
         <h2 id="shop-h" className="mb-3 text-xl font-bold">Shop</h2>
-        <div className="flex items-center gap-4 rounded-2xl border-2 border-rule bg-white p-4">
-          <Snowflake size={36} className="shrink-0 text-[#3a9ad9]" />
+        <div className="flex items-center gap-4 rounded-2xl border-2 border-rule bg-card p-4">
+          <Snowflake size={36} className="shrink-0 text-[#7cc4f5]" />
           <div className="flex-1">
             <p className="font-semibold">Streak freeze</p>
             <p className="text-sm text-ink-2">Covers one missed day. You can hold {MAX_FREEZES}. You have {s.freezes}.</p>
@@ -117,12 +117,12 @@ export function Profile({ go }: { go: Go }) {
           {[...all.filter((b) => b.tier !== 'locked'), ...all.filter((b) => b.tier === 'locked')].map((b) => {
             const maxed = b.tier === 'gold' && b.value >= b.goal
             return (
-              <li key={b.id} className={`flex flex-col items-center rounded-2xl border-2 p-3 text-center ${b.tier === 'locked' ? 'border-rule bg-white' : 'border-rule bg-white'}`}>
+              <li key={b.id} className={`flex flex-col items-center rounded-2xl border-2 p-3 text-center ${b.tier === 'locked' ? 'border-rule bg-card' : 'border-rule bg-card'}`}>
                 <span className="grid size-20 place-items-center rounded-2xl" style={{ background: badgeBackground(b.tier) }}>
                   <PixelSprite pixels={badgePixels(b.icon, b.tier)} view={[-1, -1, 14, 14]} width={64} label={`${b.name} badge, ${b.tier === 'locked' ? 'locked' : b.tier}`} />
                 </span>
                 <p className={`mt-2 font-display leading-tight font-bold ${b.tier === 'locked' ? 'text-ink-3' : ''}`}>{b.name}</p>
-                <p className="mt-0.5 text-xs font-semibold capitalize" style={{ color: b.tier === 'gold' ? '#b07a0c' : b.tier === 'silver' ? '#6b768c' : b.tier === 'bronze' ? '#94511c' : 'var(--color-ink-3)' }}>
+                <p className="mt-0.5 text-xs font-semibold capitalize" style={{ color: b.tier === 'gold' ? '#ffc531' : b.tier === 'silver' ? '#c5cde0' : b.tier === 'bronze' ? '#e39a5c' : 'var(--color-ink-3)' }}>
                   {b.tier === 'locked' ? 'Locked' : b.tier}
                 </p>
                 <p className="mt-1 min-h-8 text-xs leading-tight text-ink-2">{maxed ? 'Top tier reached' : b.goalText}</p>
@@ -204,7 +204,7 @@ function SaveProgress() {
           placeholder="Paste a save code"
           aria-label="Save code"
           spellCheck={false}
-          className="min-w-0 flex-1 rounded-xl border-2 border-rule bg-white px-3 py-2.5 font-mono text-sm outline-none focus:border-cobalt"
+          className="min-w-0 flex-1 rounded-xl border-2 border-rule bg-card px-3 py-2.5 font-mono text-sm outline-none focus:border-cobalt"
         />
         <button className="btn !py-2.5 text-sm" disabled={!code.trim()} onClick={() => restore(code)}>Restore</button>
       </div>
@@ -216,14 +216,14 @@ function SaveProgress() {
 function Toggle({ on, label, onClick }: { on: boolean; label: string; onClick: () => void }) {
   return (
     <button role="switch" aria-checked={on} aria-label={label} onClick={onClick} className={`relative h-8 w-14 shrink-0 rounded-full transition-colors ${on ? 'bg-good' : 'bg-rule'}`}>
-      <span className={`absolute top-1 size-6 rounded-full bg-white transition-[left] ${on ? 'left-7' : 'left-1'}`} />
+      <span className={`absolute top-1 size-6 rounded-full bg-[#fff] transition-[left] ${on ? 'left-7' : 'left-1'}`} />
     </button>
   )
 }
 
 function Row({ title, note, children, dashed = false }: { title: string; note: string; children: React.ReactNode; dashed?: boolean }) {
   return (
-    <div className={`flex items-center justify-between gap-4 rounded-2xl border-2 bg-white p-4 ${dashed ? 'border-dashed border-rule' : 'border-rule'}`}>
+    <div className={`flex items-center justify-between gap-4 rounded-2xl border-2 bg-card p-4 ${dashed ? 'border-dashed border-rule' : 'border-rule'}`}>
       <div>
         <p className="font-medium">{title}</p>
         <p className="text-sm text-ink-2">{note}</p>
@@ -252,7 +252,7 @@ export function Settings({ go }: { go: Go }) {
   return (
     <div className="mx-auto max-w-xl space-y-6 px-4 py-6 pb-28">
       <div className="flex items-center gap-2">
-        <button onClick={() => go('/me')} aria-label="Back to profile" className="-ml-2 rounded-xl p-2 text-ink-2 hover:bg-white hover:text-ink">
+        <button onClick={() => go('/me')} aria-label="Back to profile" className="-ml-2 rounded-xl p-2 text-ink-2 hover:bg-cobalt-soft hover:text-ink">
           <ArrowLeft size={24} />
         </button>
         <h1 className="text-3xl font-bold">Settings</h1>
@@ -260,7 +260,7 @@ export function Settings({ go }: { go: Go }) {
 
       <label className="block">
         <span className="text-sm font-medium">Name</span>
-        <input value={s.name} maxLength={30} onChange={(e) => update((p) => ({ ...p, name: e.target.value }))} className="mt-1 w-full rounded-xl border-2 border-rule bg-white px-3 py-2.5 outline-none focus:border-cobalt" />
+        <input value={s.name} maxLength={30} onChange={(e) => update((p) => ({ ...p, name: e.target.value }))} className="mt-1 w-full rounded-xl border-2 border-rule bg-card px-3 py-2.5 outline-none focus:border-cobalt" />
       </label>
 
       <div>

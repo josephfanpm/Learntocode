@@ -174,7 +174,7 @@ export function Match({ ex, locked, reveal, register }: ExProps<MatchExercise>) 
                 tabIndex={picked !== null && !filled && !locked ? 0 : undefined}
                 aria-label={filled ? undefined : `Slot for ${ex.pairs[l][0]}${picked !== null ? '. Press to place the chosen answer.' : ', empty'}`}
                 className={`min-h-12 rounded-xl transition-colors ${
-                  filled ? '' : `border-2 border-dashed ${over === l ? 'border-cobalt bg-cobalt-soft' : hot ? 'border-cobalt/60 bg-white' : 'border-rule'}`
+                  filled ? '' : `border-2 border-dashed ${over === l ? 'border-cobalt bg-cobalt-soft' : hot ? 'border-cobalt/60 bg-card' : 'border-rule'}`
                 } ${state === 'good' ? '[&_.tile]:!border-good [&_.tile]:!bg-good-soft' : state === 'bad' ? '[&_.tile]:!border-bad [&_.tile]:!bg-bad-soft' : ''} ${
                   filled && over === l ? 'rounded-xl ring-2 ring-cobalt' : ''
                 }`}

@@ -72,18 +72,18 @@ function Done({ result, lesson, onNext }: { result: { r: LessonResult; accuracy:
       <div className="flex flex-1 flex-col items-center justify-center text-center">
         <Pip mood="celebrate" size={130} className="mb-4" />
         <p className="text-ink-3">{lesson.title}</p>
-        <h1 className="rise-in mt-1 text-5xl font-extrabold">Lesson done</h1>
+        <h1 className="pixel rise-in mt-3 text-[1.5rem] text-gold" style={{ textShadow: '0 4px 0 #060817' }}>LESSON DONE</h1>
         <div className="mt-8 grid w-full grid-cols-2 gap-3">
-          <div className="rise-in rounded-2xl border-2 border-rule bg-white p-4" style={stagger(1)}>
+          <div className="rise-in rounded-2xl border-2 border-rule bg-card p-4" style={stagger(1)}>
             <p className="text-sm text-ink-3">XP earned</p>
             <p className="font-display text-4xl font-bold text-cobalt tabular-nums">+{xp}</p>
           </div>
-          <div className="rise-in rounded-2xl border-2 border-rule bg-white p-4" style={stagger(2)}>
+          <div className="rise-in rounded-2xl border-2 border-rule bg-card p-4" style={stagger(2)}>
             <p className="text-sm text-ink-3">First-try accuracy</p>
             <p className="font-display text-4xl font-bold text-good tabular-nums">{acc}%</p>
           </div>
         </div>
-        <div className="rise-in mt-3 w-full rounded-2xl border-2 border-rule bg-white p-4 text-left" style={stagger(3)}>
+        <div className="rise-in mt-3 w-full rounded-2xl border-2 border-rule bg-card p-4 text-left" style={stagger(3)}>
           <div className="flex justify-between text-sm">
             <span className="font-medium">Daily goal</span>
             <span className="text-ink-2">{Math.min(today, s.dailyGoal)} / {s.dailyGoal} XP</span>
@@ -113,9 +113,9 @@ function StreakScreen({ r, onNext }: { r: LessonResult; onNext: () => void }) {
     <div className="mx-auto flex min-h-dvh max-w-md flex-col px-5 py-10">
       <div className="flex flex-1 flex-col items-center justify-center text-center">
         <Flame className="ignite text-flame" size={120} fill="currentColor" strokeWidth={1.5} />
-        <p className="mt-2 font-display text-7xl leading-none font-extrabold text-flame tabular-nums">{n}</p>
-        <h1 className="mt-1 text-2xl font-bold">day streak</h1>
-        <ol className="rise-in mt-8 flex w-full justify-between rounded-2xl border-2 border-rule bg-white p-4" style={stagger(2)} aria-label="This week">
+        <p className="pixel mt-4 text-6xl leading-none text-flame tabular-nums" style={{ textShadow: '0 5px 0 #060817' }}>{n}</p>
+        <h1 className="pixel mt-4 text-sm text-white">DAY STREAK</h1>
+        <ol className="rise-in mt-8 flex w-full justify-between rounded-2xl border-2 border-rule bg-card p-4" style={stagger(2)} aria-label="This week">
           {week.map((d) => {
             const done = (s.activity[d]?.xp ?? 0) > 0
             const isToday = d === today
@@ -166,7 +166,7 @@ function ProfilePrompt({ onAvatar, onLater }: { onAvatar: () => void; onLater: (
             maxLength={30}
             placeholder="First name"
             aria-label="First name"
-            className="min-w-0 flex-1 rounded-xl border-2 border-rule bg-white px-4 py-3.5 text-lg outline-none focus:border-cobalt"
+            className="min-w-0 flex-1 rounded-xl border-2 border-rule bg-card px-4 py-3.5 text-lg outline-none focus:border-cobalt"
           />
         </div>
         <div className="mt-8 grid gap-3">
