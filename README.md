@@ -1,18 +1,155 @@
-# ByteQuest: learning to code, and to build with AI, as a daily habit
+# ByteQuest: learn to code a few minutes a day
 
-ByteQuest teaches programming a few minutes a day, the way a habit app would: short lessons, real code that runs in the browser, a streak, a mascot, and reminders that respond to how each learner is doing. It has three courses, for three starting points:
+ByteQuest teaches programming in short lessons, the way a language app teaches a language. Each lesson takes three to five minutes, the code you write runs right in your browser, and a streak and daily goal help you come back tomorrow. There is nothing to install and no account to make.
 
-- **Computer science**, for people who have never coded: Harvard's CS50, rewritten in small steps.
-- **Developer skills**, for people who can program but haven't worked as developers: Git, testing, JavaScript, shipping, teamwork.
-- **Building with AI**, for working developers: language models, the Claude API, agents and Claude Code, from the ground up.
-
-It is a working prototype that runs entirely in the browser.
-
-**[Try the live demo](https://josephfanpm.github.io/Learntocode/)**
+**[Start learning](https://josephfanpm.github.io/Learntocode/)**
 
 ![Four screens: the welcome screen, the Learn tab with a chapter banner of Mount Fuji, a worked example with its output in a SQL lab, and the badges on the profile](docs/screenshot.png)
 
+## Getting started
+
+1. Open **[the app](https://josephfanpm.github.io/Learntocode/)** in any modern browser, on a phone or a computer.
+2. Answer a few questions from Pip, the red panda. One of them is how much coding you have done; ByteQuest suggests a course from your answer.
+3. Choose **Start from scratch**, or **Find my level** for a short placement quiz. Each right answer skips a chapter you already know; the first miss starts you there. Skipped chapters stay open if you want to review.
+4. Do your first lesson. A name and avatar are asked for after it, and you can skip both.
+
+After that, the **Learn** tab shows your path and the **Profile** tab shows your streak, badges and settings. You can switch courses at the top of the Learn tab at any time.
+
+## Courses
+
+| Course | For | Size |
+|---|---|---|
+| **Computer science** | People who have never coded. Harvard's CS50, rewritten in small steps. | 14 units, 112 lessons |
+| **Developer skills** | People who can program but haven't worked as developers: Git, testing, JavaScript, shipping, teamwork. | 12 chapters, 60 lessons |
+| **Building with AI** | Working developers: language models, the Claude API, agents and Claude Code, from the ground up. | 12 chapters, 60 lessons |
+
+### Computer science
+
+| Unit | CS50 week | Topics | Labs and projects |
+|---|---|---|---|
+| 0 | 0 (Scratch) | Binary; text, colour, images and sound as numbers; algorithms | Design a program |
+| 1 | 1 (C) | Print, variables, input, decisions, loops, functions; compiling, types and their limits, the command line | Pyramids and coins; checksum |
+| 2 | 2 (Arrays) | Lists and text, debugging, arguments | Word scores and reading level; ciphers |
+| 3 | 3 (Algorithms) | Searching, sorting, big O, recursion, records, merge sort | Run an election; which sort is this? |
+| 4 | 4 (Memory) | Hexadecimal, names and values, copying, files, pointers, memory care, images | Sound volume and lost photos |
+| 5 | 5 (Data structures) | Stacks, queues, linked lists, hash tables, trees, tries | Family tree; spell checker |
+| 6 | 6 (Python) | Dictionaries, formatting, errors, comprehensions, CSV, classes, libraries | DNA detective |
+| 7 | 7 (SQL) | Queries, grouping, joins, subqueries, table design | Music library; a mystery solved with queries |
+| 8 | 8 (HTML, CSS, JavaScript) | How the internet works, pages, forms, styling, layout, interactivity | Homepage; quiz page |
+| 9 | 9 (Flask) | Routes, forms, templates, sessions, APIs, accounts and passwords | Birthday book; play-money stock trader |
+| 10 | AI | Learning from examples, game search, training and testing, how chatbots write, prompts | |
+| 11 | Cybersecurity | Passwords, hashing, encryption, staying safe | |
+| 12 | Beyond CS50 | Systems design: scaling, load balancing, caching, databases at scale, failure | Design a photo-sharing app |
+| 13 | Final project | Scope an idea, then build, save, test and share a habit tracker | The project itself |
+
+### Developer skills
+
+| Chapter | Topics | How it is taught |
+|---|---|---|
+| 1 Git and version control | Commits, history, branches, merge conflicts, remotes, pull requests, undoing safely | Acting out what the history looks like after each command; typing commands |
+| 2 Testing | Assert, arrange-act-assert, edge cases, errors, test-first, fakes, CI | Writing real tests in Python that must catch a planted bug |
+| 3 Real JavaScript | Values, functions, arrays, objects and JSON, scope, errors, async as an idea | Writing JavaScript that runs in the browser |
+| 4 Frameworks and TypeScript | Components, props, state, events; type annotations and what the compiler catches | Reading components; writing render and update functions; spotting the line the compiler rejects |
+| 5 Your developer setup | Editor, terminal, PATH, packages, virtual environments, the debugger | Typing commands, stepping through a debugger; ends with a checklist to do on your own machine |
+| 6 Shipping your code | Hosting, environments, secrets, pipelines, containers, logs, rollbacks | Ordering pipeline stages, reading logs; ends with a checklist for putting a page online |
+| 7 Building a real API | Methods, status codes, validation, tokens, pagination | Building an in-memory tasks API step by step |
+| 8 Working in existing code | Reading unfamiliar code, naming, refactoring, comments, code review | Refactoring messy code while its tests keep passing |
+| 9 Databases in practice | Parameterised queries, transactions, migrations, ORMs, indexes, non-SQL stores | Real SQLite from Python, with rollbacks and ordered migrations |
+| 10 Working on a team | Tickets, estimates, asking good questions, pull requests, incidents | Choosing the better message; spotting the vague sentence |
+| 11 Accessible, responsive pages | Semantic HTML, alt text, labels, keyboard, contrast, media queries, flexbox | Writing HTML that is checked for the right structure |
+| 12 Everyday tools | Regular expressions, dates and time zones, type hints, file formats | Writing patterns and date code in Python |
+
+Three things in this course cannot be learned by tapping through lessons: installing tools, using Git on a real project, and deploying. Those chapters teach the ideas and commands, then hand over to a checklist to do for real.
+
+### Building with AI
+
+| Chapter | Topics | How it is taught |
+|---|---|---|
+| 1 How language models work | Tokens, next-token prediction, sampling, the context window, hallucination | Acting out next-word choices; spotting the claim to verify |
+| 2 Prompting well | Clear instructions, context, examples, roles, structure, thinking step by step, iterating | Picking the better prompt; spotting the vague or contradictory line |
+| 3 The Claude API | The Messages API, stateless conversations, content blocks, stop reasons, usage, models, keys, retries | Reading real SDK code; writing the code around a stand-in model |
+| 4 Context | Token budgets, cost, long conversations, retrieval, caching, context engineering | Estimating tokens, trimming a history, picking the best chunks |
+| 5 Reliable output | JSON output, validation, retries, grounding, evaluation sets | Parsing and validating replies; scoring two prompt versions |
+| 6 Tools | Tool definitions, the tool-use loop, errors, choosing among tools | Writing the dispatcher and the full loop |
+| 7 Agents from the ground up | The agent loop, workflows vs agents, the common patterns, step limits, memory | Writing an agent loop with a step limit, a router, a chain, an evaluator loop |
+| 8 Claude Code basics | What it is, sessions, permissions, diffs, good tasks, CLAUDE.md | Realistic sessions: what happens next, which command to decline |
+| 9 Claude Code in depth | Memory, permission rules, commands, skills, subagents, hooks, long sessions | Which feature fits; what belongs in a memory file |
+| 10 Connecting things with MCP | Hosts, clients and servers; tools, resources, prompts; trust | Building a toy server in Python (labelled as a teaching model, not the real protocol) |
+| 11 Working with coding agents | Good tasks, small steps, tests as guard rails, reading diffs, staying responsible | Spotting the bug or weakened test in an AI-written change |
+| 12 Building responsibly | Prompt injection, least privilege, approval, privacy, honesty | A capstone: design a support-inbox triage agent with an approval rule |
+
+The app cannot call a real model, since that would need a private API key in the browser. Learners instead write the code that surrounds a model call, in Python, against a scripted stand-in whose replies have the same shape as real ones. Real API code is shown read-only.
+
+Sources for this course: the [Claude API documentation](https://docs.claude.com), the [Claude Code documentation](https://code.claude.com/docs), Anthropic's [Building effective agents](https://www.anthropic.com/engineering/building-effective-agents), and the [Model Context Protocol](https://modelcontextprotocol.io) site, read in November 2026. The lessons are original writing.
+
+## How lessons work
+
+- **Real code, no setup.** Python, JavaScript and SQL run in the browser tab, and web pages are checked as you build them. A program that loops forever is stopped after a few seconds, and error messages are rewritten as one plain sentence.
+- **Ten kinds of exercise.** Multiple choice, putting lines in order, matching pairs, filling gaps, writing code, tapping the line with the bug, flipping switches to make a binary number, acting out an algorithm, and typing what a program prints.
+- **Show, then ask.** Before you're asked to write or fix code, you see a worked example of nearly the same problem with its output.
+- **Free hints.** Every question has a two-step hint: the first recaps the idea, the second gives a specific nudge. After a second miss, the hint opens by itself.
+- **No hearts.** A wrong answer comes back at the end of the lesson. Code exercises let you retry, and after two misses the answer is offered.
+
+## Streaks, goals and badges
+
+| Mechanic | Rule |
+|---|---|
+| Streak | Counts the learner's own calendar days. A day stays alive until midnight. |
+| Streak freeze | Covers a missed day. Start with 1, hold up to 2, buy more with gems. Freezes are only spent when they cover the whole gap. |
+| XP and daily goal | 10 XP for a new lesson, 5 for a repeat, 5 more for a perfect one. Goals are 10, 20, 30 or 50 XP a day. |
+| Unlocks | Lessons open in order; finishing a unit opens the next. |
+| Mistakes | A wrong answer returns at the end of the lesson. Code exercises allow retries. After two misses the worked example opens by itself, and for code the answer is offered too. |
+
+Seventeen badges level up from bronze to silver to gold for things like hitting your daily goal, writing code and coming back after time away.
+
+Reminders arrive around the time you usually practice, at most once a day. Turn them on or off in Settings. Because ByteQuest is a website, they only arrive while the tab is open.
+
+## Save your progress
+
+Your progress is kept in your browser on the device you're using. Clearing your browser data, or using a private window, will lose it, so back it up from time to time.
+
+Open **Profile**, then the gear icon for **Settings**, and scroll to **Save your progress**:
+
+- **Backup file** downloads your progress as a `.json` file.
+- **Copy save code** copies your progress as text you can paste anywhere, such as a note or an email to yourself.
+- **Restore from file**, or pasting a save code into the box and pressing **Restore**, loads it on any device. If the device already has more finished lessons than the save, ByteQuest asks before replacing them.
+
+There are no accounts, so progress does not sync between devices on its own.
+
+## Settings
+
+In Settings you can change your name and daily goal, and turn sound effects, animations and reminders on or off. A **Prototype: unlock all lessons** switch opens every lesson on the path so you can try any of them.
+
+## Run it on your own computer
+
+You need [Node.js](https://nodejs.org) 22 or newer.
+
+```sh
+git clone https://github.com/josephfanpm/Learntocode.git
+cd Learntocode
+npm install
+npm run dev        # open http://localhost:5173
+```
+
+Other commands:
+
+```sh
+npm test                           # streak, unlock, reminder, hint, badge and save tests
+npx tsx scripts/check-content.ts   # validates every exercise; runs each Python, JavaScript and SQL answer and worked example
+npm run build                      # production build in dist/
+```
+
+Any exercise can be opened directly with `#/lesson/<lesson-id>?at=<index>`, which does not save progress. The first sample of the pixel-adventure look is at `#/sample` (how it moves is in [docs/motion-spec.md](docs/motion-spec.md)); its backdrops and the welcome screen's are CC0 art by Luis Zuno (see [public/art/CREDITS.md](public/art/CREDITS.md)). `npx tsx scripts/render-worlds.ts <folder>` writes every chapter scene as a PNG.
+
+Built with Vite, React, TypeScript and Tailwind. Python runs in [Pyodide](https://pyodide.org) inside a Web Worker, JavaScript in its own worker, and SQL in [sql.js](https://sql.js.org). Pip, the avatars and the sounds are generated in code: sprites as pixel grids ([src/ui/pixel/sprites.ts](src/ui/pixel/sprites.ts)), sounds with the Web Audio API ([src/sound.ts](src/sound.ts)). The reminder rules are in [src/engine/messaging.ts](src/engine/messaging.ts).
+
 This is an independent portfolio project. It is not affiliated with or endorsed by Harvard, CS50, Anthropic or any other learning app. There are no real learners yet, so there are no usage numbers here.
+
+---
+
+# About this project: product case study
+
+This section is for anyone interested in how ByteQuest was designed: the problem, the users, the decisions and the trade-offs.
 
 ## At a glance
 
@@ -68,75 +205,6 @@ In every course a placement quiz lets people skip what they already know.
 - **A place for every chapter.** The app has a night-sky, pixel-adventure look, and each of the 38 chapters opens with its own pixel scene of a real destination, from Mount Fuji to Monument Valley. The scenes are drawn in code on a 272 by 160 grid, so they add no image files.
 - **Badges that level up.** Seventeen pixel-art badges climb from bronze to silver to gold, each with a progress bar toward the next tier. They reward more than volume: hitting the daily goal, writing code, repeating lessons, coming back after a week away, and progress in each course.
 - **Progress that can be kept.** Progress lives in the browser; a backup file or a save code moves it to another device.
-
-### The Computer science course
-
-| Unit | CS50 week | Topics | Labs and projects |
-|---|---|---|---|
-| 0 | 0 (Scratch) | Binary; text, colour, images and sound as numbers; algorithms | Design a program |
-| 1 | 1 (C) | Print, variables, input, decisions, loops, functions; compiling, types and their limits, the command line | Pyramids and coins; checksum |
-| 2 | 2 (Arrays) | Lists and text, debugging, arguments | Word scores and reading level; ciphers |
-| 3 | 3 (Algorithms) | Searching, sorting, big O, recursion, records, merge sort | Run an election; which sort is this? |
-| 4 | 4 (Memory) | Hexadecimal, names and values, copying, files, pointers, memory care, images | Sound volume and lost photos |
-| 5 | 5 (Data structures) | Stacks, queues, linked lists, hash tables, trees, tries | Family tree; spell checker |
-| 6 | 6 (Python) | Dictionaries, formatting, errors, comprehensions, CSV, classes, libraries | DNA detective |
-| 7 | 7 (SQL) | Queries, grouping, joins, subqueries, table design | Music library; a mystery solved with queries |
-| 8 | 8 (HTML, CSS, JavaScript) | How the internet works, pages, forms, styling, layout, interactivity | Homepage; quiz page |
-| 9 | 9 (Flask) | Routes, forms, templates, sessions, APIs, accounts and passwords | Birthday book; play-money stock trader |
-| 10 | AI | Learning from examples, game search, training and testing, how chatbots write, prompts | |
-| 11 | Cybersecurity | Passwords, hashing, encryption, staying safe | |
-| 12 | Beyond CS50 | Systems design: scaling, load balancing, caching, databases at scale, failure | Design a photo-sharing app |
-| 13 | Final project | Scope an idea, then build, save, test and share a habit tracker | The project itself |
-
-### The Developer skills course
-
-| Chapter | Topics | How it is taught |
-|---|---|---|
-| 1 Git and version control | Commits, history, branches, merge conflicts, remotes, pull requests, undoing safely | Acting out what the history looks like after each command; typing commands |
-| 2 Testing | Assert, arrange-act-assert, edge cases, errors, test-first, fakes, CI | Writing real tests in Python that must catch a planted bug |
-| 3 Real JavaScript | Values, functions, arrays, objects and JSON, scope, errors, async as an idea | Writing JavaScript that runs in the browser |
-| 4 Frameworks and TypeScript | Components, props, state, events; type annotations and what the compiler catches | Reading components; writing render and update functions; spotting the line the compiler rejects |
-| 5 Your developer setup | Editor, terminal, PATH, packages, virtual environments, the debugger | Typing commands, stepping through a debugger; ends with a checklist to do on your own machine |
-| 6 Shipping your code | Hosting, environments, secrets, pipelines, containers, logs, rollbacks | Ordering pipeline stages, reading logs; ends with a checklist for putting a page online |
-| 7 Building a real API | Methods, status codes, validation, tokens, pagination | Building an in-memory tasks API step by step |
-| 8 Working in existing code | Reading unfamiliar code, naming, refactoring, comments, code review | Refactoring messy code while its tests keep passing |
-| 9 Databases in practice | Parameterised queries, transactions, migrations, ORMs, indexes, non-SQL stores | Real SQLite from Python, with rollbacks and ordered migrations |
-| 10 Working on a team | Tickets, estimates, asking good questions, pull requests, incidents | Choosing the better message; spotting the vague sentence |
-| 11 Accessible, responsive pages | Semantic HTML, alt text, labels, keyboard, contrast, media queries, flexbox | Writing HTML that is checked for the right structure |
-| 12 Everyday tools | Regular expressions, dates and time zones, type hints, file formats | Writing patterns and date code in Python |
-
-Three things in this course cannot be learned by tapping through lessons: installing tools, using Git on a real project, and deploying. Those chapters teach the ideas and commands, then hand over to a checklist to do for real.
-
-### The Building with AI course
-
-| Chapter | Topics | How it is taught |
-|---|---|---|
-| 1 How language models work | Tokens, next-token prediction, sampling, the context window, hallucination | Acting out next-word choices; spotting the claim to verify |
-| 2 Prompting well | Clear instructions, context, examples, roles, structure, thinking step by step, iterating | Picking the better prompt; spotting the vague or contradictory line |
-| 3 The Claude API | The Messages API, stateless conversations, content blocks, stop reasons, usage, models, keys, retries | Reading real SDK code; writing the code around a stand-in model |
-| 4 Context | Token budgets, cost, long conversations, retrieval, caching, context engineering | Estimating tokens, trimming a history, picking the best chunks |
-| 5 Reliable output | JSON output, validation, retries, grounding, evaluation sets | Parsing and validating replies; scoring two prompt versions |
-| 6 Tools | Tool definitions, the tool-use loop, errors, choosing among tools | Writing the dispatcher and the full loop |
-| 7 Agents from the ground up | The agent loop, workflows vs agents, the common patterns, step limits, memory | Writing an agent loop with a step limit, a router, a chain, an evaluator loop |
-| 8 Claude Code basics | What it is, sessions, permissions, diffs, good tasks, CLAUDE.md | Realistic sessions: what happens next, which command to decline |
-| 9 Claude Code in depth | Memory, permission rules, commands, skills, subagents, hooks, long sessions | Which feature fits; what belongs in a memory file |
-| 10 Connecting things with MCP | Hosts, clients and servers; tools, resources, prompts; trust | Building a toy server in Python (labelled as a teaching model, not the real protocol) |
-| 11 Working with coding agents | Good tasks, small steps, tests as guard rails, reading diffs, staying responsible | Spotting the bug or weakened test in an AI-written change |
-| 12 Building responsibly | Prompt injection, least privilege, approval, privacy, honesty | A capstone: design a support-inbox triage agent with an approval rule |
-
-The app cannot call a real model, since that would need a private API key in the browser. Learners instead write the code that surrounds a model call, in Python, against a scripted stand-in whose replies have the same shape as real ones. Real API code is shown read-only.
-
-Sources for this course: the [Claude API documentation](https://docs.claude.com), the [Claude Code documentation](https://code.claude.com/docs), Anthropic's [Building effective agents](https://www.anthropic.com/engineering/building-effective-agents), and the [Model Context Protocol](https://modelcontextprotocol.io) site, read in November 2026. The lessons are original writing.
-
-### How the habit loop works
-
-| Mechanic | Rule |
-|---|---|
-| Streak | Counts the learner's own calendar days. A day stays alive until midnight. |
-| Streak freeze | Covers a missed day. Start with 1, hold up to 2, buy more with gems. Freezes are only spent when they cover the whole gap. |
-| XP and daily goal | 10 XP for a new lesson, 5 for a repeat, 5 more for a perfect one. Goals are 10, 20, 30 or 50 XP a day. |
-| Unlocks | Lessons open in order; finishing a unit opens the next. |
-| Mistakes | A wrong answer returns at the end of the lesson. Code exercises allow retries. After two misses the worked example opens by itself, and for code the answer is offered too. |
 
 ### How reminders decide what to send
 
@@ -203,19 +271,6 @@ I built ByteQuest with Claude Code as a pair programmer. I set the product direc
 - **Hands-on tooling.** Git, installing tools and deploying are taught as ideas and commands, with checklists to do on a real machine; the app cannot run them.
 - **Simplified assignments.** Some CS50 problem sets are reduced (a one-row blur instead of a full image filter) and the hardest election method is left out. Flask and live web requests are shown, not run.
 - **No leagues, friends or leaderboards.**
-
-## Run it
-
-```sh
-npm install
-npm run dev        # http://localhost:5173
-npm test           # streak, unlock, reminder, hint, badge and save tests
-npx tsx scripts/check-content.ts   # validates every exercise; runs each Python, JavaScript and SQL answer and worked example
-```
-
-Settings (the gear icon on the profile) has a **Prototype: unlock all lessons** switch, off by default. The first sample of the pixel-adventure look is still at `#/sample` (how it moves is in [docs/motion-spec.md](docs/motion-spec.md)); its backdrops and the welcome screen's are CC0 art by Luis Zuno (see [public/art/CREDITS.md](public/art/CREDITS.md)). `npx tsx scripts/render-worlds.ts <folder>` writes every chapter scene as a PNG. Any exercise can be opened directly with `#/lesson/<lesson-id>?at=<index>`, which does not save progress.
-
-Built with Vite, React, TypeScript and Tailwind. Python runs in [Pyodide](https://pyodide.org) inside a Web Worker, JavaScript in its own worker, and SQL in [sql.js](https://sql.js.org). Pip, the avatars and the sounds are generated in code: sprites as pixel grids ([src/ui/pixel/sprites.ts](src/ui/pixel/sprites.ts)), sounds with the Web Audio API ([src/sound.ts](src/sound.ts)). The reminder rules are in [src/engine/messaging.ts](src/engine/messaging.ts).
 
 ## Credits and licence
 
