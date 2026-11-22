@@ -137,7 +137,7 @@ export function Blank({ ex, locked, reveal, register }: ExProps<BlankExercise>) 
                 <button
                   disabled={locked || fill[i] === null}
                   onClick={() => setFill(fill.map((f, j) => (j === i ? null : f)))}
-                  className={`mx-0.5 inline-block min-w-14 rounded-md border-b-2 px-2 align-baseline font-mono ${
+                  className={`mx-0.5 inline-block min-w-14 rounded-t-md border-b-2 px-2 align-baseline font-mono ${
                     locked
                       ? ex.bank[fill[i]!] === ex.answers[i]
                         ? 'border-good bg-good/25 text-white'
