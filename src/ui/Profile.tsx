@@ -16,6 +16,7 @@ export function Profile({ go }: { go: Go }) {
   const { s, update } = useStore()
   const today = dayKey(new Date())
   const best = longestStreak(s)
+  const xpToday = s.activity[today]?.xp ?? 0
   const [confirmReset, setConfirmReset] = useState(false)
   const [notice, setNotice] = useState('')
 
@@ -68,6 +69,16 @@ export function Profile({ go }: { go: Go }) {
         {stat('Longest streak', best, <Flame className="text-ink-3" size={24} />)}
         {stat('Total XP', s.xp, <span className="text-cobalt">⚡</span>)}
         {stat('Lessons done', Object.keys(s.completed).length, <Award className="text-good" size={24} />)}
+      </section>
+
+      <section aria-label="Daily goal" className="rounded-2xl border-2 border-rule bg-white p-4">
+        <div className="flex justify-between text-sm">
+          <span className="font-medium">Today’s goal</span>
+          <span className="text-ink-2 tabular-nums">{Math.min(xpToday, s.dailyGoal)} / {s.dailyGoal} XP</span>
+        </div>
+        <div className="mt-2 h-3 overflow-hidden rounded-full bg-rule" role="progressbar" aria-valuenow={Math.min(xpToday, s.dailyGoal)} aria-valuemin={0} aria-valuemax={s.dailyGoal}>
+          <div className="bar-fill h-full rounded-full bg-flame" style={{ width: `${Math.min(100, (xpToday / s.dailyGoal) * 100)}%` }} />
+        </div>
       </section>
 
       <section aria-labelledby="cal">

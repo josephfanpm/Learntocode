@@ -19,8 +19,6 @@ export function TopBar({ go }: { go: Go }) {
   const today = dayKey(new Date())
   const st = streak(s, today)
   const lit = practicedToday(s, today)
-  const xpToday = s.activity[today]?.xp ?? 0
-  const pct = Math.min(1, xpToday / s.dailyGoal)
   return (
     <header className="sticky top-0 z-10 border-b-2 border-rule bg-paper/95 backdrop-blur">
       <div className="mx-auto flex max-w-xl items-center gap-2 px-4 py-2.5">
@@ -39,12 +37,8 @@ export function TopBar({ go }: { go: Go }) {
         <button onClick={() => go('/me')} className="flex items-center gap-1.5 rounded-xl px-2 py-1.5 font-semibold hover:bg-white" aria-label={`${s.gems} gems`}>
           <Gem size={19} className="text-gem" /> {s.gems}
         </button>
-        <button onClick={() => go('/me')} className="relative size-9" aria-label={`Daily goal: ${xpToday} of ${s.dailyGoal} XP`}>
-          <svg viewBox="0 0 36 36" className="size-9 -rotate-90">
-            <circle cx="18" cy="18" r="15" fill="none" stroke="var(--color-rule)" strokeWidth="4" />
-            <circle cx="18" cy="18" r="15" fill="none" stroke="var(--color-flame)" strokeWidth="4" strokeLinecap="round" strokeDasharray={`${pct * 94.2} 94.2`} />
-          </svg>
-          {pct >= 1 && <Check size={14} strokeWidth={3} className="absolute inset-0 m-auto text-flame" />}
+        <button onClick={() => go('/me')} className="ml-1 rounded-[28%]" aria-label="Your profile">
+          <Avatar avatar={s.avatar} size={36} />
         </button>
       </div>
     </header>
