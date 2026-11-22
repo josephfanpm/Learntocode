@@ -1,4 +1,4 @@
-// Pip, the Line by Line mascot: a round cobalt creature with a signal-light
+// Pip, the ByteQuest mascot: a round cobalt creature with a signal-light
 // antenna. One SVG, seven moods. The antenna light follows the mood (bright
 // when celebrating, dim when sleepy).
 

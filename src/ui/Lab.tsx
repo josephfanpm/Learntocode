@@ -46,7 +46,7 @@ function Preview({ m }: { m: Message }) {
     return (
       <div className="rounded-2xl bg-ink/90 p-3 text-white shadow-lg">
         <div className="flex items-center gap-2 text-xs text-white/60">
-          <span className="size-4 rounded bg-cobalt" /> Line by Line · now
+          <span className="size-4 rounded bg-cobalt" /> ByteQuest · now
         </div>
         <p className="mt-1 font-semibold">{m.title}</p>
         <p className="text-sm text-white/85">{m.body}</p>

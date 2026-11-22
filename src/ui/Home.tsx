@@ -24,7 +24,7 @@ export function TopBar({ go }: { go: Go }) {
     <header className="sticky top-0 z-10 border-b-2 border-rule bg-paper/95 backdrop-blur">
       <div className="mx-auto flex max-w-xl items-center gap-2 px-4 py-2.5">
         <button onClick={() => go('/')} className="mr-auto font-display text-xl font-extrabold tracking-tight">
-          Line by Line
+          ByteQuest
         </button>
         <button onClick={() => go('/me')} className="flex items-center gap-1.5 rounded-xl px-2 py-1.5 font-semibold hover:bg-white" aria-label={`${st}-day streak${lit ? '' : ', not yet extended today'}`}>
           <Flame size={22} className={lit ? 'text-flame' : 'text-ink-3'} fill={lit ? 'currentColor' : 'none'} />

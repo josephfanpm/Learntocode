@@ -1,4 +1,4 @@
-# Line by Line
+# ByteQuest
 
 Learn to code from zero, a few minutes a day. Bite-sized lessons, daily streaks, unlocks, and reminders that respond to how each learner is actually doing.
 
