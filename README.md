@@ -26,15 +26,44 @@ The course follows the topics of Harvard's [CS50x](https://cs50.harvard.edu/x/),
 
 **Code runs in the browser.** Python runs in [Pyodide](https://pyodide.org) inside a Web Worker, so an endless loop is stopped after 6 seconds instead of freezing the page. SQL runs in [sql.js](https://sql.js.org) (SQLite). HTML is checked by CSS selectors against a sandboxed preview. Python errors are translated into one plain sentence ("Line 3: Python doesn't know the name "nme"…").
 
-## Placement test
+## Setup
 
-Instead of asking "have you coded before?", setup asks real questions ([src/content/placement.ts](src/content/placement.ts)): one per unit for units 0–6, easiest first. Each right answer skips that unit; the first wrong answer or "I don't know" ends the test, so a beginner is out after one question. Brand-new learners can skip it entirely. Skipped units show as dashed stations on the path, stay open for review, and don't count as finished lessons.
+Setup borrows the structure that Duolingo is known for, with our own content: Pip asks one question per screen in a speech bubble under a progress bar, and the first lesson comes before any profile details.
+
+1. Welcome, then Pip says hi.
+2. How did you hear about ByteQuest? (skippable)
+3. Why do you want to learn? Pip replies to the answer, and it personalises later messages.
+4. What you'll be able to do.
+5. Daily goal.
+6. Reminders: Pip explains why first, then the browser asks permission. "Not now" is fine.
+7. Starting point: start from scratch, or find your level.
+8. Lesson one.
+9. After lesson one: lesson-done screen, streak screen, then **Create your profile** (name and avatar), which can be skipped with "Later".
+
+**Finding your level** asks real questions instead of "have you coded before?" ([src/content/placement.ts](src/content/placement.ts)): one per unit for units 0–6, easiest first. Each right answer skips that unit; the first wrong answer or "I don't know" ends it. Skipped units show as dashed stations, stay open for review, and don't count as finished lessons.
+
+## Animation
+
+Pip is animated like a sprite in an old game, organised as a small state machine (the same idea character tools such as Rive use): each mood is a state with its own frames, over an idle layer that blinks at random intervals and bobs by one pixel. Body moves (hop, shake) snap between whole-pixel positions.
+
+| Moment | What moves |
+|---|---|
+| Any time Pip is on screen | Blink, 1-pixel idle bob |
+| Setup questions | Pip waves; the speech bubble grows from its tail |
+| Right answer | Pip hops with paws up |
+| Wrong answer | Pip does a small shake |
+| Progress bar | Fill eases to its new width |
+| Lesson done | Pixel confetti, stats count up, cards rise in one after another |
+| Streak extended | Flame lights up, the number ticks up, today fills in on the week row |
+| Home | Pip stands next to your next lesson |
+
+Everything respects the reduced-motion setting: frames and movement stop, and entrances become simple fades.
 
 ## Pip and avatars
 
 Pip is the mascot ([src/ui/Pip.tsx](src/ui/Pip.tsx)): a pixel-art red panda with seven moods (happy, wave, cheer, oops, think, sleepy, celebrate). Pip shows up on the welcome screen, the placement test, right and wrong answers, the lesson-done screen, message banners and the profile. The Messaging lab lists every mood and where it's used.
 
-Learners can make a **pixel avatar** in the same style ([src/ui/Avatar.tsx](src/ui/Avatar.tsx)): a red panda, cat, bunny or bear, with six fur colours, five expressions, six accessories and six backgrounds. It shows in the top bar and on the profile. The app doesn't ask for it during sign-up, where every extra step costs first-lesson completions. Instead an in-app banner suggests it once the first lesson is done, and it can be made or changed from the profile at any time.
+Learners can make a **pixel avatar** in the same style ([src/ui/Avatar.tsx](src/ui/Avatar.tsx)): a red panda, cat, bunny or bear, with six fur colours, five expressions, six accessories and six backgrounds. It shows in the top bar and on the profile. Everyone gets a random avatar during setup, so nobody starts with an empty placeholder and there's no extra step before the first lesson. After lesson one, the create-your-profile step shows it with a shuffle button and a link to the full builder; it can be changed from the profile at any time.
 
 All sprites are drawn in code as pixel grids ([src/ui/pixel/sprites.ts](src/ui/pixel/sprites.ts)): heads are drawn as half rows and mirrored, with faces, paws, accessories and effects layered on top.
 

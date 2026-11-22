@@ -100,6 +100,23 @@ function check(where: string, ex: Exercise) {
       if (new Set(ex.pairs.map((p) => p[0])).size !== ex.pairs.length) err('duplicate left items')
       if (new Set(ex.pairs.map((p) => p[1])).size !== ex.pairs.length) err('duplicate right items')
       break
+    case 'spot':
+      if (ex.lines.length < 3) err('spot needs 3+ lines')
+      if (!(ex.answer >= 0 && ex.answer < ex.lines.length)) err('answer index out of range')
+      break
+    case 'bits':
+      if (!(ex.bits >= 3 && ex.bits <= 8)) err('bits must be 3–8')
+      if (!(Number.isInteger(ex.target) && ex.target >= 0 && ex.target < 2 ** ex.bits)) err('target does not fit in bits')
+      break
+    case 'steps':
+      if (ex.cells.length < 3 || ex.cells.length > 9) err('steps needs 3–9 cells')
+      if (ex.steps.length < 2 || ex.steps.length > 5) err('steps needs 2–5 steps')
+      for (const st of ex.steps) if (!(st.answer >= 0 && st.answer < ex.cells.length)) err('step answer out of range')
+      break
+    case 'type':
+      if (!ex.accept.length || ex.accept.some((a) => !a.trim())) err('type needs non-empty accepted answers')
+      if (ex.accept.some((a) => a.length > 40)) err('typed answers should be short (40 chars max)')
+      break
     case 'write': {
       if (!ex.tests.length) err('write needs tests')
       if (ex.language === 'sql' && !ex.setup) err('sql write needs setup')

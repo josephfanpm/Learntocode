@@ -10,5 +10,7 @@ import { u7 } from './units/u7'
 import { u8 } from './units/u8'
 import { u9 } from './units/u9'
 import { u10 } from './units/u10'
+import { u11 } from './units/u11'
+import { u12 } from './units/u12'
 
-export const units: Unit[] = [ u0, u1, u2, u3, u4, u5, u6, u7, u8, u9, u10 ]
+export const units: Unit[] = [ u0, u1, u2, u3, u4, u5, u6, u7, u8, u9, u10, u11, u12 ]

@@ -88,6 +88,60 @@ export interface WriteExercise {
   explain: string
 }
 
+/**
+ * Tap the one line that has the bug (or that the prompt asks for).
+ * `answer` is the index into `lines`. Great for debugging practice.
+ */
+export interface SpotExercise {
+  kind: 'spot'
+  prompt: string
+  lines: string[]
+  language?: Language
+  answer: number
+  explain: string
+}
+
+/**
+ * Flip bit switches to make a number in binary. `bits` is how many switches
+ * (3–8); `target` must fit in that many bits.
+ */
+export interface BitsExercise {
+  kind: 'bits'
+  prompt: string
+  target: number
+  bits: number
+  explain: string
+}
+
+/**
+ * Step through a row of boxes, tapping the right box at each step. Use it to
+ * act out an algorithm by hand: binary search ("which box do you check
+ * next?"), walking a linked list, the order a stack pops, a sort's next swap.
+ * `cells` is the row (3–9 short labels); each step has its own question and
+ * the index of the box to tap. 2–5 steps.
+ */
+export interface StepsExercise {
+  kind: 'steps'
+  prompt: string
+  cells: string[]
+  steps: { ask: string; answer: number }[]
+  explain: string
+}
+
+/**
+ * Type a short answer (a number, a word, one line of output). Compared
+ * ignoring case and surrounding spaces. `accept` lists every accepted answer.
+ * Use when recalling beats recognising, e.g. "What does this print?".
+ */
+export interface TypeExercise {
+  kind: 'type'
+  prompt: string
+  code?: string
+  language?: Language
+  accept: string[]
+  explain: string
+}
+
 export type Exercise =
   | ConceptExercise
   | ChoiceExercise
@@ -95,6 +149,10 @@ export type Exercise =
   | OrderExercise
   | MatchExercise
   | WriteExercise
+  | SpotExercise
+  | BitsExercise
+  | StepsExercise
+  | TypeExercise
 
 export interface Lesson {
   /** Globally unique, kebab-case, prefixed with the unit id, e.g. "u1-print". */

@@ -43,13 +43,23 @@ export function Placement({ onDone }: { onDone: (placed: number) => void }) {
 
   if (phase === 'intro')
     return (
-      <div className="flex flex-1 flex-col items-center justify-center text-center">
-        <Pip mood="think" size={110} />
-        <h1 className="mt-6 text-3xl font-bold">Let’s find your starting point</h1>
-        <p className="mt-2 text-ink-2">A few quick questions that get harder. Each one you get right skips a unit. Stop whenever you’re not sure.</p>
-        <div className="mt-8 grid w-full gap-3">
-          <button className="btn w-full" onClick={() => setPhase('quiz')}>Start the questions</button>
-          <button className="btn btn-ghost w-full" onClick={() => onDone(0)}>I’m new to coding, start at the beginning</button>
+      <div className="flex flex-1 flex-col justify-center py-6">
+        <div className="flex items-start gap-3">
+          <Pip mood="think" size={84} className="shrink-0" />
+          <h1 className="bubble mt-2 font-sans text-lg leading-snug font-semibold">Where should we start?</h1>
+        </div>
+        <div className="mt-6 grid gap-3">
+          <button className="tile px-4 py-4 text-left" onClick={() => onDone(0)}>
+            <span className="block font-semibold">Start from scratch</span>
+            <span className="text-sm text-ink-2">I’m new to coding. Take me to the first lesson.</span>
+          </button>
+          <button className="tile px-4 py-4 text-left" onClick={() => setPhase('quiz')}>
+            <span className="flex items-center gap-2 font-semibold">
+              Find my level
+              <span className="rounded-md bg-cobalt-soft px-1.5 py-0.5 text-xs font-semibold text-cobalt-deep">Recommended if you’ve coded before</span>
+            </span>
+            <span className="text-sm text-ink-2">Answer a few questions that get harder. Each one you get right skips a unit.</span>
+          </button>
         </div>
       </div>
     )

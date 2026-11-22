@@ -151,30 +151,104 @@ h3 {
 .anim-pulse { animation: pulse-ring 1.6s ease-out infinite; }
 .anim-shake { animation: shake 260ms ease; }
 
-/* Pip, the mascot */
-@keyframes pip-bounce {
-  0%, 100% { transform: translateY(0) scaleY(1); }
-  30% { transform: translateY(-7px) scaleY(1.03); }
-  55% { transform: translateY(0) scaleY(0.96); }
+/* Motion tokens */
+:root {
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
 }
-@keyframes pip-breathe {
-  0%, 100% { transform: scaleY(1); }
-  50% { transform: scaleY(0.97); }
+
+/* Pip, the mascot. Body moves snap between whole-pixel positions
+   (--u is one sprite pixel), like sprite animation. */
+@keyframes pip-bob {
+  0%, 49.9% { transform: translateY(0); }
+  50%, 100% { transform: translateY(calc(var(--u) * -1)); }
 }
-@keyframes pip-wave {
-  0%, 100% { transform: rotate(0deg); }
-  50% { transform: rotate(-5deg); }
+@keyframes pip-hop {
+  0% { transform: translateY(0); }
+  15% { transform: translateY(calc(var(--u) * -3)); }
+  35% { transform: translateY(calc(var(--u) * -5)); }
+  55% { transform: translateY(calc(var(--u) * -3)); }
+  70%, 100% { transform: translateY(0); }
 }
-@keyframes pip-sparkle {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
+@keyframes pip-hop-loop {
+  0% { transform: translateY(0); }
+  6% { transform: translateY(calc(var(--u) * -3)); }
+  13% { transform: translateY(calc(var(--u) * -5)); }
+  20% { transform: translateY(calc(var(--u) * -3)); }
+  27%, 100% { transform: translateY(0); }
 }
-.pip-bounce { animation: pip-bounce 700ms cubic-bezier(0.3, 0.7, 0.4, 1) 2; }
-.pip-breathe { animation: pip-breathe 3s ease-in-out infinite; }
-.pip-sway { animation: pip-wave 700ms ease-in-out 2; }
+@keyframes pip-shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(calc(var(--u) * -1)); }
+  40%, 80% { transform: translateX(var(--u)); }
+}
+.pip-bob { animation: pip-bob 1.8s steps(1) infinite; }
+.pip-bob.pip-slow { animation-duration: 3.2s; }
+.pip-hop { animation: pip-hop 420ms steps(1) 2; }
+.pip-hop.pip-hop-loop { animation: pip-hop-loop 1.6s steps(1) infinite; }
+.pip-shake { animation: pip-shake 360ms steps(1) 1; }
+
+/* Speech bubble: grows from its tail. */
+@keyframes bubble-in {
+  from { opacity: 0; transform: scale(0.94); }
+}
+.bubble {
+  position: relative;
+  border: 2px solid var(--color-rule);
+  background: white;
+  border-radius: 16px;
+  padding: 0.75rem 1rem;
+  transform-origin: 0% 60%;
+  animation: bubble-in 220ms var(--ease-out) both;
+}
+.bubble::before {
+  content: '';
+  position: absolute;
+  left: -9px;
+  top: 22px;
+  width: 14px;
+  height: 14px;
+  background: white;
+  border-left: 2px solid var(--color-rule);
+  border-bottom: 2px solid var(--color-rule);
+  transform: rotate(45deg);
+}
+
+/* Entrances on rare screens (lesson done, streak): rise and fade, staggered by --i. */
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(12px); }
+}
+.rise-in { animation: rise-in 360ms var(--ease-out) both; animation-delay: calc(var(--i, 0) * 70ms); }
+
+/* Streak flame lights up. */
+@keyframes ignite {
+  0% { opacity: 0; transform: scale(0.9); filter: grayscale(1); }
+  60% { opacity: 1; transform: scale(1.12); filter: grayscale(0); }
+  100% { transform: scale(1); }
+}
+.ignite { animation: ignite 520ms var(--ease-out) both; animation-delay: 250ms; }
+@keyframes day-fill {
+  from { transform: scale(0.9); opacity: 0.4; }
+}
+.day-fill { animation: day-fill 300ms var(--ease-out) both; animation-delay: 700ms; }
+
+/* Pixel confetti: square bits fall in stepped motion. */
+@keyframes confetti {
+  0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(105vh) rotate(180deg); opacity: 1; }
+}
+.confetti { position: fixed; top: 0; width: 8px; height: 8px; pointer-events: none; animation: confetti var(--d, 2.4s) steps(24) var(--delay, 0s) 1 both; }
+
+/* Progress bar: a glossy strip, and the fill eases to its new width. */
+.bar-fill { position: relative; transition: width 420ms var(--ease-out); }
+.bar-fill::after { content: ''; position: absolute; left: 8px; right: 8px; top: 3px; height: 4px; border-radius: 4px; background: rgb(255 255 255 / 0.35); }
+
+@keyframes fade-only { from { opacity: 0; } }
 
 @media (prefers-reduced-motion: reduce) {
-  .pip-bounce, .pip-breathe, .pip-sway { animation: none; }
+  .pip-bob, .pip-hop, .pip-hop.pip-hop-loop, .pip-shake, .confetti { animation: none; }
+  .confetti { display: none; }
+  .bubble, .rise-in, .ignite, .day-fill { animation-name: fade-only; }
+  .bar-fill { transition: none; }
   .anim-pop, .anim-rise, .anim-pulse, .anim-shake { animation: none; }
   .btn, .tile { transition: none; }
 }

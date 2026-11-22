@@ -108,11 +108,13 @@ const PINK = '#f59ab0'
 const WHITE = '#ffffff'
 
 /** Eyes, nose, mouth and cheeks. Eyes sit at rows 7–8, cols 5–6 and 13–14. */
-function face(mood: Face): Pixel[] {
+function face(mood: Face, blink = false): Pixel[] {
   const px: Pixel[] = []
   // 2×3 eyes with a highlight in the top-right corner.
   const eye = (x: number, y: number) => {
-    px.push([x, y, INK], [x + 1, y, WHITE], [x, y + 1, INK], [x + 1, y + 1, INK], [x, y + 2, INK], [x + 1, y + 2, INK])
+    // Blink frame: the eye closes to a line along its bottom row.
+    if (blink) px.push([x, y + 2, INK], [x + 1, y + 2, INK])
+    else px.push([x, y, INK], [x + 1, y, WHITE], [x, y + 1, INK], [x + 1, y + 1, INK], [x, y + 2, INK], [x + 1, y + 2, INK])
   }
   const closedHappy = (x: number) => px.push([x - 1, 8, INK], [x, 7, INK], [x + 1, 7, INK], [x + 2, 8, INK])
   // nose
@@ -149,7 +151,8 @@ function face(mood: Face): Pixel[] {
 }
 
 /** Paws and effects that sit around the body, per mood. */
-function extras(mood: Face, fur: Fur): Pixel[] {
+function extras(mood: Face, fur: Fur, frame = 0): Pixel[] {
+  const alt = frame % 2 === 1
   const d = FURS[fur].d
   const px: Pixel[] = []
   const paw = (x: number, y: number) =>
@@ -157,28 +160,36 @@ function extras(mood: Face, fur: Fur): Pixel[] {
   switch (mood) {
     case 'cheer':
     case 'celebrate':
-      paw(-1, 10)
-      paw(19, 10)
+      paw(-1, alt ? 9 : 10)
+      paw(19, alt ? 9 : 10)
       break
     case 'wave':
-      paw(19, 9)
+      paw(alt ? 20 : 19, alt ? 8 : 9)
       break
     case 'think':
       paw(14, 12)
-      px.push([20, 1, '#8691ad'], [21, -1, '#8691ad'], [22, -1, '#8691ad'], [21, -2, '#8691ad'], [22, -2, '#8691ad'])
+      px.push([20, 1, '#8691ad'])
+      if (!alt) px.push([21, -1, '#8691ad'], [22, -1, '#8691ad'], [21, -2, '#8691ad'], [22, -2, '#8691ad'])
       break
     case 'oops':
       px.push([19, 3, '#7cc4f5'], [18, 4, '#7cc4f5'], [19, 4, '#7cc4f5'], [20, 4, '#7cc4f5'], [19, 5, '#7cc4f5'])
       break
     case 'sleepy':
-      for (const [x, y] of [[18, -2], [19, -2], [20, -2], [21, -2], [20, -1], [19, 0], [18, 1], [19, 1], [20, 1], [21, 1]]) px.push([x, y, '#8691ad'])
+      for (const [x, y] of [[18, -2], [19, -2], [20, -2], [21, -2], [20, -1], [19, 0], [18, 1], [19, 1], [20, 1], [21, 1]]) px.push([x + (alt ? 1 : 0), y - (alt ? 1 : 0), '#8691ad'])
       break
   }
   if (mood === 'celebrate') {
     const spark = (x: number, y: number, c: string) => px.push([x, y - 1, c], [x - 1, y, c], [x, y, c], [x + 1, y, c], [x, y + 1, c])
-    spark(-2, 2, '#ffd166')
-    spark(21, 3, '#ff7a1a')
-    px.push([1, -2, '#0f9fae'], [18, -2, '#c2378b'], [-1, 7, '#7a4ff0'])
+    // Sparkles twinkle: two alternating sets.
+    if (alt) {
+      spark(-2, 5, '#ff7a1a')
+      spark(21, 0, '#ffd166')
+      px.push([3, -3, '#c2378b'], [16, -3, '#0f9fae'], [22, 7, '#7a4ff0'])
+    } else {
+      spark(-2, 2, '#ffd166')
+      spark(21, 3, '#ff7a1a')
+      px.push([1, -2, '#0f9fae'], [18, -2, '#c2378b'], [-1, 7, '#7a4ff0'])
+    }
   }
   return px
 }
@@ -272,6 +283,10 @@ export interface CritterSpec {
   body?: boolean
   /** Paws and mood effects (mascot only). */
   effects?: boolean
+  /** Animation: eyes closed for a blink. */
+  blink?: boolean
+  /** Animation frame for paws and effects (alternates on odd/even). */
+  frame?: number
   tail?: boolean
 }
 
@@ -280,10 +295,10 @@ export function critter(spec: CritterSpec): Pixel[] {
   const layers: Pixel[] = []
   if (withBody && spec.tail) layers.push(...tail(spec.fur))
   layers.push(...base(spec.animal, spec.fur, withBody))
-  layers.push(...face(spec.face))
+  layers.push(...face(spec.face, spec.blink))
   // Hats sit on top of ears; headphones and glasses on the face.
   layers.push(...accessory(spec.accessory ?? 'none'))
-  if (withBody && spec.effects !== false) layers.push(...extras(spec.face, spec.fur))
+  if (withBody && spec.effects !== false) layers.push(...extras(spec.face, spec.fur, spec.frame))
   // Later layers win.
   const map = new Map<string, Pixel>()
   for (const p of layers) map.set(`${p[0]},${p[1]}`, p)

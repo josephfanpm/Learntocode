@@ -8,6 +8,7 @@ import type {
   WriteExercise,
 } from '../content/types'
 import { check, runPythonFree, runSqlQuery, warmPython, type RunResult } from '../runners'
+import { Bits, Spot, Steps, TypeAnswer } from './interactive'
 import { Match } from './match'
 import { Order } from './order'
 import { Code, highlight, Inline, Prose } from './text'
@@ -377,5 +378,13 @@ export function ExerciseView(props: ExProps<Exercise>) {
       return <Match {...props} ex={ex} />
     case 'write':
       return <Write {...props} ex={ex} />
+    case 'spot':
+      return <Spot {...props} ex={ex} />
+    case 'bits':
+      return <Bits {...props} ex={ex} />
+    case 'steps':
+      return <Steps {...props} ex={ex} />
+    case 'type':
+      return <TypeAnswer {...props} ex={ex} />
   }
 }

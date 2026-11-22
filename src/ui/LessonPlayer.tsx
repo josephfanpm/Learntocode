@@ -1,11 +1,11 @@
-import { Flame, Volume2, VolumeX, X } from 'lucide-react'
+import { Volume2, VolumeX, X } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { Lesson, Unit } from '../content/types'
-import { dayKey } from '../engine/dates'
-import { completeLesson, streak, type LessonResult } from '../engine/state'
+import { completeLesson, type LessonResult } from '../engine/state'
 import { warmPython } from '../runners'
 import { play } from '../sound'
 import { useStore } from '../store'
+import { AfterLesson } from './AfterLesson'
 import { ExerciseView, type Grader } from './exercises'
 import { Pip } from './Pip'
 import { Inline } from './text'
@@ -14,7 +14,7 @@ type Status = 'answering' | 'right' | 'wrong'
 
 const PRAISE = ['Nice.', 'Correct.', 'That’s it.', 'Right.', 'Good work.']
 
-export function LessonPlayer({ lesson, unit, color, startAt = 0, onExit }: { lesson: Lesson; unit: Unit; color: string; startAt?: number; onExit: () => void }) {
+export function LessonPlayer({ lesson, unit, color, startAt = 0, onExit, onAvatar }: { lesson: Lesson; unit: Unit; color: string; startAt?: number; onExit: () => void; onAvatar: () => void }) {
   const { update, s } = useStore()
   const total = lesson.exercises.length
   // Queue of exercise indices; wrong answers go to the back for another try.
@@ -118,7 +118,7 @@ export function LessonPlayer({ lesson, unit, color, startAt = 0, onExit }: { les
     return () => window.removeEventListener('keydown', onKey)
   })
 
-  if (result) return <LessonDone result={result} lesson={lesson} onDone={onExit} streakNow={streak(s, dayKey(new Date()))} />
+  if (result) return <AfterLesson result={result} lesson={lesson} saved={startAt === 0} onExit={onExit} onAvatar={onAvatar} />
 
   const progress = done.size / total
 
@@ -129,7 +129,7 @@ export function LessonPlayer({ lesson, unit, color, startAt = 0, onExit }: { les
           <X size={26} />
         </button>
         <div className="h-4 flex-1 overflow-hidden rounded-full bg-rule" role="progressbar" aria-valuenow={Math.round(progress * 100)} aria-valuemin={0} aria-valuemax={100}>
-          <div className="h-full rounded-full transition-[width] duration-500" style={{ width: `${Math.max(4, progress * 100)}%`, background: color }} />
+          <div className="bar-fill h-full rounded-full" style={{ width: `${Math.max(4, progress * 100)}%`, background: color }} />
         </div>
         <button
           aria-label={s.sound === false ? 'Turn sound on' : 'Turn sound off'}
@@ -219,56 +219,6 @@ export function LessonPlayer({ lesson, unit, color, startAt = 0, onExit }: { les
           </div>
         </div>
       )}
-    </div>
-  )
-}
-
-function LessonDone({ result, lesson, onDone, streakNow }: { result: { r: LessonResult; accuracy: number }; lesson: Lesson; onDone: () => void; streakNow: number }) {
-  const { r, accuracy } = result
-  const { s } = useStore()
-  const today = s.activity[dayKey(new Date())]?.xp ?? 0
-  const grew = r.streakAfter > r.streakBefore
-  useEffect(() => {
-    play('complete')
-    if (!grew) return
-    const id = setTimeout(() => play('streak'), 650)
-    return () => clearTimeout(id)
-  }, [grew])
-  return (
-    <div className="mx-auto flex min-h-dvh max-w-md flex-col px-5 py-10">
-      <div className="flex flex-1 flex-col items-center justify-center text-center">
-        <Pip mood="celebrate" size={130} className="mb-4" />
-        <p className="text-ink-3">{lesson.title}</p>
-        <h1 className="anim-pop mt-1 text-5xl font-extrabold">Lesson done</h1>
-        <div className="mt-10 grid w-full grid-cols-2 gap-3">
-          <div className="rounded-2xl border-2 border-rule bg-white p-4">
-            <p className="text-sm text-ink-3">XP earned</p>
-            <p className="font-display text-4xl font-bold text-cobalt">+{r.xp}</p>
-          </div>
-          <div className="rounded-2xl border-2 border-rule bg-white p-4">
-            <p className="text-sm text-ink-3">First-try accuracy</p>
-            <p className="font-display text-4xl font-bold text-good">{Math.round(accuracy * 100)}%</p>
-          </div>
-        </div>
-        <div className={`mt-3 flex w-full items-center gap-4 rounded-2xl p-4 text-left ${grew ? 'bg-flame-soft' : 'border-2 border-rule bg-white'}`}>
-          <Flame className={grew ? 'anim-pop text-flame' : 'text-flame'} size={40} fill="currentColor" />
-          <div>
-            <p className="font-display text-2xl font-bold">{streakNow}-day streak</p>
-            <p className="text-sm text-ink-2">{grew ? 'Extended today. Come back tomorrow to keep it going.' : 'Already counted for today.'}</p>
-          </div>
-        </div>
-        <div className="mt-3 w-full rounded-2xl border-2 border-rule bg-white p-4 text-left">
-          <div className="flex justify-between text-sm">
-            <span className="font-medium">Daily goal</span>
-            <span className="text-ink-2">{Math.min(today, s.dailyGoal)} / {s.dailyGoal} XP</span>
-          </div>
-          <div className="mt-2 h-3 overflow-hidden rounded-full bg-rule">
-            <div className="h-full rounded-full bg-flame" style={{ width: `${Math.min(100, (today / s.dailyGoal) * 100)}%` }} />
-          </div>
-          {r.goalHit && <p className="mt-2 text-sm font-medium text-gem">Goal reached. +20 bonus gems.</p>}
-        </div>
-      </div>
-      <button className="btn mt-8 w-full" autoFocus onClick={onDone}>Continue</button>
     </div>
   )
 }

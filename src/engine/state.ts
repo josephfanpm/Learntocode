@@ -48,6 +48,10 @@ export interface LearnerState {
   placedUnit?: number
   /** Prototype setting: every lesson is open. Off by default. */
   unlockAll?: boolean
+  /** Where the learner heard about the app (asked in setup, skippable). */
+  source?: string
+  /** The create-your-profile step after lesson one has been shown. */
+  profilePrompted?: boolean
   /** Pixel-art profile picture; unset until the learner makes one. */
   avatar?: AvatarSpec
   /** Interface sounds. Missing (older saves) means on. */

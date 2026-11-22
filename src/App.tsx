@@ -42,7 +42,7 @@ function Screens() {
     const found = findLesson(units, m[1])
     if (found) {
       const color = LINE_COLORS[units.indexOf(found.unit) % LINE_COLORS.length]
-      return <LessonPlayer key={m[1]} lesson={found.lesson} unit={found.unit} color={color} startAt={Number(m[2] ?? 0)} onExit={() => go('/')} />
+      return <LessonPlayer key={m[1]} lesson={found.lesson} unit={found.unit} color={color} startAt={Number(m[2] ?? 0)} onExit={() => go('/')} onAvatar={() => go('/avatar')} />
     }
   }
   return (

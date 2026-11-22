@@ -131,7 +131,7 @@ export function Home({ go }: { go: Go }) {
                 <h2 id={`h-${unit.id}`} className="text-xl leading-tight font-bold">{unit.title}</h2>
                 <p className="text-sm text-white/85">{unit.summary}</p>
                 <p className="mt-1 text-xs text-white/75">
-                  {unitSkipped ? 'Skipped by your placement test · open to review' : `Week ${unit.week} of CS50 · ${prog.done}/${prog.total} lessons`}
+                  {unitSkipped ? 'Skipped by your placement test · open to review' : `${unit.week <= 10 ? `Week ${unit.week} of CS50` : unit.week === 11 ? "CS50’s cybersecurity lecture" : "CS50’s final project"} · ${prog.done}/${prog.total} lessons`}
                 </p>
               </div>
             </div>
@@ -143,7 +143,8 @@ export function Home({ go }: { go: Go }) {
                 const isCur = st.status === 'current'
                 return (
                   <li key={st.lesson.id} className="relative flex justify-center py-3" style={{ transform: `translateX(${x}px)` }}>
-                    <div className="flex flex-col items-center">
+                    <div className="relative flex flex-col items-center">
+                      {isCur && <Pip mood="happy" size={64} className={`absolute top-2 ${x > 0 ? 'right-full mr-3' : 'left-full ml-3'}`} />}
                       <button
                         ref={isCur ? current : undefined}
                         disabled={st.status === 'locked'}

@@ -1,17 +1,25 @@
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Bell, Code2, Flame, Globe } from 'lucide-react'
 import { useState } from 'react'
 import { units } from '../content'
 import type { Motivation } from '../engine/state'
 import { useStore } from '../store'
+import { randomAvatar } from './Avatar'
 import type { Go } from './Home'
-import { Pip } from './Pip'
+import { Pip, type Mood } from './Pip'
 import { Placement } from './Placement'
 
-const WHYS: { id: Motivation; label: string }[] = [
-  { id: 'career', label: 'Change careers or get a new job' },
-  { id: 'work', label: 'Get more done at my current job' },
-  { id: 'build', label: 'Build my own app or website' },
-  { id: 'curious', label: 'I’m curious how it all works' },
+// Setup, in the order that gets people to a first lesson fastest:
+// welcome → Pip says hi → how you heard (skippable) → why → what you'll be
+// able to do → daily goal → reminders → starting point → lesson one.
+// Name and avatar are asked after the first lesson, not before it.
+
+const SOURCES = ['A friend or family member', 'Social media', 'Search', 'A video or podcast', 'Work or school', 'Somewhere else']
+
+const WHYS: { id: Motivation; label: string; reply: string }[] = [
+  { id: 'career', label: 'Change careers or get a new job', reply: 'Good plan. Every lesson is a step toward it.' },
+  { id: 'work', label: 'Get more done at my current job', reply: 'Smart. A little code saves a lot of clicking.' },
+  { id: 'build', label: 'Build my own app or website', reply: 'Love it. We’ll get you building.' },
+  { id: 'curious', label: 'I’m curious how it all works', reply: 'Same here. Curiosity is the best reason.' },
 ]
 
 export const GOALS = [
@@ -24,64 +32,111 @@ export const GOALS = [
 export const HOURS = [8, 12, 17, 19, 21]
 export const hourLabel = (h: number) => `${h % 12 || 12}${h < 12 ? 'am' : 'pm'}`
 
+const STEPS = 7
+
 export function Onboarding({ go }: { go: Go }) {
   const { update } = useStore()
   const [step, setStep] = useState(0)
+  const [source, setSource] = useState<string | null>(null)
   const [why, setWhy] = useState<Motivation | null>(null)
   const [goal, setGoal] = useState(20)
   const [hour, setHour] = useState(19)
-  const [name, setName] = useState('')
-  const [placed, setPlaced] = useState(0)
+  const [push, setPush] = useState(false)
+  const next = () => setStep((s) => s + 1)
 
-  const finish = async (askPush: boolean) => {
-    let push = false
-    if (askPush && typeof Notification !== 'undefined') push = (await Notification.requestPermission()) === 'granted'
-    update((s) => ({ ...s, onboarded: true, motivation: why ?? 'curious', dailyGoal: goal, reminderHour: hour, name: name.trim(), pushEnabled: push, placedUnit: placed }))
+  const finish = (placed: number) => {
+    update((s) => ({
+      ...s,
+      onboarded: true,
+      motivation: why ?? 'curious',
+      dailyGoal: goal,
+      reminderHour: hour,
+      pushEnabled: push,
+      placedUnit: placed,
+      source: source ?? undefined,
+      // Everyone starts with a random pixel avatar; they can change it after lesson one.
+      avatar: s.avatar ?? randomAvatar(),
+    }))
     go(`/lesson/${units[placed].lessons[0].id}`)
   }
 
-  const lessons = units.reduce((a, u) => a + u.lessons.length, 0)
+  const askPush = async () => {
+    if (typeof Notification !== 'undefined') setPush((await Notification.requestPermission()) === 'granted')
+    next()
+  }
+
+  if (step === 0)
+    return (
+      <div className="mx-auto flex min-h-dvh max-w-md flex-col items-center justify-center px-5 py-8 text-center">
+        <Pip mood="wave" size={150} className="mb-6" />
+        <h1 className="text-5xl leading-[1.02] font-extrabold">Learn to code from zero.</h1>
+        <p className="mt-4 text-lg text-ink-2">Free, fun, and a few minutes a day.</p>
+        <button className="btn mt-10 w-full" onClick={next}>Get started</button>
+      </div>
+    )
+
+  const whyReply = WHYS.find((w) => w.id === why)?.reply
+  const canPush = typeof Notification !== 'undefined' && Notification.permission !== 'denied'
 
   return (
-    <div className="mx-auto flex min-h-dvh max-w-md flex-col px-5 py-8">
-      {step > 0 && step !== 2 && (
-        <button aria-label="Back" onClick={() => setStep(step - 1)} className="-ml-1 self-start rounded-lg p-1 text-ink-3 hover:text-ink">
+    <div className="mx-auto flex min-h-dvh max-w-md flex-col px-5 py-6">
+      <header className="flex items-center gap-3">
+        <button aria-label="Back" onClick={() => setStep(step - 1)} className="-ml-1 rounded-lg p-1 text-ink-3 hover:text-ink">
           <ArrowLeft size={24} />
         </button>
-      )}
-      {step === 0 && (
-        <div className="flex flex-1 flex-col items-center justify-center text-center">
-          <div className="flex flex-col items-center">
-            <Pip mood="wave" size={130} className="mb-6" />
-            <h1 className="text-5xl leading-[1.02] font-extrabold">Learn to code from zero.</h1>
-            <p className="mt-4 text-lg text-ink-2">
-              A few minutes a day. {lessons} short lessons that follow Harvard’s CS50, from how computers think to building web pages. No experience or setup needed.
-            </p>
-          </div>
-          <button className="btn mt-10 w-full" onClick={() => setStep(1)}>Get started</button>
+        <div className="h-3.5 flex-1 overflow-hidden rounded-full bg-rule" role="progressbar" aria-valuenow={step} aria-valuemin={0} aria-valuemax={STEPS}>
+          <div className="bar-fill h-full rounded-full bg-cobalt" style={{ width: `${(step / STEPS) * 100}%` }} />
         </div>
-      )}
+      </header>
+
       {step === 1 && (
-        <Step title="What brings you here?" onNext={() => setStep(2)} canNext={!!why}>
+        <Talk key={1} mood="wave" say="Hi there. I’m Pip!" onNext={next}>
+          <p className="text-lg text-ink-2">A few quick questions, then your first lesson. It takes about a minute.</p>
+        </Talk>
+      )}
+
+      {step === 2 && (
+        <Talk key={2} mood="happy" say="How did you hear about ByteQuest?" onNext={next} canNext={!!source} onSkip={() => { setSource(null); next() }}>
+          {SOURCES.map((o) => (
+            <button key={o} aria-pressed={source === o} onClick={() => setSource(o)} className="tile w-full px-4 py-3.5 text-left font-medium">
+              {o}
+            </button>
+          ))}
+        </Talk>
+      )}
+
+      {step === 3 && (
+        <Talk key={3} mood={why ? 'cheer' : 'think'} say={whyReply ?? 'Why do you want to learn to code?'} onNext={next} canNext={!!why}>
           {WHYS.map((w) => (
-            <button key={w.id} aria-pressed={why === w.id} onClick={() => setWhy(w.id)} className="tile w-full px-4 py-4 text-left font-medium">
+            <button key={w.id} aria-pressed={why === w.id} onClick={() => setWhy(w.id)} className="tile w-full px-4 py-3.5 text-left font-medium">
               {w.label}
             </button>
           ))}
-        </Step>
+        </Talk>
       )}
-      {step === 2 && (
-        <Placement
-          onDone={(n) => {
-            setPlaced(n)
-            setStep(3)
-          }}
-        />
+
+      {step === 4 && (
+        <Talk key={4} mood="cheer" say="Here’s what you’ll be able to do." onNext={next}>
+          {[
+            { icon: Code2, title: 'Write real programs', note: 'Python from your first week, run right in the browser' },
+            { icon: Globe, title: 'Understand how tech works', note: 'Apps, websites, databases and AI, following Harvard’s CS50' },
+            { icon: Flame, title: 'Build a habit that sticks', note: 'Short lessons, a daily streak, and reminders when you want them' },
+          ].map(({ icon: Icon, title, note }, i) => (
+            <div key={title} className="rise-in flex items-start gap-3 rounded-2xl border-2 border-rule bg-white p-4" style={{ ['--i' as string]: i + 1 }}>
+              <Icon className="mt-0.5 shrink-0 text-cobalt" size={24} />
+              <div>
+                <p className="font-semibold">{title}</p>
+                <p className="text-sm text-ink-2">{note}</p>
+              </div>
+            </div>
+          ))}
+        </Talk>
       )}
-      {step === 3 && (
-        <Step title="Pick a daily goal" sub="You can change it any time." onNext={() => setStep(4)} canNext>
+
+      {step === 5 && (
+        <Talk key={5} mood="think" say="What’s your daily goal?" onNext={next}>
           {GOALS.map((g) => (
-            <button key={g.xp} aria-pressed={goal === g.xp} onClick={() => setGoal(g.xp)} className="tile flex w-full items-center justify-between px-4 py-3.5 text-left">
+            <button key={g.xp} aria-pressed={goal === g.xp} onClick={() => setGoal(g.xp)} className="tile flex w-full items-center justify-between px-4 py-3 text-left">
               <span>
                 <span className="block font-semibold">{g.label}</span>
                 <span className="text-sm text-ink-2">{g.note}</span>
@@ -89,56 +144,69 @@ export function Onboarding({ go }: { go: Go }) {
               <span className="font-display font-bold text-ink-2">{g.xp} XP</span>
             </button>
           ))}
-        </Step>
+        </Talk>
       )}
-      {step === 4 && (
-        <Step title="When should we remind you?" sub="One reminder, only on days you haven’t practiced yet." onNext={() => setStep(5)} canNext>
-          <div className="grid grid-cols-3 gap-2.5">
+
+      {step === 6 && (
+        <Talk
+          key={6}
+          mood="happy"
+          say="I’ll remind you to practice, so it becomes a habit."
+          onNext={canPush ? askPush : next}
+          nextLabel={canPush ? 'Remind me' : 'Continue'}
+          onSkip={canPush ? next : undefined}
+          skipLabel="Not now"
+        >
+          <div className="flex items-center gap-3 rounded-2xl border-2 border-rule bg-white p-4">
+            <Bell className="shrink-0 text-flame" size={24} />
+            <p className="text-sm text-ink-2">One reminder a day, only if you haven’t practiced yet. Pick a time:</p>
+          </div>
+          <div className="grid grid-cols-5 gap-2">
             {HOURS.map((h) => (
-              <button key={h} aria-pressed={hour === h} onClick={() => setHour(h)} className="tile py-3.5 font-semibold">
+              <button key={h} aria-pressed={hour === h} onClick={() => setHour(h)} className="tile py-3 text-sm font-semibold">
                 {hourLabel(h)}
               </button>
             ))}
           </div>
-        </Step>
+        </Talk>
       )}
-      {step === 5 && (
-        <div className="flex flex-1 flex-col justify-center">
-          <h1 className="text-3xl font-bold">What should we call you?</h1>
-          <p className="mt-1 text-ink-2">Optional.</p>
-          <input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            maxLength={30}
-            placeholder="First name"
-            autoFocus
-            className="mt-6 w-full rounded-xl border-2 border-rule bg-white px-4 py-3.5 text-lg outline-none focus:border-cobalt"
-          />
-          <div className="mt-8 grid gap-3">
-            {typeof Notification !== 'undefined' && Notification.permission !== 'denied' ? (
-              <>
-                <button className="btn w-full" onClick={() => finish(true)}>Turn on reminders and start</button>
-                <button className="btn btn-ghost w-full" onClick={() => finish(false)}>Start without reminders</button>
-              </>
-            ) : (
-              <button className="btn w-full" onClick={() => finish(false)}>Start lesson one</button>
-            )}
-          </div>
-        </div>
-      )}
+
+      {step === 7 && <Placement onDone={finish} />}
     </div>
   )
 }
 
-function Step({ title, sub, children, onNext, canNext }: { title: string; sub?: string; children: React.ReactNode; onNext: () => void; canNext: boolean }) {
+/** One setup screen: Pip asks in a speech bubble, options below, action under the content. */
+function Talk({
+  mood,
+  say,
+  children,
+  onNext,
+  canNext = true,
+  nextLabel = 'Continue',
+  onSkip,
+  skipLabel = 'Skip',
+}: {
+  mood: Mood
+  say: string
+  children: React.ReactNode
+  onNext: () => void
+  canNext?: boolean
+  nextLabel?: string
+  onSkip?: () => void
+  skipLabel?: string
+}) {
   return (
-    <div className="flex flex-1 flex-col justify-center">
-      <h1 className="text-3xl font-bold">{title}</h1>
-      {sub && <p className="mt-1 text-ink-2">{sub}</p>}
-      <div className="mt-6 space-y-3">{children}</div>
-      <button className="btn mt-8 w-full" disabled={!canNext} onClick={onNext}>
-        Continue
-      </button>
+    <div className="flex flex-1 flex-col justify-center py-6">
+      <div className="flex items-start gap-3">
+        <Pip mood={mood} size={84} className="shrink-0" />
+        <h1 key={say} className="bubble mt-2 font-sans text-lg leading-snug font-semibold">{say}</h1>
+      </div>
+      <div className="mt-6 space-y-2.5">{children}</div>
+      <div className="mt-7 grid gap-3">
+        <button className="btn w-full" disabled={!canNext} onClick={onNext}>{nextLabel}</button>
+        {onSkip && <button className="btn btn-ghost w-full" onClick={onSkip}>{skipLabel}</button>}
+      </div>
     </div>
   )
 }
