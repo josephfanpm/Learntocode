@@ -47,8 +47,8 @@ export function Onboarding({ go }: { go: Go }) {
         </button>
       )}
       {step === 0 && (
-        <div className="flex flex-1 flex-col">
-          <div className="flex flex-1 flex-col justify-center">
+        <div className="flex flex-1 flex-col items-center justify-center text-center">
+          <div className="flex flex-col items-center">
             <svg viewBox="-12 -12 244 144" className="mb-8 w-60" aria-hidden>
               <path d="M10 100 C 60 100, 60 20, 110 20 S 160 100, 210 100" fill="none" stroke="#2d5be3" strokeWidth="10" strokeLinecap="round" />
               <path d="M10 60 H 210" fill="none" stroke="#ff7a1a" strokeWidth="10" strokeLinecap="round" />
@@ -61,7 +61,7 @@ export function Onboarding({ go }: { go: Go }) {
               A few minutes a day. {lessons} short lessons that follow Harvard’s CS50, from how computers think to building web pages. No experience or setup needed.
             </p>
           </div>
-          <button className="btn w-full" onClick={() => setStep(1)}>Get started</button>
+          <button className="btn mt-10 w-full" onClick={() => setStep(1)}>Get started</button>
         </div>
       )}
       {step === 1 && (
@@ -98,8 +98,8 @@ export function Onboarding({ go }: { go: Go }) {
         </Step>
       )}
       {step === 4 && (
-        <div className="flex flex-1 flex-col">
-          <h1 className="mt-6 text-3xl font-bold">What should we call you?</h1>
+        <div className="flex flex-1 flex-col justify-center">
+          <h1 className="text-3xl font-bold">What should we call you?</h1>
           <p className="mt-1 text-ink-2">Optional.</p>
           <input
             value={name}
@@ -109,7 +109,7 @@ export function Onboarding({ go }: { go: Go }) {
             autoFocus
             className="mt-6 w-full rounded-xl border-2 border-rule bg-white px-4 py-3.5 text-lg outline-none focus:border-cobalt"
           />
-          <div className="mt-auto grid gap-3 pt-8">
+          <div className="mt-8 grid gap-3">
             {typeof Notification !== 'undefined' && Notification.permission !== 'denied' ? (
               <>
                 <button className="btn w-full" onClick={() => finish(true)}>Turn on reminders and start</button>
@@ -127,11 +127,11 @@ export function Onboarding({ go }: { go: Go }) {
 
 function Step({ title, sub, children, onNext, canNext }: { title: string; sub?: string; children: React.ReactNode; onNext: () => void; canNext: boolean }) {
   return (
-    <div className="flex flex-1 flex-col">
-      <h1 className="mt-6 text-3xl font-bold">{title}</h1>
+    <div className="flex flex-1 flex-col justify-center">
+      <h1 className="text-3xl font-bold">{title}</h1>
       {sub && <p className="mt-1 text-ink-2">{sub}</p>}
       <div className="mt-6 space-y-3">{children}</div>
-      <button className="btn mt-auto w-full" disabled={!canNext} onClick={onNext}>
+      <button className="btn mt-8 w-full" disabled={!canNext} onClick={onNext}>
         Continue
       </button>
     </div>
