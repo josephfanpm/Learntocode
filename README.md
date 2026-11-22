@@ -1,12 +1,12 @@
 # ByteQuest: learning to code as a daily habit
 
-ByteQuest teaches people who have never coded, a few minutes a day. It takes the content of Harvard's CS50 and delivers it the way a habit app would: short lessons, a streak, a mascot, and reminders that respond to how each learner is doing. A second course, Developer skills, covers the day-to-day craft CS50 leaves out. It is a working prototype that runs entirely in the browser.
+ByteQuest teaches people who have never coded, a few minutes a day. It takes the content of Harvard's CS50 and delivers it the way a habit app would: short lessons, a streak, a mascot, and reminders that respond to how each learner is doing. Two more courses go further: Developer skills covers the day-to-day craft CS50 leaves out, and Building with AI covers language models, agents and Claude Code from the ground up. It is a working prototype that runs entirely in the browser.
 
 **[Try the live demo](https://josephfanpm.github.io/Learntocode/)**
 
 ![Four screens: Pip asking why you want to learn, the Learn tab with the course switcher and the Developer skills path, a step-through binary search question, and the badges on the profile](docs/screenshot.png)
 
-This is an independent portfolio project. It is not affiliated with or endorsed by Harvard, CS50 or any other learning app. There are no real learners yet, so there are no usage numbers here.
+This is an independent portfolio project. It is not affiliated with or endorsed by Harvard, CS50, Anthropic or any other learning app. There are no real learners yet, so there are no usage numbers here.
 
 ## At a glance
 
@@ -14,8 +14,8 @@ This is an independent portfolio project. It is not affiliated with or endorsed 
 |---|---|
 | **Problem** | The best free way to learn computer science is a university course built from long lectures and multi-hour problem sets. People with jobs and no background start it and stop. |
 | **User** | An adult with no coding experience who wants to change careers, get more done at work, build something, or understand how technology works, and has minutes a day rather than hours. |
-| **Solution** | CS50's full arc, rewritten as 112 three-minute lessons with real code that runs in the browser, plus a 60-lesson Developer skills course, wrapped in a habit loop: streaks, a daily goal, a placement quiz, and reminders timed to when the learner usually practices. |
-| **Result** | A working prototype: two courses, 26 units, 172 lessons and 1,675 exercises, 26 tests on the streak, unlock, reminder, hint, badge and save logic, and a checker that runs every code exercise's answer. No real-world result: nobody has been measured using it. |
+| **Solution** | CS50's full arc, rewritten as 112 three-minute lessons with real code that runs in the browser, plus 60-lesson courses on Developer skills and Building with AI, wrapped in a habit loop: streaks, a daily goal, a placement quiz, and reminders timed to when the learner usually practices. |
+| **Result** | A working prototype: three courses, 38 units, 232 lessons and 2,244 exercises, 26 tests on the streak, unlock, reminder, hint, badge and save logic, and a checker that runs every code exercise's answer. No real-world result: nobody has been measured using it. |
 | **My role** | Product and build: the problem, the course structure, the habit and reminder rules, the trade-offs, and the prototype. |
 
 ## Problem
@@ -45,6 +45,7 @@ Language-learning apps solved the same shape of problem with short sessions, imm
 
 - **The whole of CS50, in small steps.** Fourteen units follow the course week by week, from binary to web apps, AI and cybersecurity, then a systems design unit that goes beyond CS50, and a final project. Each unit covers that week's lecture ideas and the ideas behind its labs and problem sets, rewritten as original lessons of 7 to 10 exercises.
 - **A second course for the job.** Developer skills is twelve chapters on what an entry-level developer needs beyond computer science: Git, testing, real JavaScript, frameworks and TypeScript, the developer's setup, shipping, APIs, working in existing code, databases in practice, teamwork, accessibility, and everyday tools. It has its own path, switched from the top of the Learn tab, and can be started at any time.
+- **A third course on AI.** Building with AI is twelve chapters: how language models work, prompting, the Claude API, context, reliable output, tools, agents, Claude Code, MCP, working with coding agents, and building responsibly. Product facts were checked against the official documentation; prices and limits are left out because they change.
 - **Real code, no setup.** Python, JavaScript and SQL run in the browser tab, and web pages are checked as they are built. A program that loops forever is stopped after six seconds, and error messages are rewritten as one plain sentence.
 - **Ten kinds of exercise.** Beyond multiple choice: put lines in order by dragging, match pairs, fill gaps, write code, tap the line with the bug, flip switches to make a binary number, act out an algorithm by tapping the box it would check next, and type what a program prints.
 - **Two-step hints on every question.** The first press recaps the idea being tested; the second gives a specific nudge, such as ruling out two wrong options or revealing which line goes first. Hints are free.
@@ -93,6 +94,27 @@ Language-learning apps solved the same shape of problem with short sessions, imm
 | 12 Everyday tools | Regular expressions, dates and time zones, type hints, file formats | Writing patterns and date code in Python |
 
 Three things in this course cannot be learned by tapping through lessons: installing tools, using Git on a real project, and deploying. Those chapters teach the ideas and commands, then hand over to a checklist to do for real.
+
+### The Building with AI course
+
+| Chapter | Topics | How it is taught |
+|---|---|---|
+| 1 How language models work | Tokens, next-token prediction, sampling, the context window, hallucination | Acting out next-word choices; spotting the claim to verify |
+| 2 Prompting well | Clear instructions, context, examples, roles, structure, thinking step by step, iterating | Picking the better prompt; spotting the vague or contradictory line |
+| 3 The Claude API | The Messages API, stateless conversations, content blocks, stop reasons, usage, models, keys, retries | Reading real SDK code; writing the code around a stand-in model |
+| 4 Context | Token budgets, cost, long conversations, retrieval, caching, context engineering | Estimating tokens, trimming a history, picking the best chunks |
+| 5 Reliable output | JSON output, validation, retries, grounding, evaluation sets | Parsing and validating replies; scoring two prompt versions |
+| 6 Tools | Tool definitions, the tool-use loop, errors, choosing among tools | Writing the dispatcher and the full loop |
+| 7 Agents from the ground up | The agent loop, workflows vs agents, the common patterns, step limits, memory | Writing an agent loop with a step limit, a router, a chain, an evaluator loop |
+| 8 Claude Code basics | What it is, sessions, permissions, diffs, good tasks, CLAUDE.md | Realistic sessions: what happens next, which command to decline |
+| 9 Claude Code in depth | Memory, permission rules, commands, skills, subagents, hooks, long sessions | Which feature fits; what belongs in a memory file |
+| 10 Connecting things with MCP | Hosts, clients and servers; tools, resources, prompts; trust | Building a toy server in Python (labelled as a teaching model, not the real protocol) |
+| 11 Working with coding agents | Good tasks, small steps, tests as guard rails, reading diffs, staying responsible | Spotting the bug or weakened test in an AI-written change |
+| 12 Building responsibly | Prompt injection, least privilege, approval, privacy, honesty | A capstone: design a support-inbox triage agent with an approval rule |
+
+The app cannot call a real model, since that would need a private API key in the browser. Learners instead write the code that surrounds a model call, in Python, against a scripted stand-in whose replies have the same shape as real ones. Real API code is shown read-only.
+
+Sources for this course: the [Claude API documentation](https://docs.claude.com), the [Claude Code documentation](https://code.claude.com/docs), Anthropic's [Building effective agents](https://www.anthropic.com/engineering/building-effective-agents), and the [Model Context Protocol](https://modelcontextprotocol.io) site, read in November 2026. The lessons are original writing.
 
 ### How the habit loop works
 
@@ -148,12 +170,15 @@ I built ByteQuest with Claude Code as a pair programmer. I set the product direc
 | **Sound** | None · sounds from famous games · an open-licensed pack · made in code | Original classic-console sounds made in code (pulse waves, triangle bass, noise); the right-answer blip climbs with each answer in a row | The instant recognition of a famous game's sounds, and the polish of studio-made effects | Sound marks the moments that matter. Sounds from real games are copyrighted whether or not the app makes money, so the style was borrowed and every tune is original. |
 | **Saving progress** | Accounts and a server · browser only · browser plus export | Browser storage with a backup file and a save code | Automatic sync across devices | A prototype with no server has nothing to breach and nothing to run. The save code covers moving devices without an account. |
 | **Where job skills go** | Leave them out · bonus chapters after the final project · a second course | A second course with its own path | One simple, single path | Twelve chapters would have doubled the path and buried the final project. A separate course keeps the first one's promise clear (CS50, in small steps) and lets someone who already programs start with Git or testing. |
+| **Teaching AI without calling a model** | Call a real model from the browser · teach it read-only · a scripted stand-in | Learners write the surrounding code against a stand-in with realistically shaped replies | The feel of a live model answering | A real call needs a secret key, which cannot live in a static site. The stand-in keeps exercises deterministic, so every answer can be checked, and the skill being taught (the loop around the model) is the same. |
+| **Product facts that change** | State everything · state only what the official docs confirm, without prices or limits | Only what the docs confirm, dated, no prices or limits | Some specifics a learner might want | A lesson with a wrong command or an old price teaches the wrong thing with confidence. Anything that could not be confirmed was left out. |
 | **Running JavaScript** | Read-only snippets · run it in the page · run it in a worker | A worker with a four-second limit, with console.log as the output | The DOM, timers and network inside exercises | JavaScript is the one language a browser runs natively, so learners should write it. A worker means an endless loop is stopped instead of freezing the lesson. |
 | **Getting around** | Links in the top bar · bottom tabs | Two bottom tabs: Learn and Profile | Screen height on small phones | From the profile there was no obvious way back to the lessons. Tabs make both places one tap away and always visible. |
 | **Internal tooling in the app** | Keep a page that simulates which reminders each kind of learner gets · remove it | Removed | A visible demonstration of the reminder rules | It was a tool for the builder, not something a learner needs. The rules and their tests remain. |
 
 ## What is not here
 
+- **AI course facts will age.** They were checked against the official documentation in November 2026; commands, model names and features change.
 - **No real learners or results.** Whether this keeps people learning is untested.
 - **No accounts or sync.** Progress stays in the browser unless exported.
 - **No real push or email delivery.** The rules run; a server would be needed to deliver when the app is closed.

@@ -45,7 +45,7 @@ export const u31: Unit = {
         {
           kind: 'concept',
           title: 'A brain in a jar',
-          body: 'On its own, a model only writes text from what it learned in training and what is in the prompt. It cannot:\n\n- **look things up**, like today\'s weather or your orders\n- **calculate** big sums reliably\n- **act**: send an email, save a file\n\nA **tool** fixes this. It is a function in *your* program that the model can ask you to run.',
+          body: 'On its own, a model only writes text from its training and the prompt. It cannot:\n\n- **look things up**, like today\'s weather or your orders\n- **calculate** big sums reliably\n- **act**: send an email, save a file\n\nA **tool** fixes this. It is a function in *your* program that the model can ask you to run.',
         },
         {
           kind: 'choice',

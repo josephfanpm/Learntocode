@@ -463,7 +463,7 @@ export const u33: Unit = {
         {
           kind: 'concept',
           title: 'Interrupt and redirect',
-          body: 'You are part of the loop. If the agent heads the wrong way, do not wait.\n\n- Press **`Esc`** to stop it. Work so far is kept, and you can give a new instruction.\n- Or just type a correction while it works.\n- **`/rewind`** rolls file edits back to an earlier point.\n\nRewinding covers file changes only, not things like a database or a deploy.',
+          body: 'You are part of the loop. If the agent heads the wrong way, do not wait.\n\n- Press **`Esc`** to stop it. Work so far is kept.\n- Or type a correction while it works.\n- **`/rewind`** rolls file edits back to an earlier point.\n\nRewinding covers file changes only, not a database or a deploy.',
         },
         {
           kind: 'steps',
