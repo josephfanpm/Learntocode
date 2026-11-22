@@ -124,7 +124,7 @@ export function Home({ go }: { go: Go }) {
 
   return (
     <div className="mx-auto max-w-xl px-4 pb-28">
-      <div className="mt-4 grid grid-cols-2 gap-2" role="tablist" aria-label="Course">
+      <div className="mt-4 grid grid-cols-3 gap-2" role="tablist" aria-label="Course">
         {COURSES.map((c) => (
           <button
             key={c.id}
@@ -135,16 +135,15 @@ export function Home({ go }: { go: Go }) {
               update((prev) => ({ ...prev, course: c.id }))
               window.scrollTo(0, 0)
             }}
-            className="tile px-3 py-2.5 text-left"
+            className="tile px-2 py-2.5 text-center font-display text-[0.9rem] leading-tight font-bold"
           >
-            <span className="block font-display leading-tight font-bold">{c.title}</span>
-            <span className="text-xs text-ink-2">{c.blurb}</span>
+            {c.short}
           </button>
         ))}
       </div>
-      {course === 'dev' && (
-        <p className="mt-3 text-sm text-ink-2">Best after the Computer science units on Python, SQL and web pages, but open to start any time.</p>
-      )}
+      <p className="mt-3 text-sm text-ink-2">
+        {COURSES.find((c) => c.id === course)!.blurb}.{COURSES.find((c) => c.id === course)!.note ? ` ${COURSES.find((c) => c.id === course)!.note}` : ''}
+      </p>
       {banners.length > 0 && (
         <div className="mt-4 space-y-3">
           {banners.map((m) => (
@@ -168,7 +167,7 @@ export function Home({ go }: { go: Go }) {
                 <h2 id={`h-${unit.id}`} className="text-xl leading-tight font-bold">{unit.title}</h2>
                 <p className="text-sm text-white/85">{unit.summary}</p>
                 <p className="mt-1 text-xs text-white/75">
-                  {unitSkipped ? 'Skipped by your placement test · open to review' : `${unit.course === 'dev' ? `Chapter ${unit.week} of ${units.length}` : unit.week <= 10 ? `Week ${unit.week} of CS50` : unit.week === 11 ? "CS50’s cybersecurity lecture" : unit.week === 12 ? "Beyond CS50" : "CS50’s final project"} · ${prog.done}/${prog.total} lessons`}
+                  {unitSkipped ? 'Skipped by your placement test · open to review' : `${(unit.course ?? 'cs') !== 'cs' ? `Chapter ${unit.week} of ${units.length}` : unit.week <= 10 ? `Week ${unit.week} of CS50` : unit.week === 11 ? "CS50’s cybersecurity lecture" : unit.week === 12 ? "Beyond CS50" : "CS50’s final project"} · ${prog.done}/${prog.total} lessons`}
                 </p>
               </div>
             </div>

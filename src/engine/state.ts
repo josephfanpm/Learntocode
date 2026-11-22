@@ -54,7 +54,7 @@ export interface LearnerState {
   /** Prototype setting: every lesson is open. Off by default. */
   unlockAll?: boolean
   /** The course shown on the Learn tab. Missing = 'cs'. */
-  course?: 'cs' | 'dev'
+  course?: 'cs' | 'dev' | 'ai'
   /** Where the learner heard about the app (asked in setup, skippable). */
   source?: string
   /** The create-your-profile step after lesson one has been shown. */

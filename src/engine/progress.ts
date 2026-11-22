@@ -21,7 +21,7 @@ export function path(units: Unit[], s: LearnerState): PathLesson[] {
   const out: PathLesson[] = []
   let foundCurrent = false
   // The placement quiz is about the CS course; it never skips Developer skills units.
-  const placed = units.some((u) => u.course === 'dev') ? 0 : (s.placedUnit ?? 0)
+  const placed = units.some((u) => (u.course ?? 'cs') !== 'cs') ? 0 : (s.placedUnit ?? 0)
   units.forEach((unit, ui) => {
     for (const lesson of unit.lessons) {
       let status: NodeStatus

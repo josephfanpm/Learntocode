@@ -172,8 +172,9 @@ export interface Unit {
   /**
    * Which course the unit belongs to. Missing = 'cs', the CS50-based course.
    * 'dev' = Developer skills: the day-to-day craft CS50 doesn't cover.
+   * 'ai' = Building with AI: LLMs, prompting, the Claude API, agents, Claude Code.
    */
-  course?: 'cs' | 'dev'
+  course?: 'cs' | 'dev' | 'ai'
   title: string
   /** One short line shown on the path, e.g. "Variables, input and decisions". */
   summary: string
