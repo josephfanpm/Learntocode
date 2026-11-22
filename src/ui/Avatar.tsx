@@ -93,7 +93,7 @@ export function AvatarBuilder({ go }: { go: Go }) {
   }
 
   return (
-    <div className="mx-auto max-w-xl px-4 py-6 pb-24">
+    <div className="mx-auto max-w-xl px-4 py-6 pb-28">
       <h1 className="text-3xl font-bold">{s.avatar ? 'Edit your avatar' : 'Make your avatar'}</h1>
       <div className="mt-5 flex items-end gap-4">
         <Avatar avatar={a} size={148} className="border-4 border-white shadow-[0_6px_0_var(--color-rule)]" />

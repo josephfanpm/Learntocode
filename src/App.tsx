@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { units } from './content'
 import { findLesson } from './engine/progress'
 import { StoreProvider, useStore } from './store'
-import { Home, LINE_COLORS, TopBar, type Go } from './ui/Home'
+import { BottomNav, Home, LINE_COLORS, TopBar, type Go } from './ui/Home'
 import { AvatarBuilder } from './ui/Avatar'
 import { LessonPlayer } from './ui/LessonPlayer'
 import { Onboarding } from './ui/Onboarding'
@@ -41,6 +41,7 @@ function Screens() {
     <>
       <TopBar go={go} />
       {route.startsWith('/me') ? <Profile go={go} /> : route === '/avatar' ? <AvatarBuilder go={go} /> : <Home go={go} />}
+      <BottomNav route={route} go={go} />
     </>
   )
 }

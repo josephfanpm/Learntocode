@@ -1,4 +1,4 @@
-import { Check, FastForward, Flame, Play, Gem, Lock, Snowflake, X } from 'lucide-react'
+import { Check, FastForward, Flame, Map, Play, Gem, Lock, Snowflake, X } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 import { units } from '../content'
 import { dayKey } from '../engine/dates'
@@ -46,9 +46,6 @@ export function TopBar({ go }: { go: Go }) {
           </svg>
           {pct >= 1 && <Check size={14} strokeWidth={3} className="absolute inset-0 m-auto text-flame" />}
         </button>
-        <button onClick={() => go('/me')} className="ml-1 rounded-[28%]" aria-label="Your profile">
-          <Avatar avatar={s.avatar} size={34} />
-        </button>
       </div>
     </header>
   )
@@ -65,6 +62,28 @@ const BANNER_MOOD: Record<string, Mood> = {
   goal_close: 'cheer',
   freeze_offer: 'think',
   avatar_prompt: 'wave',
+}
+
+/** Bottom tabs: the lesson path and the profile. */
+export function BottomNav({ route, go }: { route: string; go: Go }) {
+  const { s } = useStore()
+  const onProfile = route.startsWith('/me') || route === '/avatar'
+  const tab = (active: boolean) =>
+    `flex flex-1 flex-col items-center gap-0.5 rounded-xl py-1.5 text-xs font-semibold transition-colors ${active ? 'bg-cobalt-soft text-cobalt-deep' : 'text-ink-3 hover:text-ink'}`
+  return (
+    <nav aria-label="Main" className="fixed inset-x-0 bottom-0 z-10 border-t-2 border-rule bg-paper/95 backdrop-blur">
+      <div className="mx-auto flex max-w-xl gap-2 px-4 py-2">
+        <button className={tab(!onProfile)} aria-current={!onProfile ? 'page' : undefined} onClick={() => go('/')}>
+          <Map size={24} />
+          Learn
+        </button>
+        <button className={tab(onProfile)} aria-current={onProfile ? 'page' : undefined} onClick={() => go('/me')}>
+          <Avatar avatar={s.avatar} size={24} />
+          Profile
+        </button>
+      </div>
+    </nav>
+  )
 }
 
 export function Banner({ m, go, onDismiss }: { m: Message; go: Go; onDismiss: () => void }) {
@@ -107,7 +126,7 @@ export function Home({ go }: { go: Go }) {
   }, [])
 
   return (
-    <div className="mx-auto max-w-xl px-4 pb-24">
+    <div className="mx-auto max-w-xl px-4 pb-28">
       {banners.length > 0 && (
         <div className="mt-4 space-y-3">
           {banners.map((m) => (

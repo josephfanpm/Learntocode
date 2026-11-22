@@ -15,7 +15,7 @@ This is an independent portfolio project. It is not affiliated with or endorsed 
 | **Problem** | The best free way to learn computer science is a university course built from long lectures and multi-hour problem sets. People with jobs and no background start it and stop. |
 | **User** | An adult with no coding experience who wants to change careers, get more done at work, build something, or understand how technology works, and has minutes a day rather than hours. |
 | **Solution** | CS50's full arc, rewritten as 107 three-minute lessons with real code that runs in the browser, wrapped in a habit loop: streaks, a daily goal, a placement quiz, and reminders timed to when the learner usually practices. |
-| **Result** | A working prototype: 13 units, 1,038 exercises, 20 tests on the streak, unlock, reminder and save logic, and a checker that runs every code exercise's answer. No real-world result: nobody has been measured using it. |
+| **Result** | A working prototype: 13 units, 1,038 exercises, 21 tests on the streak, unlock, reminder, badge and save logic, and a checker that runs every code exercise's answer. No real-world result: nobody has been measured using it. |
 | **My role** | Product and build: the problem, the course structure, the habit and reminder rules, the trade-offs, and the prototype. |
 
 ## Problem
@@ -51,6 +51,7 @@ Language-learning apps solved the same shape of problem with short sessions, imm
 - **A habit loop.** A daily streak, streak freezes for missed days, a daily goal, lessons that unlock in order, and wrong answers that come back at the end of the lesson.
 - **Reminders that adapt.** In-app banners, browser notifications and email (simulated) come from one set of rules that read the learner's activity. See below.
 - **A character.** Pip is a pixel-art red panda who reacts to answers, and every learner gets a pixel-art avatar in the same style.
+- **Badges that level up.** Six pixel-art badges (sword, flame, shield, star, gem, trophy) climb from bronze to silver to gold, each with a progress bar toward the next tier.
 - **Progress that can be kept.** Progress lives in the browser; a backup file or a save code moves it to another device.
 
 ### The course
@@ -122,6 +123,7 @@ I built ByteQuest with Claude Code as a pair programmer. I set the product direc
 | **Mascot** | None · smooth vector character · pixel art | A pixel-art red panda with seven moods | The fluid motion of a rigged character | A character makes feedback feel like it comes from someone. Pixel art suits the subject, animates frame by frame in code, and is cheap to extend to learner avatars. |
 | **Sound** | None · licensed pack · made in code | Original chip-style sounds made in code; the right-answer sound climbs with each answer in a row | The polish of studio-made effects | Sound marks the moments that matter. Making it in code keeps it original, free of licences, and matched to the art. |
 | **Saving progress** | Accounts and a server · browser only · browser plus export | Browser storage with a backup file and a save code | Automatic sync across devices | A prototype with no server has nothing to breach and nothing to run. The save code covers moving devices without an account. |
+| **Getting around** | Links in the top bar · bottom tabs | Two bottom tabs: Learn and Profile | Screen height on small phones | From the profile there was no obvious way back to the lessons. Tabs make both places one tap away and always visible. |
 | **Internal tooling in the app** | Keep a page that simulates which reminders each kind of learner gets · remove it | Removed | A visible demonstration of the reminder rules | It was a tool for the builder, not something a learner needs. The rules and their tests remain. |
 
 ## What is not here
@@ -137,7 +139,7 @@ I built ByteQuest with Claude Code as a pair programmer. I set the product direc
 ```sh
 npm install
 npm run dev        # http://localhost:5173
-npm test           # streak, unlock, reminder and save tests
+npm test           # streak, unlock, reminder, badge and save tests
 npx tsx scripts/check-content.ts   # validates every exercise; runs each Python and SQL answer against its tests
 ```
 

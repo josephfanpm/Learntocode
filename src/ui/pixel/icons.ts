@@ -1,0 +1,121 @@
+// Pixel-art badge icons on a 12×12 grid, in the same style as Pip.
+// Keys: o outline, a main colour, b highlight, c shade, w white, . empty.
+import type { Pixel } from './sprites'
+
+export type BadgeIcon = 'flame' | 'sword' | 'shield' | 'trophy' | 'star' | 'gem'
+export type Tier = 'locked' | 'bronze' | 'silver' | 'gold'
+
+const ART: Record<BadgeIcon, string[]> = {
+  flame: [
+    '.....o......',
+    '....oao.....',
+    '....oaao....',
+    '...oaaao.o..',
+    '..oaabaaoao.',
+    '..oabbbaaao.',
+    '.oaabwbbaao.',
+    '.oabbwwbbao.',
+    '.oabwwwwbao.',
+    '..oabwwbao..',
+    '...oabbao...',
+    '....oooo....',
+  ],
+  sword: [
+    '.........ooo',
+    '........obwo',
+    '.......obwo.',
+    '......obwo..',
+    '.....obwo...',
+    '.o..obwo....',
+    'oaoobwo.....',
+    '.oaawo......',
+    '..oaao......',
+    '.ocooao.....',
+    'oco..oo.....',
+    'oo..........',
+  ],
+  shield: [
+    '.oooooooooo.',
+    'obbbbbaaaaao',
+    'obwbbbaaaaao',
+    'obbbbbaaaaao',
+    'obbbbbaaaaao',
+    'oaaaaaccccco',
+    'oaaaaaccccco',
+    '.oaaaacccco.',
+    '.oaaaacccco.',
+    '..oaaaccco..',
+    '...oaacco...',
+    '....oooo....',
+  ],
+  trophy: [
+    '.oooooooooo.',
+    'ooabbaaaacoo',
+    'o.obwaaaco.o',
+    'o.obbaaaco.o',
+    '.oobbaaacoo.',
+    '...obaaco...',
+    '....oaco....',
+    '.....oo.....',
+    '.....oo.....',
+    '....oaco....',
+    '...oaaaco...',
+    '...oooooo...',
+  ],
+  star: [
+    '.....oo.....',
+    '....obao....',
+    '....obao....',
+    'oooobbaaoooo',
+    'obbbwbaaaaao',
+    '.obbbbaaaao.',
+    '..obbaaaao..',
+    '..obaaaaco..',
+    '.obaaooacco.',
+    '.oaaoooocco.',
+    'oaao....occo',
+    'ooo......ooo',
+  ],
+  gem: [
+    '............',
+    '..oooooooo..',
+    '.obbwwaaaao.',
+    'obbwwaaaaaco',
+    'oooooooooooo',
+    'oabbbaaaccco',
+    '.oabbaaacco.',
+    '..oabaaaco..',
+    '...oabaco...',
+    '....oaco....',
+    '.....oo.....',
+    '............',
+  ],
+}
+
+const TIERS: Record<Tier, { a: string; b: string; c: string; bg: string }> = {
+  locked: { a: '#c3cad8', b: '#dde2ec', c: '#a4adc0', bg: '#eef1f6' },
+  bronze: { a: '#d0803a', b: '#f3b57c', c: '#94511c', bg: '#fbe9d8' },
+  silver: { a: '#a3aec2', b: '#e6ebf3', c: '#6b768c', bg: '#e9edf5' },
+  gold: { a: '#ffc531', b: '#fff0a8', c: '#c98a12', bg: '#fff3cc' },
+}
+
+/** Icons that keep their own colours once earned (a flame should look like fire). */
+const OWN: Partial<Record<BadgeIcon, { a: string; b: string; c: string }>> = {
+  flame: { a: '#ff7a1a', b: '#ffc531', c: '#d6481a' },
+}
+
+export function badgeBackground(tier: Tier): string {
+  return TIERS[tier].bg
+}
+
+export function badgePixels(icon: BadgeIcon, tier: Tier): Pixel[] {
+  const t = tier !== 'locked' && OWN[icon] ? OWN[icon]! : TIERS[tier]
+  const colors: Record<string, string> = { o: tier === 'locked' ? '#8691ad' : '#241a2e', a: t.a, b: t.b, c: t.c, w: '#ffffff' }
+  const px: Pixel[] = []
+  ART[icon].forEach((row, y) =>
+    [...row].forEach((ch, x) => {
+      if (ch !== '.') px.push([x, y, colors[ch]])
+    }),
+  )
+  return px
+}

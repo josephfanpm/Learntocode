@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import type { Unit } from '../content/types'
 import { addDays } from './dates'
 import { decide, facts } from './messaging'
-import { path } from './progress'
+import { badges, path } from './progress'
 import { PERSONAS, simulate } from './simulate'
 import { completeLesson, exportSave, importSave, longestStreak, newLearner, reconcile, streak, type LearnerState } from './state'
 
@@ -86,6 +86,21 @@ describe('lessons and unlocks', () => {
     for (const id of ['u0-l1', 'u0-l2', 'u0-l3']) [s] = completeLesson(s, id, 1, at('2026-11-01'))
     const p = path(units, s)
     expect(p.map((x) => x.status)).toEqual(['done', 'done', 'done', 'current', 'locked'])
+  })
+})
+
+describe('badges', () => {
+  it('start locked and climb bronze, silver, gold', () => {
+    const fresh = newLearner(at('2026-11-01'))
+    expect(badges(units, fresh, 0).every((b) => b.tier === 'locked')).toBe(true)
+    const byId = (st: LearnerState, streakBest: number) => Object.fromEntries(badges(units, st, streakBest).map((b) => [b.id, b]))
+    const one = practicedOn(['2026-11-01'])
+    expect(byId(one, 1).quest.tier).toBe('gold') // single-step badge goes straight to gold
+    expect(byId(one, 1).streak).toMatchObject({ tier: 'locked', value: 1, goal: 3 })
+    expect(byId(one, 3).streak).toMatchObject({ tier: 'bronze', goal: 7 })
+    expect(byId(one, 8).streak.tier).toBe('silver')
+    expect(byId(one, 30).streak).toMatchObject({ tier: 'gold', value: 30, goal: 30 })
+    expect(byId(one, 1).perfect.tier).toBe('bronze')
   })
 })
 

@@ -7,7 +7,8 @@ import { buyFreeze, exportSave, FREEZE_PRICE, importSave, longestStreak, MAX_FRE
 import { play, setSoundEnabled } from '../sound'
 import { useStore } from '../store'
 import { Avatar } from './Avatar'
-import { Pip } from './Pip'
+import { badgeBackground, badgePixels } from './pixel/icons'
+import { PixelSprite } from './pixel/PixelSprite'
 import { GOALS, HOURS, hourLabel } from './Onboarding'
 import type { Go } from './Home'
 
@@ -45,7 +46,7 @@ export function Profile({ go }: { go: Go }) {
   )
 
   return (
-    <div className="mx-auto max-w-xl space-y-8 px-4 py-6 pb-20">
+    <div className="mx-auto max-w-xl space-y-8 px-4 py-6 pb-28">
       <div className="flex items-center gap-4">
         <button onClick={() => go('/avatar')} className="group relative rounded-[28%]" aria-label={s.avatar ? 'Edit your avatar' : 'Make your avatar'}>
           <Avatar avatar={s.avatar} size={84} className="border-4 border-white shadow-[0_5px_0_var(--color-rule)]" />
@@ -60,7 +61,6 @@ export function Profile({ go }: { go: Go }) {
             <button className="mt-1 text-sm font-semibold text-cobalt" onClick={() => go('/avatar')}>Make your avatar</button>
           )}
         </div>
-        <Pip mood={practicedToday(s, today) ? 'happy' : 'sleepy'} size={64} className="hidden sm:inline-block" />
       </div>
 
       <section className="grid grid-cols-2 gap-3">
@@ -105,12 +105,26 @@ export function Profile({ go }: { go: Go }) {
 
       <section aria-labelledby="badges">
         <h2 id="badges" className="mb-3 text-xl font-bold">Badges</h2>
-        <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-          {badges(units, s, best).map((b) => (
-            <li key={b.id} className={`rounded-xl border-2 px-3 py-2.5 text-sm ${b.earned ? 'border-flame/40 bg-flame-soft font-medium' : 'border-rule text-ink-3'}`}>
-              {b.label}
-            </li>
-          ))}
+        <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+          {badges(units, s, best).map((b) => {
+            const maxed = b.tier === 'gold' && b.value >= b.goal
+            return (
+              <li key={b.id} className={`flex flex-col items-center rounded-2xl border-2 p-3 text-center ${b.tier === 'locked' ? 'border-rule bg-white' : 'border-rule bg-white'}`}>
+                <span className="grid size-20 place-items-center rounded-2xl" style={{ background: badgeBackground(b.tier) }}>
+                  <PixelSprite pixels={badgePixels(b.icon, b.tier)} view={[-1, -1, 14, 14]} width={64} label={`${b.name} badge, ${b.tier === 'locked' ? 'locked' : b.tier}`} />
+                </span>
+                <p className={`mt-2 font-display leading-tight font-bold ${b.tier === 'locked' ? 'text-ink-3' : ''}`}>{b.name}</p>
+                <p className="mt-0.5 text-xs font-semibold capitalize" style={{ color: b.tier === 'gold' ? '#b07a0c' : b.tier === 'silver' ? '#6b768c' : b.tier === 'bronze' ? '#94511c' : 'var(--color-ink-3)' }}>
+                  {b.tier === 'locked' ? 'Locked' : b.tier}
+                </p>
+                <p className="mt-1 min-h-8 text-xs leading-tight text-ink-2">{maxed ? 'Top tier reached' : b.goalText}</p>
+                <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-rule" role="progressbar" aria-valuenow={b.value} aria-valuemin={0} aria-valuemax={b.goal}>
+                  <div className="h-full rounded-full" style={{ width: `${(b.value / b.goal) * 100}%`, background: maxed ? '#ffc531' : 'var(--color-cobalt)' }} />
+                </div>
+                <p className="mt-1 text-[0.7rem] text-ink-3 tabular-nums">{b.value.toLocaleString('en-US')} / {b.goal.toLocaleString('en-US')}</p>
+              </li>
+            )
+          })}
         </ul>
       </section>
 
