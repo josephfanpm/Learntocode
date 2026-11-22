@@ -27,6 +27,9 @@ self.onmessage = async (ev) => {
   py.setStdin({ stdin: () => (lines.length ? lines.shift() + '\n' : undefined) })
   try {
     // Fresh globals each run so earlier attempts don't leak in.
+    // Some standard modules (sqlite3, for one) ship separately in Pyodide: load whatever the code imports.
+    // Its progress messages are kept out of the learner's output.
+    await py.loadPackagesFromImports(code, { messageCallback: () => {}, errorCallback: () => {} })
     const globals = py.toPy({ __name__: '__main__' })
     await py.runPythonAsync(code, { globals, filename: '<your code>' })
     globals.destroy()

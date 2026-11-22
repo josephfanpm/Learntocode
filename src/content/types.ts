@@ -6,7 +6,7 @@
 // - Plain words. Assume the learner has never written code.
 // - `explain` is shown after the answer (right or wrong). One or two sentences.
 
-export type Language = 'python' | 'sql' | 'html'
+export type Language = 'python' | 'sql' | 'html' | 'javascript'
 
 /** A short teaching card. No answer; the learner taps Continue. */
 export interface ConceptExercise {
@@ -74,6 +74,9 @@ export interface MatchExercise {
  *   result rendered as rows of `|`-joined values, one row per line, no header.
  * html: rendered in a preview; each test's `expected` is a CSS selector that
  *   must match at least one element (e.g. "h1", "a[href]").
+ * javascript: like python. Output is whatever the code passes to console.log
+ *   (objects and arrays print as JSON); `stdin` lines are returned one at a
+ *   time by a provided input() function. No DOM, no network, no timers.
  */
 export interface WriteExercise {
   kind: 'write'
@@ -164,8 +167,13 @@ export interface Lesson {
 export interface Unit {
   /** "u0" … "u10" */
   id: string
-  /** Matches the CS50 week this unit follows, e.g. 0 for Scratch. */
+  /** The number shown on the path. For units 0–10 it is the CS50 week. */
   week: number
+  /**
+   * Which course the unit belongs to. Missing = 'cs', the CS50-based course.
+   * 'dev' = Developer skills: the day-to-day craft CS50 doesn't cover.
+   */
+  course?: 'cs' | 'dev'
   title: string
   /** One short line shown on the path, e.g. "Variables, input and decisions". */
   summary: string

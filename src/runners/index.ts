@@ -48,7 +48,8 @@ export function warmPython(): Promise<void> {
   return readyPromise ?? startWorker()
 }
 
-const TIMEOUT_MS = 6000
+// Long enough for a first-time download of an extra module (sqlite3), short enough to catch endless loops.
+const TIMEOUT_MS = 10_000
 
 async function runPythonOnce(code: string, stdin: string[]) {
   try {
@@ -133,6 +134,69 @@ export async function runPythonFree(code: string, stdin: string[]): Promise<{ ou
   return { output: r.stdout, error: r.ok ? undefined : friendlyError(r.error ?? '') }
 }
 
+// ---------- JavaScript ----------
+
+let jsWorker: Worker | null = null
+const jsPending = new Map<number, (r: { ok: boolean; stdout: string; error: string | null }) => void>()
+
+function runJsOnce(code: string, stdin: string[]) {
+  return new Promise<{ ok: boolean; stdout: string; error: string | null }>((resolve) => {
+    if (!jsWorker) {
+      jsWorker = new Worker(`${import.meta.env.BASE_URL}js-worker.js`)
+      jsWorker.onmessage = (ev) => {
+        jsPending.get(ev.data.id)?.(ev.data)
+        jsPending.delete(ev.data.id)
+      }
+    }
+    const id = ++seq
+    const timer = setTimeout(() => {
+      jsPending.delete(id)
+      jsWorker?.terminate()
+      jsWorker = null
+      resolve({ ok: false, stdout: '', error: 'Your code ran for too long and was stopped. Is there a loop that never ends?' })
+    }, 4000)
+    jsPending.set(id, (r) => {
+      clearTimeout(timer)
+      resolve(r)
+    })
+    jsWorker.postMessage({ id, code, stdin })
+  })
+}
+
+const JS_HINTS: [RegExp, (m: RegExpMatchArray) => string][] = [
+  [/ReferenceError: (\w+) is not defined/, (m) => `JavaScript doesn't know the name "${m[1]}". Check the spelling, or declare it with let or const first.`],
+  [/TypeError: Assignment to constant variable/, () => 'You tried to change something declared with const. Use let if it needs to change.'],
+  [/TypeError: (.+) is not a function/, (m) => `${m[1]} isn't a function, so it can't be called with ( ). Check the name.`],
+  [/TypeError: Cannot read properties of (undefined|null)/, (m) => `You used a dot on something that is ${m[1]}. Check the value before it exists.`],
+  [/SyntaxError/, () => 'JavaScript couldn’t read this. Look for a missing bracket, quote or brace.'],
+]
+
+function friendlyJsError(raw: string): string {
+  for (const [re, f] of JS_HINTS) {
+    const m = raw.match(re)
+    if (m) return `${f(m)}\n\n${raw}`
+  }
+  return raw
+}
+
+async function runJs(ex: WriteExercise, code: string): Promise<RunResult> {
+  const tests = ex.tests.length ? ex.tests : [{ expected: '' }]
+  let first: RunResult | null = null
+  for (const [i, t] of tests.entries()) {
+    const r = await runJsOnce(code, t.stdin ?? [])
+    if (!r.ok) return { pass: false, output: r.stdout, error: friendlyJsError(r.error ?? ''), failedTest: i, expected: t.expected, testCount: tests.length }
+    if (norm(r.stdout) !== norm(t.expected)) return { pass: false, output: r.stdout, expected: t.expected, failedTest: i, testCount: tests.length }
+    first ??= { pass: true, output: r.stdout, testCount: tests.length }
+  }
+  return first!
+}
+
+/** Run JavaScript without tests (the "Run" button). */
+export async function runJsFree(code: string, stdin: string[]): Promise<{ output: string; error?: string }> {
+  const r = await runJsOnce(code, stdin)
+  return { output: r.stdout, error: r.ok ? undefined : friendlyJsError(r.error ?? '') }
+}
+
 // ---------- SQL ----------
 
 type SqlJs = Awaited<ReturnType<typeof import('sql.js').default>>
@@ -198,5 +262,6 @@ export function describeSelector(sel: string): string {
 export async function check(ex: WriteExercise, code: string): Promise<RunResult> {
   if (ex.language === 'python') return runPython(ex, code)
   if (ex.language === 'sql') return runSql(ex, code)
+  if (ex.language === 'javascript') return runJs(ex, code)
   return runHtml(ex, code)
 }

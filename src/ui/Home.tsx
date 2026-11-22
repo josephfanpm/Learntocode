@@ -1,6 +1,6 @@
 import { Check, FastForward, Flame, Map, Play, Gem, Lock, Snowflake, X } from 'lucide-react'
 import { useEffect, useRef } from 'react'
-import { units } from '../content'
+import { COURSES, courseUnits, units as allUnits } from '../content'
 import { dayKey } from '../engine/dates'
 import type { Message } from '../engine/messaging'
 import { path, unitProgress } from '../engine/progress'
@@ -112,15 +112,39 @@ export function Banner({ m, go, onDismiss }: { m: Message; go: Go; onDismiss: ()
 const OFFSETS = [0, 34, 52, 34, 0, -34, -52, -34]
 
 export function Home({ go }: { go: Go }) {
-  const { s, banners, dismiss } = useStore()
+  const { s, update, banners, dismiss } = useStore()
+  const course = s.course ?? 'cs'
+  const units = courseUnits(course)
   const p = path(units, s)
   const current = useRef<HTMLButtonElement>(null)
   useEffect(() => {
-    current.current?.scrollIntoView({ block: 'center' })
-  }, [])
+    // On first load, jump to the current lesson unless it is the first one on the path.
+    if (p[0]?.status !== 'current') current.current?.scrollIntoView({ block: 'center' })
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="mx-auto max-w-xl px-4 pb-28">
+      <div className="mt-4 grid grid-cols-2 gap-2" role="tablist" aria-label="Course">
+        {COURSES.map((c) => (
+          <button
+            key={c.id}
+            role="tab"
+            aria-selected={course === c.id}
+            aria-pressed={course === c.id}
+            onClick={() => {
+              update((prev) => ({ ...prev, course: c.id }))
+              window.scrollTo(0, 0)
+            }}
+            className="tile px-3 py-2.5 text-left"
+          >
+            <span className="block font-display leading-tight font-bold">{c.title}</span>
+            <span className="text-xs text-ink-2">{c.blurb}</span>
+          </button>
+        ))}
+      </div>
+      {course === 'dev' && (
+        <p className="mt-3 text-sm text-ink-2">Best after the Computer science units on Python, SQL and web pages, but open to start any time.</p>
+      )}
       {banners.length > 0 && (
         <div className="mt-4 space-y-3">
           {banners.map((m) => (
@@ -128,8 +152,8 @@ export function Home({ go }: { go: Go }) {
           ))}
         </div>
       )}
-      {units.map((unit, ui) => {
-        const color = LINE_COLORS[ui % LINE_COLORS.length]
+      {units.map((unit) => {
+        const color = LINE_COLORS[allUnits.indexOf(unit) % LINE_COLORS.length]
         const prog = unitProgress(unit, s)
         const stations = p.filter((x) => x.unit.id === unit.id)
         const unitLocked = stations.every((x) => x.status === 'locked')
@@ -144,7 +168,7 @@ export function Home({ go }: { go: Go }) {
                 <h2 id={`h-${unit.id}`} className="text-xl leading-tight font-bold">{unit.title}</h2>
                 <p className="text-sm text-white/85">{unit.summary}</p>
                 <p className="mt-1 text-xs text-white/75">
-                  {unitSkipped ? 'Skipped by your placement test · open to review' : `${unit.week <= 10 ? `Week ${unit.week} of CS50` : unit.week === 11 ? "CS50’s cybersecurity lecture" : unit.week === 12 ? "Beyond CS50" : "CS50’s final project"} · ${prog.done}/${prog.total} lessons`}
+                  {unitSkipped ? 'Skipped by your placement test · open to review' : `${unit.course === 'dev' ? `Chapter ${unit.week} of ${units.length}` : unit.week <= 10 ? `Week ${unit.week} of CS50` : unit.week === 11 ? "CS50’s cybersecurity lecture" : unit.week === 12 ? "Beyond CS50" : "CS50’s final project"} · ${prog.done}/${prog.total} lessons`}
                 </p>
               </div>
             </div>

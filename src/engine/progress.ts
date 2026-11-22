@@ -20,7 +20,8 @@ export interface PathLesson {
 export function path(units: Unit[], s: LearnerState): PathLesson[] {
   const out: PathLesson[] = []
   let foundCurrent = false
-  const placed = s.placedUnit ?? 0
+  // The placement quiz is about the CS course; it never skips Developer skills units.
+  const placed = units.some((u) => u.course === 'dev') ? 0 : (s.placedUnit ?? 0)
   units.forEach((unit, ui) => {
     for (const lesson of unit.lessons) {
       let status: NodeStatus
@@ -99,13 +100,14 @@ export function badges(units: Unit[], s: LearnerState, bestStreak: number): Badg
   const records = Object.values(s.completed)
   const lessons = records.length
   const perfect = records.filter((r) => r.bestAccuracy === 1).length
-  const unitsDone = units.filter((u) => isUnitDone(u, s)).length
+  const core = units.filter((u) => (u.course ?? 'cs') === 'cs')
+  const unitsDone = core.filter((u) => isUnitDone(u, s)).length
   return [
     tiered('quest', 'sword', 'First Quest', lessons, [1], () => 'Finish your first lesson'),
     tiered('streak', 'flame', 'On Fire', bestStreak, [3, 7, 30], (n) => `Reach a ${n}-day streak`),
     tiered('lessons', 'shield', 'Adventurer', lessons, [10, 30, 100], (n) => `Finish ${n} lessons`),
     tiered('perfect', 'star', 'Flawless', perfect, [1, 10, 30], (n) => `Finish ${n} ${n === 1 ? 'lesson' : 'lessons'} with no mistakes`),
     tiered('xp', 'gem', 'Treasure Hunter', s.xp, [100, 500, 1500], (n) => `Earn ${n.toLocaleString('en-US')} XP`),
-    tiered('units', 'trophy', 'Boss Slayer', unitsDone, [1, 5, units.length], (n) => `Complete ${n} ${n === 1 ? 'unit' : 'units'}`),
+    tiered('units', 'trophy', 'Boss Slayer', unitsDone, [1, 5, core.length], (n) => `Complete ${n} ${n === 1 ? 'unit' : 'units'}`),
   ]
 }

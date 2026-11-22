@@ -1,10 +1,10 @@
 # ByteQuest: learning to code as a daily habit
 
-ByteQuest teaches people who have never coded, a few minutes a day. It takes the content of Harvard's CS50 and delivers it the way a habit app would: short lessons, a streak, a mascot, and reminders that respond to how each learner is doing. It is a working prototype that runs entirely in the browser.
+ByteQuest teaches people who have never coded, a few minutes a day. It takes the content of Harvard's CS50 and delivers it the way a habit app would: short lessons, a streak, a mascot, and reminders that respond to how each learner is doing. A second course, Developer skills, covers the day-to-day craft CS50 leaves out. It is a working prototype that runs entirely in the browser.
 
 **[Try the live demo](https://josephfanpm.github.io/Learntocode/)**
 
-![Four screens: Pip asking why you want to learn, the lesson path with Pip beside the next lesson, a step-through binary search question, and the badges on the profile](docs/screenshot.png)
+![Four screens: Pip asking why you want to learn, the Learn tab with the course switcher and the Developer skills path, a step-through binary search question, and the badges on the profile](docs/screenshot.png)
 
 This is an independent portfolio project. It is not affiliated with or endorsed by Harvard, CS50 or any other learning app. There are no real learners yet, so there are no usage numbers here.
 
@@ -14,8 +14,8 @@ This is an independent portfolio project. It is not affiliated with or endorsed 
 |---|---|
 | **Problem** | The best free way to learn computer science is a university course built from long lectures and multi-hour problem sets. People with jobs and no background start it and stop. |
 | **User** | An adult with no coding experience who wants to change careers, get more done at work, build something, or understand how technology works, and has minutes a day rather than hours. |
-| **Solution** | CS50's full arc, rewritten as 112 three-minute lessons with real code that runs in the browser, wrapped in a habit loop: streaks, a daily goal, a placement quiz, and reminders timed to when the learner usually practices. |
-| **Result** | A working prototype: 14 units, 1,088 exercises, 26 tests on the streak, unlock, reminder, hint, badge and save logic, and a checker that runs every code exercise's answer. No real-world result: nobody has been measured using it. |
+| **Solution** | CS50's full arc, rewritten as 112 three-minute lessons with real code that runs in the browser, plus a 60-lesson Developer skills course, wrapped in a habit loop: streaks, a daily goal, a placement quiz, and reminders timed to when the learner usually practices. |
+| **Result** | A working prototype: two courses, 26 units, 172 lessons and 1,675 exercises, 26 tests on the streak, unlock, reminder, hint, badge and save logic, and a checker that runs every code exercise's answer. No real-world result: nobody has been measured using it. |
 | **My role** | Product and build: the problem, the course structure, the habit and reminder rules, the trade-offs, and the prototype. |
 
 ## Problem
@@ -44,7 +44,8 @@ Language-learning apps solved the same shape of problem with short sessions, imm
 ## Solution
 
 - **The whole of CS50, in small steps.** Fourteen units follow the course week by week, from binary to web apps, AI and cybersecurity, then a systems design unit that goes beyond CS50, and a final project. Each unit covers that week's lecture ideas and the ideas behind its labs and problem sets, rewritten as original lessons of 7 to 10 exercises.
-- **Real code, no setup.** Python and SQL run in the browser tab, and web pages are checked as they are built. A program that loops forever is stopped after six seconds, and error messages are rewritten as one plain sentence.
+- **A second course for the job.** Developer skills is twelve chapters on what an entry-level developer needs beyond computer science: Git, testing, real JavaScript, frameworks and TypeScript, the developer's setup, shipping, APIs, working in existing code, databases in practice, teamwork, accessibility, and everyday tools. It has its own path, switched from the top of the Learn tab, and can be started at any time.
+- **Real code, no setup.** Python, JavaScript and SQL run in the browser tab, and web pages are checked as they are built. A program that loops forever is stopped after six seconds, and error messages are rewritten as one plain sentence.
 - **Ten kinds of exercise.** Beyond multiple choice: put lines in order by dragging, match pairs, fill gaps, write code, tap the line with the bug, flip switches to make a binary number, act out an algorithm by tapping the box it would check next, and type what a program prints.
 - **Two-step hints on every question.** The first press recaps the idea being tested; the second gives a specific nudge, such as ruling out two wrong options or revealing which line goes first. Hints are free.
 - **Setup that ends in a lesson.** Pip, the mascot, asks one question per screen. The first lesson comes before any profile details; name and avatar are asked after it and can be skipped.
@@ -73,6 +74,25 @@ Language-learning apps solved the same shape of problem with short sessions, imm
 | 11 | Cybersecurity | Passwords, hashing, encryption, staying safe | |
 | 12 | Beyond CS50 | Systems design: scaling, load balancing, caching, databases at scale, failure | Design a photo-sharing app |
 | 13 | Final project | Scope an idea, then build, save, test and share a habit tracker | The project itself |
+
+### The Developer skills course
+
+| Chapter | Topics | How it is taught |
+|---|---|---|
+| 1 Git and version control | Commits, history, branches, merge conflicts, remotes, pull requests, undoing safely | Acting out what the history looks like after each command; typing commands |
+| 2 Testing | Assert, arrange-act-assert, edge cases, errors, test-first, fakes, CI | Writing real tests in Python that must catch a planted bug |
+| 3 Real JavaScript | Values, functions, arrays, objects and JSON, scope, errors, async as an idea | Writing JavaScript that runs in the browser |
+| 4 Frameworks and TypeScript | Components, props, state, events; type annotations and what the compiler catches | Reading components; writing render and update functions; spotting the line the compiler rejects |
+| 5 Your developer setup | Editor, terminal, PATH, packages, virtual environments, the debugger | Typing commands, stepping through a debugger; ends with a checklist to do on your own machine |
+| 6 Shipping your code | Hosting, environments, secrets, pipelines, containers, logs, rollbacks | Ordering pipeline stages, reading logs; ends with a checklist for putting a page online |
+| 7 Building a real API | Methods, status codes, validation, tokens, pagination | Building an in-memory tasks API step by step |
+| 8 Working in existing code | Reading unfamiliar code, naming, refactoring, comments, code review | Refactoring messy code while its tests keep passing |
+| 9 Databases in practice | Parameterised queries, transactions, migrations, ORMs, indexes, non-SQL stores | Real SQLite from Python, with rollbacks and ordered migrations |
+| 10 Working on a team | Tickets, estimates, asking good questions, pull requests, incidents | Choosing the better message; spotting the vague sentence |
+| 11 Accessible, responsive pages | Semantic HTML, alt text, labels, keyboard, contrast, media queries, flexbox | Writing HTML that is checked for the right structure |
+| 12 Everyday tools | Regular expressions, dates and time zones, type hints, file formats | Writing patterns and date code in Python |
+
+Three things in this course cannot be learned by tapping through lessons: installing tools, using Git on a real project, and deploying. Those chapters teach the ideas and commands, then hand over to a checklist to do for real.
 
 ### How the habit loop works
 
@@ -127,6 +147,8 @@ I built ByteQuest with Claude Code as a pair programmer. I set the product direc
 | **Mascot** | None · smooth vector character · pixel art | A pixel-art red panda with seven moods | The fluid motion of a rigged character | A character makes feedback feel like it comes from someone. Pixel art suits the subject, animates frame by frame in code, and is cheap to extend to learner avatars. |
 | **Sound** | None · sounds from famous games · an open-licensed pack · made in code | Original classic-console sounds made in code (pulse waves, triangle bass, noise); the right-answer blip climbs with each answer in a row | The instant recognition of a famous game's sounds, and the polish of studio-made effects | Sound marks the moments that matter. Sounds from real games are copyrighted whether or not the app makes money, so the style was borrowed and every tune is original. |
 | **Saving progress** | Accounts and a server · browser only · browser plus export | Browser storage with a backup file and a save code | Automatic sync across devices | A prototype with no server has nothing to breach and nothing to run. The save code covers moving devices without an account. |
+| **Where job skills go** | Leave them out · bonus chapters after the final project · a second course | A second course with its own path | One simple, single path | Twelve chapters would have doubled the path and buried the final project. A separate course keeps the first one's promise clear (CS50, in small steps) and lets someone who already programs start with Git or testing. |
+| **Running JavaScript** | Read-only snippets · run it in the page · run it in a worker | A worker with a four-second limit, with console.log as the output | The DOM, timers and network inside exercises | JavaScript is the one language a browser runs natively, so learners should write it. A worker means an endless loop is stopped instead of freezing the lesson. |
 | **Getting around** | Links in the top bar · bottom tabs | Two bottom tabs: Learn and Profile | Screen height on small phones | From the profile there was no obvious way back to the lessons. Tabs make both places one tap away and always visible. |
 | **Internal tooling in the app** | Keep a page that simulates which reminders each kind of learner gets · remove it | Removed | A visible demonstration of the reminder rules | It was a tool for the builder, not something a learner needs. The rules and their tests remain. |
 
@@ -136,6 +158,7 @@ I built ByteQuest with Claude Code as a pair programmer. I set the product direc
 - **No accounts or sync.** Progress stays in the browser unless exported.
 - **No real push or email delivery.** The rules run; a server would be needed to deliver when the app is closed.
 - **No first-hand notification log.** The teardown of Duolingo's reminders uses published sources, not a two-week log from a test account.
+- **Hands-on tooling.** Git, installing tools and deploying are taught as ideas and commands, with checklists to do on a real machine; the app cannot run them.
 - **Simplified assignments.** Some CS50 problem sets are reduced (a one-row blur instead of a full image filter) and the hardest election method is left out. Flask and live web requests are shown, not run.
 - **No leagues, friends or leaderboards.**
 
@@ -145,12 +168,12 @@ I built ByteQuest with Claude Code as a pair programmer. I set the product direc
 npm install
 npm run dev        # http://localhost:5173
 npm test           # streak, unlock, reminder, hint, badge and save tests
-npx tsx scripts/check-content.ts   # validates every exercise; runs each Python and SQL answer against its tests
+npx tsx scripts/check-content.ts   # validates every exercise; runs each Python, JavaScript and SQL answer against its tests
 ```
 
 Settings (the gear icon on the profile) has a **Prototype: unlock all lessons** switch, off by default. Any exercise can be opened directly with `#/lesson/<lesson-id>?at=<index>`, which does not save progress.
 
-Built with Vite, React, TypeScript and Tailwind. Python runs in [Pyodide](https://pyodide.org) inside a Web Worker and SQL in [sql.js](https://sql.js.org). Pip, the avatars and the sounds are generated in code: sprites as pixel grids ([src/ui/pixel/sprites.ts](src/ui/pixel/sprites.ts)), sounds with the Web Audio API ([src/sound.ts](src/sound.ts)). The reminder rules are in [src/engine/messaging.ts](src/engine/messaging.ts).
+Built with Vite, React, TypeScript and Tailwind. Python runs in [Pyodide](https://pyodide.org) inside a Web Worker, JavaScript in its own worker, and SQL in [sql.js](https://sql.js.org). Pip, the avatars and the sounds are generated in code: sprites as pixel grids ([src/ui/pixel/sprites.ts](src/ui/pixel/sprites.ts)), sounds with the Web Audio API ([src/sound.ts](src/sound.ts)). The reminder rules are in [src/engine/messaging.ts](src/engine/messaging.ts).
 
 ## Credits and licence
 

@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react'
-import { units } from '../content'
+import { courseUnits } from '../content'
+
+const units = courseUnits('cs')
 import { PLACEMENT } from '../content/placement'
 import { play } from '../sound'
 import { Pip } from './Pip'

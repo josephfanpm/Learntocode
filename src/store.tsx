@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
-import { units } from './content'
+import { courseUnits } from './content'
 import { dayKey } from './engine/dates'
 import { decide, facts, type Message } from './engine/messaging'
 import { load, reconcile, save, type LearnerState } from './engine/state'
@@ -39,7 +39,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       const cur = ref.current
       if (!cur.onboarded) return
       let next = cur.lastSeenDay !== dayKey(now) ? reconcile(cur, dayKey(now)) : cur
-      const out = decide(facts(next, units, now), next.messages).sent.filter((m) => m.channel !== 'banner')
+      const out = decide(facts(next, courseUnits(next.course ?? 'cs'), now), next.messages).sent.filter((m) => m.channel !== 'banner')
       if (out.length) {
         for (const m of out)
           if (m.channel === 'push' && typeof Notification !== 'undefined' && Notification.permission === 'granted')
@@ -57,7 +57,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     return () => clearInterval(id)
   }, [update])
 
-  const banners = s.onboarded ? decide(facts(s, units, new Date()), [], s.dismissed).sent.filter((m) => m.channel === 'banner') : []
+  const banners = s.onboarded ? decide(facts(s, courseUnits(s.course ?? 'cs'), new Date()), [], s.dismissed).sent.filter((m) => m.channel === 'banner') : []
 
   const dismiss = useCallback(
     (m: Message) =>

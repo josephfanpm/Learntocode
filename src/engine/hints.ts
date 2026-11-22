@@ -10,7 +10,7 @@ export interface Hint {
   title: string
   body: string
   code?: string
-  language?: 'python' | 'sql' | 'html'
+  language?: 'python' | 'sql' | 'html' | 'javascript'
 }
 
 const oneLine = (s: string) => s.replace(/\s*\n\s*/g, ' / ').trim()

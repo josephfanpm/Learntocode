@@ -7,7 +7,7 @@ import type {
   Exercise,
   WriteExercise,
 } from '../content/types'
-import { check, runPythonFree, runSqlQuery, warmPython, type RunResult } from '../runners'
+import { check, runJsFree, runPythonFree, runSqlQuery, warmPython, type RunResult } from '../runners'
 import { Bits, Spot, Steps, TypeAnswer } from './interactive'
 import { Match } from './match'
 import { Order } from './order'
@@ -286,6 +286,7 @@ export function Write({ ex, locked, reveal, register }: ExProps<WriteExercise>) 
     setBusy(true)
     setResult(null)
     if (ex.language === 'python') setScratch(await runPythonFree(code, ex.tests[0]?.stdin ?? []))
+    else if (ex.language === 'javascript') setScratch(await runJsFree(code, ex.tests[0]?.stdin ?? []))
     else if (ex.language === 'sql') {
       const r = await runSqlQuery(ex.setup ?? '', code)
       setScratch({ output: '', error: r.error, table: r })

@@ -1,6 +1,8 @@
 import { ArrowLeft, Bell, Code2, Flame, Globe } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { units } from '../content'
+import { courseUnits } from '../content'
+
+const units = courseUnits('cs')
 import type { Motivation } from '../engine/state'
 import { play } from '../sound'
 import { useStore } from '../store'

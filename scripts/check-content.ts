@@ -27,6 +27,26 @@ function runPython(code: string, stdin: string[] = []): { out: string; err: stri
   return { out: r.stdout ?? '', err: r.stderr ?? '' }
 }
 
+// Mirrors public/js-worker.js: console.log is the output, input() reads test lines.
+const JS_PRELUDE = `
+const __lines = JSON.parse(process.argv[2] || '[]');
+const __show = (v) => { if (typeof v === 'string') return v; if (v === undefined) return 'undefined'; if (typeof v === 'function') return '[Function]'; try { const s = JSON.stringify(v); return s === undefined ? String(v) : s } catch { return String(v) } };
+let __out = '';
+const __log = (...a) => { __out += a.map(__show).join(' ') + '\\n' };
+const __console = { log: __log, info: __log, warn: __log, error: __log };
+const __input = () => (__lines.length ? __lines.shift() : '');
+const __code = require('fs').readFileSync(process.argv[3], 'utf8');
+try { new Function('console', 'input', '"use strict";\\n' + __code)(__console, __input); process.stdout.write(__out) }
+catch (e) { process.stdout.write(__out); process.stderr.write(String(e && e.message || e)); process.exit(1) }
+`
+
+function runJs(code: string, stdin: string[] = []): { out: string; err: string } {
+  writeFileSync(join(dir, 'harness.cjs'), JS_PRELUDE)
+  writeFileSync(join(dir, 'prog.js'), code)
+  const r = spawnSync(process.execPath, [join(dir, 'harness.cjs'), JSON.stringify(stdin), join(dir, 'prog.js')], { encoding: 'utf8', cwd: dir, timeout: 10_000 })
+  return { out: r.stdout ?? '', err: r.stderr ?? '' }
+}
+
 // Mirrors src/runners/sql.ts formatting: integers without ".0", NULL for null.
 const SQL_HARNESS = `
 import sqlite3, sys
@@ -67,6 +87,7 @@ function passes(ex: WriteExercise, code: string): string | null {
     let r: { out: string; err: string }
     if (ex.language === 'python') r = runPython(code, t.stdin)
     else if (ex.language === 'sql') r = runSql(ex.setup ?? '', code)
+    else if (ex.language === 'javascript') r = runJs(code, t.stdin)
     else return null
     if (norm(r.out) !== norm(t.expected))
       return `test ${i}: expected ${JSON.stringify(norm(t.expected))}, got ${JSON.stringify(norm(r.out))}${r.err ? ' / ' + r.err.trim().split('\n').pop() : ''}`
