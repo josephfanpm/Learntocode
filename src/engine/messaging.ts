@@ -6,7 +6,10 @@
 // - Each rule has a dedupe key; a key is only ever sent once.
 // - Caps: 1 push per day, 1 email per 3 days, 2 banners at a time.
 // - Quiet hours for push: 21:00–08:00, except the learner's chosen reminder hour.
-// - Lapsed learners get push for the first week, then email, then nothing after 30 days.
+// - Lapsed learners: a fresh-start push (days 2-3), a progress push (days 4-6),
+//   one email (days 5-6), then on day 7 a last message that says reminders
+//   are stopping. After that we send nothing until they come back. The
+//   promise in that message is kept: see docs/notification-teardown.md.
 
 import type { Unit } from '../content/types'
 import { addDays, dayKey, daysBetween, parseDay } from './dates'
@@ -325,8 +328,8 @@ export const RULES: Rule[] = [
     when: (f) => f.lessonsDone === 0 && f.daysSinceSignup >= 1 && f.daysSinceSignup <= 3 && f.hour >= f.reminderHour,
     key: (f) => `push_first_lesson:${f.today}`,
     copy: (f) => ({
-      title: 'Your first lesson is waiting',
-      body: `About 3 minutes. ${WHY[f.motivation]}`,
+      title: 'Pip saved you a seat',
+      body: `Your first lesson takes about 3 minutes. ${WHY[f.motivation]}`,
       cta: nextCta(f),
       why: `Signed up ${plural(f.daysSinceSignup, 'day')} ago, no lessons yet.`,
     }),
@@ -342,7 +345,7 @@ export const RULES: Rule[] = [
       if (f.freezes > 0 && f.streak < 7)
         return {
           title: `Keep your ${f.streak}-day streak`,
-          body: 'A freeze would cover today, but a 3-minute lesson keeps it honest.',
+          body: 'A freeze has your back today. Three minutes would save it for a day you really need it.',
           cta: nextCta(f),
           why: `Streak ${f.streak}, nothing today, past reminder time, freeze equipped.`,
         }
@@ -371,7 +374,7 @@ export const RULES: Rule[] = [
     key: (f) => `push_streak_saver:${f.today}`,
     copy: (f) => ({
       title: `Last call for your ${f.streak}-day streak`,
-      body: 'A few hours left today. One lesson saves it.',
+      body: 'A few hours left today. One short lesson and it lives.',
       cta: nextCta(f),
       why: `Streak ${f.streak}, still nothing today at 8pm.`,
     }),
@@ -380,28 +383,42 @@ export const RULES: Rule[] = [
     id: 'push_lapsed_2',
     channel: 'push',
     priority: 70,
-    about: 'Day 2–4 away: the streak just broke; invite a fresh start.',
-    when: (f) => f.daysAway !== null && f.daysAway >= 2 && f.daysAway <= 4 && f.hour >= f.reminderHour,
+    about: 'Days 2–3 away: the streak just ended. Offer a fresh start, with no guilt.',
+    when: (f) => f.daysAway !== null && f.daysAway >= 2 && f.daysAway <= 3 && f.hour >= f.reminderHour,
     key: (f) => `push_lapsed_2:${f.lastPractice}`,
     copy: (f) => ({
-      title: 'Start a new streak today',
-      body: f.nextLesson ? `Pick up at "${f.nextLesson.title}".` : 'A quick review is ready.',
+      title: 'Day one again? Good.',
+      body: f.nextLesson ? `Streaks restart all the time. "${f.nextLesson.title}" takes about 3 minutes.` : 'Streaks restart all the time. A quick review takes 3 minutes.',
       cta: nextCta(f),
-      why: `${f.daysAway} days away.`,
+      why: `${f.daysAway} days away: fresh-start message.`,
     }),
   },
   {
-    id: 'push_lapsed_5',
+    id: 'push_lapsed_4',
     channel: 'push',
     priority: 65,
-    about: 'Day 5–6 away: last push before handing over to email.',
-    when: (f) => f.daysAway !== null && f.daysAway >= 5 && f.daysAway <= 6 && f.hour >= f.reminderHour,
-    key: (f) => `push_lapsed_5:${f.lastPractice}`,
+    about: 'Days 4–6 away: the backup reminder. Points at progress already made instead of the streak that was lost.',
+    when: (f) => f.daysAway !== null && f.daysAway >= 4 && f.daysAway <= 6 && f.hour >= f.reminderHour,
+    key: (f) => `push_lapsed_4:${f.lastPractice}`,
     copy: (f) => ({
-      title: `You have finished ${plural(f.lessonsDone, 'lesson')}`,
-      body: 'That progress is saved. Ten minutes this week keeps it fresh.',
+      title: `${plural(f.lessonsDone, 'lesson')} in the bank`,
+      body: f.nextLesson ? `Pip kept your place at "${f.nextLesson.title}".` : 'Pip kept your place.',
       cta: nextCta(f),
-      why: `${f.daysAway} days away.`,
+      why: `${f.daysAway} days away: progress message.`,
+    }),
+  },
+  {
+    id: 'push_last_call',
+    channel: 'push',
+    priority: 95,
+    about: 'Day 7 away: the last reminder. It says reminders are stopping, and they do. Duolingo’s team has said its week-of-inactivity version is one of their most successful notifications (docs/notification-teardown.md).',
+    when: (f) => f.daysAway !== null && f.daysAway >= 7 && f.pushEnabled && f.hour >= f.reminderHour,
+    key: (f) => `last_call:${f.lastPractice}`,
+    copy: (f) => ({
+      title: 'These reminders don’t seem to be helping',
+      body: 'So Pip will stop sending them. Your progress is saved whenever you want it.',
+      cta: nextCta(f),
+      why: `${f.daysAway} days away: final message, then silence until they return.`,
     }),
   },
 
@@ -435,45 +452,31 @@ export const RULES: Rule[] = [
     }),
   },
   {
-    id: 'email_lapsed_7',
+    id: 'email_lapsed_5',
     channel: 'email',
     priority: 75,
-    about: 'One week away: progress summary and the exact next step.',
-    when: (f) => f.daysAway !== null && f.daysAway >= 7 && f.daysAway < 14,
-    key: (f) => `email_lapsed_7:${f.lastPractice}`,
+    about: 'Days 5–6 away: one email with the exact next step and an offer to make the daily goal smaller.',
+    when: (f) => f.daysAway !== null && f.daysAway >= 5 && f.daysAway <= 6,
+    key: (f) => `email_lapsed_5:${f.lastPractice}`,
     copy: (f) => ({
-      title: 'Your progress is saved',
-      body: `You have finished ${plural(f.lessonsDone, 'lesson')} and ${plural(f.unitsDone, 'unit')}. ${f.nextLesson ? `Next is "${f.nextLesson.title}".` : ''} Start with a quick review so it feels familiar.`,
-      cta: f.reviewLesson ? { label: 'Quick review', action: 'review', lessonId: f.reviewLesson.id } : nextCta(f),
-      why: `${f.daysAway} days away.`,
+      title: 'Your place is saved',
+      body: `You have finished ${plural(f.lessonsDone, 'lesson')}. ${f.nextLesson ? `Next is "${f.nextLesson.title}".` : ''} If ${f.goal} XP a day was too much, 10 XP is one lesson, about 3 minutes.`,
+      cta: f.reviewLesson ? { label: 'Warm up with a review', action: 'review', lessonId: f.reviewLesson.id } : nextCta(f),
+      why: `${f.daysAway} days away: one email before the last message.`,
     }),
   },
   {
-    id: 'email_lapsed_14',
+    id: 'email_last_call',
     channel: 'email',
-    priority: 70,
-    about: 'Two weeks away: suggest a smaller daily goal instead of more pressure.',
-    when: (f) => f.daysAway !== null && f.daysAway >= 14 && f.daysAway < 30,
-    key: (f) => `email_lapsed_14:${f.lastPractice}`,
+    priority: 95,
+    about: 'Day 7 away, for learners with notifications off: the same last message by email. Nothing is sent after it.',
+    when: (f) => f.daysAway !== null && f.daysAway >= 7 && !f.pushEnabled,
+    key: (f) => `last_call:${f.lastPractice}`,
     copy: (f) => ({
-      title: 'Would a smaller goal help?',
-      body: `Your goal is ${f.goal} XP a day. Ten XP is one lesson, about 3 minutes. You can change it any time.`,
-      cta: { label: 'Change my goal', action: 'settings' },
-      why: `${f.daysAway} days away; goal ${f.goal} XP may feel too big.`,
-    }),
-  },
-  {
-    id: 'email_lapsed_30',
-    channel: 'email',
-    priority: 65,
-    about: 'Day 30: the last message. After this the learner hears nothing until they come back.',
-    when: (f) => f.daysAway !== null && f.daysAway >= 30,
-    key: (f) => `email_lapsed_30:${f.lastPractice}`,
-    copy: (f) => ({
-      title: 'We will stop sending reminders',
-      body: `Your ${plural(f.lessonsDone, 'lesson')} stay saved. Come back whenever you like and pick up where you left off.`,
+      title: 'We’ll stop the reminders',
+      body: `They don’t seem to be helping, so this is the last one. Your ${plural(f.lessonsDone, 'lesson')} stay saved, and Pip will be here whenever you come back.`,
       cta: nextCta(f),
-      why: `${f.daysAway} days away. Last message in the sequence.`,
+      why: `${f.daysAway} days away, notifications off: final message, then silence.`,
     }),
   },
 ]
@@ -500,6 +503,10 @@ export function decide(f: Facts, log: { rule: string; channel: Channel; at: stri
   const sentOn = (ch: Channel, sinceDays: number) =>
     log.some((m) => m.channel === ch && daysBetween(dayKey(new Date(m.at)), f.today) < sinceDays)
 
+  // The last message promised silence. Keep the promise: until they practice
+  // again, no more push or email.
+  const silenced = f.lastPractice !== null && keys.has(`last_call:${f.lastPractice}`)
+
   const matches = RULES.filter((r) => r.when(f)).sort((a, b) => b.priority - a.priority)
   let pushSent = sentOn('push', 1)
   let emailSent = sentOn('email', 3)
@@ -514,6 +521,10 @@ export function decide(f: Facts, log: { rule: string; channel: Channel; at: stri
         sent.push(msg)
         banners++
       }
+      continue
+    }
+    if (silenced) {
+      held.push({ rule: r.id, channel: r.channel, reason: 'Reminders stopped after the last message' })
       continue
     }
     if (keys.has(key)) {

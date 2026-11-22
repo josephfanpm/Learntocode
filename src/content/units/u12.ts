@@ -5,7 +5,7 @@ const MENU_HELPERS =
 
 export const u12: Unit = {
   id: 'u12',
-  week: 12,
+  week: 13,
   title: 'Final project',
   summary: 'Plan, build and ship something of your own',
   lessons: [

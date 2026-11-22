@@ -4,7 +4,7 @@ ByteQuest teaches people who have never coded, a few minutes a day. It takes the
 
 **[Try the live demo](https://josephfanpm.github.io/Learntocode/)**
 
-![Four screens: Pip asking why you want to learn, the lesson path, a step-through binary search question, and the streak screen](docs/screenshot.png)
+![Four screens: Pip asking why you want to learn, the lesson path with Pip beside the next lesson, a step-through binary search question, and the badges on the profile](docs/screenshot.png)
 
 This is an independent portfolio project. It is not affiliated with or endorsed by Harvard, CS50 or any other learning app. There are no real learners yet, so there are no usage numbers here.
 
@@ -14,8 +14,8 @@ This is an independent portfolio project. It is not affiliated with or endorsed 
 |---|---|
 | **Problem** | The best free way to learn computer science is a university course built from long lectures and multi-hour problem sets. People with jobs and no background start it and stop. |
 | **User** | An adult with no coding experience who wants to change careers, get more done at work, build something, or understand how technology works, and has minutes a day rather than hours. |
-| **Solution** | CS50's full arc, rewritten as 107 three-minute lessons with real code that runs in the browser, wrapped in a habit loop: streaks, a daily goal, a placement quiz, and reminders timed to when the learner usually practices. |
-| **Result** | A working prototype: 13 units, 1,038 exercises, 21 tests on the streak, unlock, reminder, badge and save logic, and a checker that runs every code exercise's answer. No real-world result: nobody has been measured using it. |
+| **Solution** | CS50's full arc, rewritten as 112 three-minute lessons with real code that runs in the browser, wrapped in a habit loop: streaks, a daily goal, a placement quiz, and reminders timed to when the learner usually practices. |
+| **Result** | A working prototype: 14 units, 1,088 exercises, 23 tests on the streak, unlock, reminder, badge and save logic, and a checker that runs every code exercise's answer. No real-world result: nobody has been measured using it. |
 | **My role** | Product and build: the problem, the course structure, the habit and reminder rules, the trade-offs, and the prototype. |
 
 ## Problem
@@ -43,7 +43,7 @@ Language-learning apps solved the same shape of problem with short sessions, imm
 
 ## Solution
 
-- **The whole of CS50, in small steps.** Thirteen units follow the course week by week, from binary to web apps, AI, cybersecurity and a final project. Each unit covers that week's lecture ideas and the ideas behind its labs and problem sets, rewritten as original lessons of 7 to 10 exercises.
+- **The whole of CS50, in small steps.** Fourteen units follow the course week by week, from binary to web apps, AI and cybersecurity, then a systems design unit that goes beyond CS50, and a final project. Each unit covers that week's lecture ideas and the ideas behind its labs and problem sets, rewritten as original lessons of 7 to 10 exercises.
 - **Real code, no setup.** Python and SQL run in the browser tab, and web pages are checked as they are built. A program that loops forever is stopped after six seconds, and error messages are rewritten as one plain sentence.
 - **Ten kinds of exercise.** Beyond multiple choice: put lines in order by dragging, match pairs, fill gaps, write code, tap the line with the bug, flip switches to make a binary number, act out an algorithm by tapping the box it would check next, and type what a program prints.
 - **Setup that ends in a lesson.** Pip, the mascot, asks one question per screen. The first lesson comes before any profile details; name and avatar are asked after it and can be skipped.
@@ -70,7 +70,8 @@ Language-learning apps solved the same shape of problem with short sessions, imm
 | 9 | 9 (Flask) | Routes, forms, templates, sessions, APIs, accounts and passwords | Birthday book; play-money stock trader |
 | 10 | AI | Learning from examples, game search, training and testing, how chatbots write, prompts | |
 | 11 | Cybersecurity | Passwords, hashing, encryption, staying safe | |
-| 12 | Final project | Scope an idea, then build, save, test and share a habit tracker | The project itself |
+| 12 | Beyond CS50 | Systems design: scaling, load balancing, caching, databases at scale, failure | Design a photo-sharing app |
+| 13 | Final project | Scope an idea, then build, save, test and share a habit tracker | The project itself |
 
 ### How the habit loop works
 
@@ -89,12 +90,13 @@ Twenty rules read a snapshot of the learner: streak, days away, progress toward 
 | Channel | Examples |
 |---|---|
 | In-app | First lesson, a freeze saved your streak, your streak ended (fresh start), welcome back with a review, stuck on a lesson, unit finished, streak milestones, close to the daily goal |
-| Push | Streak at risk, a late streak saver, first lesson not started, a few days away |
-| Email (simulated) | Welcome, weekly recap, one week away, two weeks away (suggests a smaller goal), thirty days away (the last message) |
+| Push | Streak at risk, a late streak saver, first lesson not started, a fresh start (days 2–3 away), progress saved (days 4–6), the last message (day 7) |
+| Email (simulated) | Welcome, weekly recap, one email at days 5–6 away (next step and a smaller goal), the last message by email if notifications are off |
 
 - **Timing.** The daily reminder is due about 23.5 hours after the learner's last lesson, kept between 8am and 8pm. If a streak of three or more days is still at risk at 8pm, one streak saver follows.
 - **Wording.** The streak reminder rotates through several messages and never repeats the previous day's.
-- **Limits.** Each message is sent once. One daily reminder, one email every three days, nothing overnight. Push hands over to email after a week away, and after thirty days the learner hears nothing until they return.
+- **The last message.** A week after the last lesson, the learner gets one message saying the reminders don't seem to be helping and will stop. After it, nothing is sent on any channel until they come back. This is taken from Duolingo, whose team has said its week-of-inactivity version is one of their most successful notifications; see the [notification teardown](docs/notification-teardown.md) for the evidence and what was not copied.
+- **Limits.** Each message is sent once. One daily reminder, one email every three days, nothing overnight.
 
 This is a static site, so notifications only arrive while the tab is open and email is not actually sent. A production version would run the same rules on a server.
 
@@ -117,7 +119,7 @@ I built ByteQuest with Claude Code as a pair programmer. I set the product direc
 | **Avatar** | Empty until made · build one during setup · assign one at random | Random pixel avatar for everyone, customisable later | A deliberate first choice | Nobody starts with a blank placeholder, there is no extra step, and people are more likely to adjust something they were given. |
 | **Reminder time** | Learner picks a time · remind when they usually practice | About 23.5 hours after the last lesson, with no time setting at all | The learner's control over the time | A time someone picks is a guess about their day. The time they practiced yesterday is something they already did. |
 | **Streak freezes** | No protection · spend a freeze per missed day · spend only when it saves the streak | Only when freezes cover the whole gap | Simplicity | A streak with no forgiveness punishes one bad day. Burning freezes on a streak that is lost anyway is a second punishment. |
-| **Lapsed learners** | Remind forever · stop at some point | Push for a week, then email, then silence after thirty days | Some learners who would have come back on day 45 | Messages nobody acts on train people to ignore the app, or to turn everything off. |
+| **Lapsed learners** | Remind forever · fade out quietly · say reminders are stopping, then stop | A last message on day 7 that says reminders are stopping, then silence | Any chance to win someone back after a week, and the later emails an earlier version sent | Duolingo's team reports that this message beat every variant they tried. Saying it and then continuing to email would make it untrue, so the later emails were removed. |
 | **Wrong answers** | Hearts that run out · no penalty | No hearts: the question returns at the end, and the wrong sound is soft | The tension that scarcity creates | Beginners are wrong a lot. Locking them out for mistakes punishes the thing learning requires. |
 | **Exercise formats** | Multiple choice only · add hands-on formats | Ten formats, including drag, tap-the-bug and step-through | Content cost: each new format needs its own authoring and checking | Recognising an answer is weaker than producing one. Debugging and tracing are skills in their own right. |
 | **Mascot** | None · smooth vector character · pixel art | A pixel-art red panda with seven moods | The fluid motion of a rigged character | A character makes feedback feel like it comes from someone. Pixel art suits the subject, animates frame by frame in code, and is cheap to extend to learner avatars. |
@@ -131,6 +133,7 @@ I built ByteQuest with Claude Code as a pair programmer. I set the product direc
 - **No real learners or results.** Whether this keeps people learning is untested.
 - **No accounts or sync.** Progress stays in the browser unless exported.
 - **No real push or email delivery.** The rules run; a server would be needed to deliver when the app is closed.
+- **No first-hand notification log.** The teardown of Duolingo's reminders uses published sources, not a two-week log from a test account.
 - **Simplified assignments.** Some CS50 problem sets are reduced (a one-row blur instead of a full image filter) and the hardest election method is left out. Flask and live web requests are shown, not run.
 - **No leagues, friends or leaderboards.**
 

@@ -191,19 +191,37 @@ describe('messaging', () => {
 describe('simulation', () => {
   const opts = { days: 45, start: at('2026-11-02'), reminderHour: 19, pushEnabled: true, motivation: 'career' as const, dailyGoal: 20 }
 
-  it('a learner who fades out gets push, then email, then silence', () => {
+  it('a learner who fades out gets two pushes, one email, a last message, then silence', () => {
     const days = simulate(PERSONAS.find((p) => p.id === 'fades')!, units, opts)
     const outbound = days.flatMap((d) => d.sent.filter((m) => m.channel !== 'banner').map((m) => [d.day, m.rule] as const))
     const rules = outbound.map(([, r]) => r)
-    expect(rules).toContain('push_lapsed_2')
-    expect(rules).toContain('push_lapsed_5')
-    expect(rules).toContain('email_lapsed_7')
-    expect(rules).toContain('email_lapsed_14')
-    expect(rules).toContain('email_lapsed_30')
-    const sunset = outbound.find(([, r]) => r === 'email_lapsed_30')![0]
-    expect(outbound.filter(([d]) => d > sunset)).toHaveLength(0)
-    // No more than one push per day.
+    for (const r of ['push_lapsed_2', 'push_lapsed_4', 'email_lapsed_5', 'push_last_call']) expect(rules).toContain(r)
+    // The last message goes out exactly a week after the last lesson (day index 4).
+    const last = outbound.find(([, r]) => r === 'push_last_call')!
+    expect(last[0]).toBe(11)
+    expect(days[11].sent.find((m) => m.rule === 'push_last_call')!.body).toContain('stop sending')
+    // The promise is kept: nothing at all after it, for the remaining five weeks.
+    expect(outbound.filter(([d]) => d > last[0])).toHaveLength(0)
     for (const d of days) expect(d.sent.filter((m) => m.channel === 'push').length).toBeLessThanOrEqual(1)
+  })
+
+  it('with notifications off, the last message comes by email and is still the last', () => {
+    const days = simulate(PERSONAS.find((p) => p.id === 'fades')!, units, { ...opts, pushEnabled: false })
+    const outbound = days.flatMap((d) => d.sent.filter((m) => m.channel !== 'banner').map((m) => [d.day, m.rule] as const))
+    const last = outbound.find(([, r]) => r === 'email_last_call')!
+    expect(last).toBeDefined()
+    expect(outbound.some(([, r]) => r.startsWith('push'))).toBe(false)
+    expect(outbound.filter(([d]) => d > last[0])).toHaveLength(0)
+  })
+
+  it('reminders start again once a silenced learner comes back', () => {
+    const days = simulate(PERSONAS.find((p) => p.id === 'returns')!, units, { ...opts, days: 30 })
+    const before = days.slice(0, 21).flatMap((d) => d.sent.map((m) => m.rule))
+    expect(before).toContain('push_last_call')
+    // Back on day 21 and practicing daily: no lapse messages, and the weekly recap resumes.
+    const after = days.slice(21).flatMap((d) => d.sent.filter((m) => m.channel !== 'banner').map((m) => m.rule))
+    expect(after.some((r) => r.includes('lapsed') || r.includes('last_call'))).toBe(false)
+    expect(after).toContain('email_weekly')
   })
 
   it('a steady learner never gets a lapse message', () => {

@@ -144,7 +144,7 @@ export function Home({ go }: { go: Go }) {
                 <h2 id={`h-${unit.id}`} className="text-xl leading-tight font-bold">{unit.title}</h2>
                 <p className="text-sm text-white/85">{unit.summary}</p>
                 <p className="mt-1 text-xs text-white/75">
-                  {unitSkipped ? 'Skipped by your placement test · open to review' : `${unit.week <= 10 ? `Week ${unit.week} of CS50` : unit.week === 11 ? "CS50’s cybersecurity lecture" : "CS50’s final project"} · ${prog.done}/${prog.total} lessons`}
+                  {unitSkipped ? 'Skipped by your placement test · open to review' : `${unit.week <= 10 ? `Week ${unit.week} of CS50` : unit.week === 11 ? "CS50’s cybersecurity lecture" : unit.week === 12 ? "Beyond CS50" : "CS50’s final project"} · ${prog.done}/${prog.total} lessons`}
                 </p>
               </div>
             </div>

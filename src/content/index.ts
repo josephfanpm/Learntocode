@@ -12,5 +12,8 @@ import { u9 } from './units/u9'
 import { u10 } from './units/u10'
 import { u11 } from './units/u11'
 import { u12 } from './units/u12'
+import { u13 } from './units/u13'
 
-export const units: Unit[] = [ u0, u1, u2, u3, u4, u5, u6, u7, u8, u9, u10, u11, u12 ]
+// Order on the path. u13 (Systems design) was added later, so its id is out of
+// sequence: lesson ids are what progress is saved under and must not change.
+export const units: Unit[] = [ u0, u1, u2, u3, u4, u5, u6, u7, u8, u9, u10, u11, u13, u12 ]
