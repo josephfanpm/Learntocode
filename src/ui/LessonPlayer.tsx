@@ -1,9 +1,10 @@
-import { Check, Flame, X } from 'lucide-react'
+import { Check, Flame, Volume2, VolumeX, X } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { Lesson, Unit } from '../content/types'
 import { dayKey } from '../engine/dates'
 import { completeLesson, streak, type LessonResult } from '../engine/state'
 import { warmPython } from '../runners'
+import { play } from '../sound'
 import { useStore } from '../store'
 import { ExerciseView, type Grader } from './exercises'
 import { Inline } from './text'
@@ -30,6 +31,8 @@ export function LessonPlayer({ lesson, unit, color, startAt = 0, onExit }: { les
   const [confirmQuit, setConfirmQuit] = useState(false)
   const [attempt, setAttempt] = useState(0)
   const praise = useRef(PRAISE[0])
+  // Right answers in a row, for the climbing correct sound.
+  const combo = useRef(0)
 
   const idx = queue[pos]
   const ex = lesson.exercises[idx]
@@ -70,9 +73,13 @@ export function LessonPlayer({ lesson, unit, color, startAt = 0, onExit }: { les
     setChecking(false)
     praise.current = PRAISE[Math.floor(Math.random() * PRAISE.length)]
     if (ok) {
+      combo.current++
+      play('correct', combo.current)
       setStatus('right')
       return
     }
+    combo.current = 0
+    play('wrong')
     setStatus('wrong')
     setTries((t) => t + 1)
     setMissed((m) => new Set(m).add(idx))
@@ -86,6 +93,16 @@ export function LessonPlayer({ lesson, unit, color, startAt = 0, onExit }: { les
     setQueue(q)
     next(false, q)
   }
+
+  // A tiny tick when an answer tile is tapped (one listener for every exercise type).
+  useEffect(() => {
+    const onDown = (e: PointerEvent) => {
+      const t = (e.target as HTMLElement).closest('.tile')
+      if (t && !(t as HTMLButtonElement).disabled) play('tap')
+    }
+    window.addEventListener('pointerdown', onDown)
+    return () => window.removeEventListener('pointerdown', onDown)
+  }, [])
 
   // Enter = Check / Continue (not inside the code editor).
   useEffect(() => {
@@ -113,6 +130,14 @@ export function LessonPlayer({ lesson, unit, color, startAt = 0, onExit }: { les
         <div className="h-4 flex-1 overflow-hidden rounded-full bg-rule" role="progressbar" aria-valuenow={Math.round(progress * 100)} aria-valuemin={0} aria-valuemax={100}>
           <div className="h-full rounded-full transition-[width] duration-500" style={{ width: `${Math.max(4, progress * 100)}%`, background: color }} />
         </div>
+        <button
+          aria-label={s.sound === false ? 'Turn sound on' : 'Turn sound off'}
+          aria-pressed={s.sound !== false}
+          onClick={() => update((p) => ({ ...p, sound: p.sound === false }))}
+          className="rounded-lg p-1 text-ink-3 hover:text-ink"
+        >
+          {s.sound === false ? <VolumeX size={22} /> : <Volume2 size={22} />}
+        </button>
       </header>
 
       <main className="flex-1 px-4 pt-4 pb-56">
@@ -201,6 +226,12 @@ function LessonDone({ result, lesson, onDone, streakNow }: { result: { r: Lesson
   const { s } = useStore()
   const today = s.activity[dayKey(new Date())]?.xp ?? 0
   const grew = r.streakAfter > r.streakBefore
+  useEffect(() => {
+    play('complete')
+    if (!grew) return
+    const id = setTimeout(() => play('streak'), 650)
+    return () => clearTimeout(id)
+  }, [grew])
   return (
     <div className="mx-auto flex min-h-dvh max-w-md flex-col px-5 py-10">
       <div className="flex flex-1 flex-col items-center justify-center text-center">

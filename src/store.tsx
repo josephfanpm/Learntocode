@@ -3,6 +3,7 @@ import { units } from './content'
 import { dayKey } from './engine/dates'
 import { decide, facts, type Message } from './engine/messaging'
 import { load, reconcile, save, type LearnerState } from './engine/state'
+import { setSoundEnabled } from './sound'
 
 interface Store {
   s: LearnerState
@@ -17,6 +18,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [s, setS] = useState<LearnerState>(() => reconcile(load(new Date()), dayKey(new Date())))
   const ref = useRef(s)
   ref.current = s
+  setSoundEnabled(s.sound !== false)
 
   const update = useCallback((f: (s: LearnerState) => LearnerState) => {
     setS((prev) => {

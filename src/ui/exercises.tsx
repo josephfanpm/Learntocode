@@ -5,11 +5,11 @@ import type {
   ChoiceExercise,
   ConceptExercise,
   Exercise,
-  MatchExercise,
   OrderExercise,
   WriteExercise,
 } from '../content/types'
 import { check, runPythonFree, runSqlQuery, warmPython, type RunResult } from '../runners'
+import { Match } from './match'
 import { Code, highlight, Inline, Prose } from './text'
 
 export type Grader = () => boolean | Promise<boolean>
@@ -221,100 +221,6 @@ export function Order({ ex, locked, reveal, register }: ExProps<OrderExercise>) 
           ))}
       </div>
       {locked && reveal && <Code code={ex.lines.join('\n')} lang={ex.language} />}
-    </div>
-  )
-}
-
-// ---------- Match ----------
-
-const PAIR_COLORS = ['#2d5be3', '#ff7a1a', '#7a4ff0', '#0f9fae', '#c2378b']
-
-export function Match({ ex, locked, reveal, register }: ExProps<MatchExercise>) {
-  const left = useMemo(() => shuffle(ex.pairs.map((_, i) => i)), [ex])
-  const right = useMemo(() => shuffleApart(ex.pairs.map((_, i) => i)), [ex])
-  // links[leftIndex] = rightIndex
-  const [links, setLinks] = useState<Record<number, number>>({})
-  const [sel, setSel] = useState<number | null>(null)
-  useEffect(
-    () =>
-      register(
-        Object.keys(links).length === ex.pairs.length
-          ? () => Object.entries(links).every(([l, r]) => Number(l) === r)
-          : null,
-      ),
-    [links, ex, register],
-  )
-  const colorOf = (l: number) => PAIR_COLORS[Object.keys(links).map(Number).sort().indexOf(l) % PAIR_COLORS.length]
-  const leftOf = (r: number) => Object.entries(links).find(([, v]) => v === r)?.[0]
-  const tapRight = (r: number) => {
-    if (sel === null) {
-      const l = leftOf(r)
-      if (l !== undefined) {
-        const next = { ...links }
-        delete next[Number(l)]
-        setLinks(next)
-      }
-      return
-    }
-    const next = { ...links }
-    const prev = leftOf(r)
-    if (prev !== undefined) delete next[Number(prev)]
-    next[sel] = r
-    setLinks(next)
-    setSel(null)
-  }
-  const style = (l: number | undefined, side: 'l' | 'r', idx: number) => {
-    if (locked && l !== undefined) {
-      const ok = side === 'l' ? links[l] === l : Number(leftOf(idx)) === idx
-      return ok ? '!border-good !bg-good-soft' : '!border-bad !bg-bad-soft'
-    }
-    return ''
-  }
-  return (
-    <div className="space-y-5">
-      <Prompt text={ex.prompt} />
-      <div className="grid grid-cols-2 gap-3">
-        <div className="space-y-2.5">
-          {left.map((l) => (
-            <button
-              key={l}
-              disabled={locked}
-              aria-pressed={sel === l}
-              onClick={() => setSel(sel === l ? null : l)}
-              className={`tile flex min-h-14 w-full items-center gap-2 px-3 py-2 text-left text-[0.95rem] ${style(links[l] !== undefined ? l : undefined, 'l', l)}`}
-            >
-              {links[l] !== undefined && <span className="size-3 shrink-0 rounded-full" style={{ background: colorOf(l) }} />}
-              <Inline text={ex.pairs[l][0]} />
-            </button>
-          ))}
-        </div>
-        <div className="space-y-2.5">
-          {right.map((r) => {
-            const l = leftOf(r)
-            return (
-              <button
-                key={r}
-                disabled={locked}
-                onClick={() => tapRight(r)}
-                className={`tile flex min-h-14 w-full items-center gap-2 px-3 py-2 text-left text-[0.95rem] ${style(l !== undefined ? Number(l) : undefined, 'r', r)}`}
-              >
-                {l !== undefined && <span className="size-3 shrink-0 rounded-full" style={{ background: colorOf(Number(l)) }} />}
-                <Inline text={ex.pairs[r][1]} />
-              </button>
-            )
-          })}
-        </div>
-      </div>
-      {!locked && <p className="text-sm text-ink-3">Tap an item on the left, then its match on the right.</p>}
-      {locked && reveal && (
-        <ul className="space-y-1 text-sm text-ink-2">
-          {ex.pairs.map(([a, b]) => (
-            <li key={a}>
-              <Inline text={a} /> → <Inline text={b} />
-            </li>
-          ))}
-        </ul>
-      )}
     </div>
   )
 }

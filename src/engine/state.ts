@@ -36,6 +36,8 @@ export interface LearnerState {
   /** Hour (0–23, local) for the streak reminder. */
   reminderHour: number
   pushEnabled: boolean
+  /** Interface sounds. Missing (older saves) means on. */
+  sound?: boolean
   xp: number
   gems: number
   freezes: number

@@ -4,6 +4,7 @@ import { units } from '../content'
 import { addDays, dayKey, parseDay } from '../engine/dates'
 import { badges } from '../engine/progress'
 import { buyFreeze, FREEZE_PRICE, longestStreak, MAX_FREEZES, reset, streak } from '../engine/state'
+import { play, setSoundEnabled } from '../sound'
 import { useStore } from '../store'
 import { GOALS, HOURS, hourLabel } from './Onboarding'
 import type { Go } from './Home'
@@ -122,6 +123,15 @@ export function Profile({ go }: { go: Go }) {
               </button>
             ))}
           </div>
+        </div>
+        <div className="flex items-center justify-between rounded-2xl border-2 border-rule bg-white p-4">
+          <div>
+            <p className="font-medium">Sound effects</p>
+            <p className="text-sm text-ink-2">Chimes for right answers and finished lessons.</p>
+          </div>
+          <button role="switch" aria-checked={s.sound !== false} aria-label="Sound effects" onClick={() => { const on = s.sound === false; update((p) => ({ ...p, sound: on })); if (on) { setSoundEnabled(true); play('correct') } }} className={`relative h-8 w-14 shrink-0 rounded-full transition-colors ${s.sound !== false ? 'bg-good' : 'bg-rule'}`}>
+            <span className={`absolute top-1 size-6 rounded-full bg-white transition-[left] ${s.sound !== false ? 'left-7' : 'left-1'}`} />
+          </button>
         </div>
         <div className="flex items-center justify-between rounded-2xl border-2 border-rule bg-white p-4">
           <div>

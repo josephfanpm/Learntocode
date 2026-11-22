@@ -22,7 +22,7 @@ The course follows the topics of Harvard's [CS50x](https://cs50.harvard.edu/x/),
 | 9 | 9 (Flask) | Routes, forms, templates, sessions |
 | 10 | AI | Learning from examples, how chatbots write, using AI well |
 
-55 lessons, 522 exercises in six types: concept cards, multiple choice, fill the gap, put lines in order, match pairs, and write real code. CS50 teaches weeks 1–5 in C; this course uses Python throughout, because beginners can run it in a browser tab and the syntax gets out of the way.
+55 lessons, 522 exercises in six types: concept cards, multiple choice, fill the gap, put lines in order, match pairs, and write real code. Match questions are drag-to-slot (each answer lands next to its partner), with tap-then-tap as a no-drag alternative. CS50 teaches weeks 1–5 in C; this course uses Python throughout, because beginners can run it in a browser tab and the syntax gets out of the way.
 
 **Code runs in the browser.** Python runs in [Pyodide](https://pyodide.org) inside a Web Worker, so an endless loop is stopped after 6 seconds instead of freezing the page. SQL runs in [sql.js](https://sql.js.org) (SQLite). HTML is checked by CSS selectors against a sandboxed preview. Python errors are translated into one plain sentence ("Line 3: Python doesn't know the name "nme"…").
 
@@ -34,6 +34,20 @@ The course follows the topics of Harvard's [CS50x](https://cs50.harvard.edu/x/),
 - **Gems:** 5 per lesson, 20 for hitting the daily goal.
 - **Unlocks:** lessons open strictly in order; finishing a unit opens the next one.
 - **Mistakes come back:** a wrong answer returns at the end of the lesson. Code exercises let you retry, with the answer offered after two misses.
+
+## Sound
+
+Sounds are synthesised in the browser ([src/sound.ts](src/sound.ts)), so there are no audio files. The rules come from Material Design's sound guidance (sound only at moments that matter; silence is part of the design) and research on earcons (short, abstract, consistent sounds that people learn by hearing them with an action):
+
+| Moment | Sound | Why |
+|---|---|---|
+| Tap an answer | Tiny filtered tick, no pitch | Confirms the touch without being musical or distracting |
+| Right answer | A crisp snap, then two quick notes rising a fifth, with a sparkle on top. Under half a second. Climbs a semitone for each answer in a row (up to 5) | Rising, consonant and short reads as "yes"; the climb makes a run feel like it's building |
+| Wrong answer | Two soft, low notes stepping down | Clearly different from right, but gentle: no buzzer, in line with supportive feedback copy |
+| Lesson done | Major arpeggio up to the octave, like a station arrival chime | The biggest moment gets the fullest sound |
+| Streak extended | A higher, sparkling rise after the lesson chime | Marks the habit win separately from the lesson |
+
+Sound can be turned off from the speaker button in any lesson or in Settings.
 
 ## Targeted messaging
 
