@@ -6,7 +6,7 @@ import { BottomNav, Home, LINE_COLORS, TopBar, type Go } from './ui/Home'
 import { AvatarBuilder } from './ui/Avatar'
 import { LessonPlayer } from './ui/LessonPlayer'
 import { Onboarding } from './ui/Onboarding'
-import { Profile } from './ui/Profile'
+import { Profile, Settings } from './ui/Profile'
 
 function useRoute(): [string, Go] {
   const read = () => location.hash.replace(/^#/, '').split('#')[0] || '/'
@@ -40,7 +40,7 @@ function Screens() {
   return (
     <>
       <TopBar go={go} />
-      {route.startsWith('/me') ? <Profile go={go} /> : route === '/avatar' ? <AvatarBuilder go={go} /> : <Home go={go} />}
+      {route.startsWith('/me') ? <Profile go={go} /> : route === '/settings' ? <Settings go={go} /> : route === '/avatar' ? <AvatarBuilder go={go} /> : <Home go={go} />}
       <BottomNav route={route} go={go} />
     </>
   )

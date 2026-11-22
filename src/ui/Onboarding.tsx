@@ -169,7 +169,7 @@ export function Onboarding({ go }: { go: Go }) {
         >
           <div className="flex items-center gap-3 rounded-2xl border-2 border-rule bg-white p-4">
             <Bell className="shrink-0 text-flame" size={24} />
-            <p className="text-sm text-ink-2">One reminder a day, around the time you usually practice, and only if you haven’t yet. You can pick a fixed time in Settings.</p>
+            <p className="text-sm text-ink-2">One reminder a day, around the time you usually practice, and only if you haven’t yet.</p>
           </div>
         </Talk>
       )}

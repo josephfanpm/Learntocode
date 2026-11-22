@@ -15,7 +15,7 @@ interface Store {
 const Ctx = createContext<Store | null>(null)
 
 export function StoreProvider({ children }: { children: ReactNode }) {
-  const [s, setS] = useState<LearnerState>(() => reconcile(load(new Date()), dayKey(new Date())))
+  const [s, setS] = useState<LearnerState>(() => ({ ...reconcile(load(new Date()), dayKey(new Date())), reminderMode: 'smart' }))
   const ref = useRef(s)
   ref.current = s
   setSoundEnabled(s.sound !== false)

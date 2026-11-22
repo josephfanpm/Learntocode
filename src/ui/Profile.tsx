@@ -1,4 +1,4 @@
-import { Award, Copy, Download, Flame, Gem, Pencil, Snowflake, Upload } from 'lucide-react'
+import { ArrowLeft, Award, Copy, Download, Flame, Gem, Pencil, Settings as SettingsIcon, Snowflake, Upload } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { units } from '../content'
 import { addDays, dayKey, parseDay } from '../engine/dates'
@@ -9,7 +9,7 @@ import { useStore } from '../store'
 import { Avatar } from './Avatar'
 import { badgeBackground, badgePixels } from './pixel/icons'
 import { PixelSprite } from './pixel/PixelSprite'
-import { GOALS, HOURS, hourLabel } from './Onboarding'
+import { GOALS } from './Onboarding'
 import type { Go } from './Home'
 
 export function Profile({ go }: { go: Go }) {
@@ -17,8 +17,6 @@ export function Profile({ go }: { go: Go }) {
   const today = dayKey(new Date())
   const best = longestStreak(s)
   const xpToday = s.activity[today]?.xp ?? 0
-  const [confirmReset, setConfirmReset] = useState(false)
-  const [notice, setNotice] = useState('')
 
   useEffect(() => {
     const id = location.hash.split('#')[2]
@@ -30,14 +28,6 @@ export function Profile({ go }: { go: Go }) {
   const mondayOffset = (end.getDay() + 6) % 7
   const start = addDays(today, -mondayOffset - 28)
   const days = Array.from({ length: 35 }, (_, i) => addDays(start, i))
-
-  const togglePush = async () => {
-    if (s.pushEnabled) return update((p) => ({ ...p, pushEnabled: false }))
-    if (typeof Notification === 'undefined') return setNotice('This browser doesn’t support notifications.')
-    const perm = await Notification.requestPermission()
-    if (perm === 'granted') update((p) => ({ ...p, pushEnabled: true }))
-    else setNotice('Notifications are blocked. Allow them in your browser’s site settings.')
-  }
 
   const stat = (label: string, value: React.ReactNode, icon: React.ReactNode) => (
     <div className="rounded-2xl border-2 border-rule bg-white p-4">
@@ -62,6 +52,9 @@ export function Profile({ go }: { go: Go }) {
             <button className="mt-1 text-sm font-semibold text-cobalt" onClick={() => go('/avatar')}>Make your avatar</button>
           )}
         </div>
+        <button onClick={() => go('/settings')} aria-label="Settings" className="self-start rounded-xl p-2 text-ink-2 hover:bg-white hover:text-ink">
+          <SettingsIcon size={26} />
+        </button>
       </div>
 
       <section className="grid grid-cols-2 gap-3">
@@ -138,76 +131,6 @@ export function Profile({ go }: { go: Go }) {
           })}
         </ul>
       </section>
-
-      <SaveProgress />
-
-      <section id="settings" aria-labelledby="set" className="space-y-5">
-        <h2 id="set" className="text-xl font-bold">Settings</h2>
-        <label className="block">
-          <span className="text-sm font-medium">Name</span>
-          <input value={s.name} maxLength={30} onChange={(e) => update((p) => ({ ...p, name: e.target.value }))} className="mt-1 w-full rounded-xl border-2 border-rule bg-white px-3 py-2.5 outline-none focus:border-cobalt" />
-        </label>
-        <div>
-          <p className="text-sm font-medium">Daily goal</p>
-          <div className="mt-1 grid grid-cols-4 gap-2">
-            {GOALS.map((g) => (
-              <button key={g.xp} aria-pressed={s.dailyGoal === g.xp} onClick={() => update((p) => ({ ...p, dailyGoal: g.xp }))} className="tile py-2 text-sm">
-                <span className="block font-semibold">{g.label}</span>
-                <span className="text-ink-3">{g.xp} XP</span>
-              </button>
-            ))}
-          </div>
-        </div>
-        <div>
-          <p className="text-sm font-medium">Reminder time</p>
-          <div className="mt-1 grid grid-cols-3 gap-2 sm:grid-cols-6">
-            <button aria-pressed={s.reminderMode === 'smart'} onClick={() => update((p) => ({ ...p, reminderMode: 'smart' }))} className="tile py-2 text-sm font-semibold">
-              Smart
-            </button>
-            {HOURS.map((h) => (
-              <button key={h} aria-pressed={s.reminderMode !== 'smart' && s.reminderHour === h} onClick={() => update((p) => ({ ...p, reminderMode: 'fixed', reminderHour: h }))} className="tile py-2 text-sm font-semibold">
-                {hourLabel(h)}
-              </button>
-            ))}
-          </div>
-          <p className="mt-1.5 text-xs text-ink-3">Smart reminds you around the time you practiced the day before.</p>
-        </div>
-        <div className="flex items-center justify-between rounded-2xl border-2 border-rule bg-white p-4">
-          <div>
-            <p className="font-medium">Sound effects</p>
-            <p className="text-sm text-ink-2">Chimes for right answers and finished lessons.</p>
-          </div>
-          <button role="switch" aria-checked={s.sound !== false} aria-label="Sound effects" onClick={() => { const on = s.sound === false; update((p) => ({ ...p, sound: on })); if (on) { setSoundEnabled(true); play('correct') } }} className={`relative h-8 w-14 shrink-0 rounded-full transition-colors ${s.sound !== false ? 'bg-good' : 'bg-rule'}`}>
-            <span className={`absolute top-1 size-6 rounded-full bg-white transition-[left] ${s.sound !== false ? 'left-7' : 'left-1'}`} />
-          </button>
-        </div>
-        <div className="flex items-center justify-between rounded-2xl border-2 border-rule bg-white p-4">
-          <div>
-            <p className="font-medium">Reminders</p>
-            <p className="text-sm text-ink-2">Browser notifications while this tab is open.</p>
-          </div>
-          <button role="switch" aria-checked={s.pushEnabled} aria-label="Reminders" onClick={togglePush} className={`relative h-8 w-14 rounded-full transition-colors ${s.pushEnabled ? 'bg-good' : 'bg-rule'}`}>
-            <span className={`absolute top-1 size-6 rounded-full bg-white transition-[left] ${s.pushEnabled ? 'left-7' : 'left-1'}`} />
-          </button>
-        </div>
-        <div className="flex items-center justify-between gap-4 rounded-2xl border-2 border-dashed border-rule bg-white p-4">
-          <div>
-            <p className="font-medium">Prototype: unlock all lessons</p>
-            <p className="text-sm text-ink-2">Open every lesson on the path so you can try any of them.</p>
-          </div>
-          <button role="switch" aria-checked={!!s.unlockAll} aria-label="Unlock all lessons" onClick={() => update((p) => ({ ...p, unlockAll: !p.unlockAll }))} className={`relative h-8 w-14 shrink-0 rounded-full transition-colors ${s.unlockAll ? 'bg-good' : 'bg-rule'}`}>
-            <span className={`absolute top-1 size-6 rounded-full bg-white transition-[left] ${s.unlockAll ? 'left-7' : 'left-1'}`} />
-          </button>
-        </div>
-        {notice && <p className="text-sm text-bad">{notice}</p>}
-        <div className="flex flex-wrap gap-3 pt-2">
-          {!confirmReset ? (
-            <button className="btn btn-ghost text-sm" onClick={() => setConfirmReset(true)}>Reset progress</button>
-          ) : (
-            <button className="btn btn-bad text-sm" onClick={() => { reset(); location.hash = '#/'; location.reload() }}>Erase everything</button>
-          )}
-        </div>
-      </section>
     </div>
   )
 }
@@ -283,5 +206,103 @@ function SaveProgress() {
       </div>
       {note && <p className={`mt-2 text-sm ${note.ok ? 'text-good' : 'text-bad'}`} role="status">{note.text}</p>}
     </section>
+  )
+}
+
+function Toggle({ on, label, onClick }: { on: boolean; label: string; onClick: () => void }) {
+  return (
+    <button role="switch" aria-checked={on} aria-label={label} onClick={onClick} className={`relative h-8 w-14 shrink-0 rounded-full transition-colors ${on ? 'bg-good' : 'bg-rule'}`}>
+      <span className={`absolute top-1 size-6 rounded-full bg-white transition-[left] ${on ? 'left-7' : 'left-1'}`} />
+    </button>
+  )
+}
+
+function Row({ title, note, children, dashed = false }: { title: string; note: string; children: React.ReactNode; dashed?: boolean }) {
+  return (
+    <div className={`flex items-center justify-between gap-4 rounded-2xl border-2 bg-white p-4 ${dashed ? 'border-dashed border-rule' : 'border-rule'}`}>
+      <div>
+        <p className="font-medium">{title}</p>
+        <p className="text-sm text-ink-2">{note}</p>
+      </div>
+      {children}
+    </div>
+  )
+}
+
+/** Everything adjustable, kept off the profile: opened from the gear icon. */
+export function Settings({ go }: { go: Go }) {
+  const { s, update } = useStore()
+  const [confirmReset, setConfirmReset] = useState(false)
+  const [notice, setNotice] = useState('')
+
+  const togglePush = async () => {
+    if (s.pushEnabled) return update((p) => ({ ...p, pushEnabled: false }))
+    if (typeof Notification === 'undefined') return setNotice('This browser doesn’t support notifications.')
+    const perm = await Notification.requestPermission()
+    if (perm === 'granted') update((p) => ({ ...p, pushEnabled: true }))
+    else setNotice('Notifications are blocked. Allow them in your browser’s site settings.')
+  }
+
+  return (
+    <div className="mx-auto max-w-xl space-y-6 px-4 py-6 pb-28">
+      <div className="flex items-center gap-2">
+        <button onClick={() => go('/me')} aria-label="Back to profile" className="-ml-2 rounded-xl p-2 text-ink-2 hover:bg-white hover:text-ink">
+          <ArrowLeft size={24} />
+        </button>
+        <h1 className="text-3xl font-bold">Settings</h1>
+      </div>
+
+      <label className="block">
+        <span className="text-sm font-medium">Name</span>
+        <input value={s.name} maxLength={30} onChange={(e) => update((p) => ({ ...p, name: e.target.value }))} className="mt-1 w-full rounded-xl border-2 border-rule bg-white px-3 py-2.5 outline-none focus:border-cobalt" />
+      </label>
+
+      <div>
+        <p className="text-sm font-medium">Daily goal</p>
+        <div className="mt-1 grid grid-cols-4 gap-2">
+          {GOALS.map((g) => (
+            <button key={g.xp} aria-pressed={s.dailyGoal === g.xp} onClick={() => update((p) => ({ ...p, dailyGoal: g.xp }))} className="tile py-2 text-sm">
+              <span className="block font-semibold">{g.label}</span>
+              <span className="text-ink-3">{g.xp} XP</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="space-y-3">
+        <Row title="Sound effects" note="Chimes for answers and finished lessons.">
+          <Toggle
+            on={s.sound !== false}
+            label="Sound effects"
+            onClick={() => {
+              const on = s.sound === false
+              update((p) => ({ ...p, sound: on }))
+              if (on) {
+                setSoundEnabled(true)
+                play('correct')
+              }
+            }}
+          />
+        </Row>
+        <Row title="Reminders" note="One a day, around the time you usually practice.">
+          <Toggle on={s.pushEnabled} label="Reminders" onClick={togglePush} />
+        </Row>
+        {notice && <p className="text-sm text-bad">{notice}</p>}
+      </div>
+
+      <SaveProgress />
+
+      <section aria-labelledby="proto" className="space-y-3">
+        <h2 id="proto" className="text-xl font-bold">Prototype</h2>
+        <Row dashed title="Unlock all lessons" note="Open every lesson on the path so you can try any of them.">
+          <Toggle on={!!s.unlockAll} label="Unlock all lessons" onClick={() => update((p) => ({ ...p, unlockAll: !p.unlockAll }))} />
+        </Row>
+        {!confirmReset ? (
+          <button className="btn btn-ghost text-sm" onClick={() => setConfirmReset(true)}>Reset progress</button>
+        ) : (
+          <button className="btn btn-bad text-sm" onClick={() => { reset(); location.hash = '#/'; location.reload() }}>Erase everything</button>
+        )}
+      </section>
+    </div>
   )
 }

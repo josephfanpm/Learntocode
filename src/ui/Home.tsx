@@ -61,7 +61,7 @@ const BANNER_MOOD: Record<string, Mood> = {
 /** Bottom tabs: the lesson path and the profile. */
 export function BottomNav({ route, go }: { route: string; go: Go }) {
   const { s } = useStore()
-  const onProfile = route.startsWith('/me') || route === '/avatar'
+  const onProfile = route.startsWith('/me') || route === '/avatar' || route === '/settings'
   const tab = (active: boolean) =>
     `flex flex-1 flex-col items-center gap-0.5 rounded-xl py-1.5 text-xs font-semibold transition-colors ${active ? 'bg-cobalt-soft text-cobalt-deep' : 'text-ink-3 hover:text-ink'}`
   return (
@@ -86,7 +86,7 @@ export function Banner({ m, go, onDismiss }: { m: Message; go: Go; onDismiss: ()
     if (m.cta.action === 'lesson' || m.cta.action === 'review') go(`/lesson/${m.cta.lessonId}`)
     else if (m.cta.action === 'shop') go('/me#shop')
     else if (m.cta.action === 'avatar') go('/avatar')
-    else go('/me#settings')
+    else go('/settings')
   }
   const tone = m.rule === 'streak_milestone' || m.rule === 'unit_done' ? 'bg-flame-soft border-flame/30' : 'bg-white border-rule'
   return (

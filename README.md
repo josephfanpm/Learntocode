@@ -92,7 +92,7 @@ Twenty rules read a snapshot of the learner: streak, days away, progress toward 
 | Push | Streak at risk, a late streak saver, first lesson not started, a few days away |
 | Email (simulated) | Welcome, weekly recap, one week away, two weeks away (suggests a smaller goal), thirty days away (the last message) |
 
-- **Timing.** The daily reminder is due about 23.5 hours after the learner's last lesson, kept between 8am and 8pm. If a streak of three or more days is still at risk at 8pm, one streak saver follows. A fixed time is available in Settings.
+- **Timing.** The daily reminder is due about 23.5 hours after the learner's last lesson, kept between 8am and 8pm. If a streak of three or more days is still at risk at 8pm, one streak saver follows.
 - **Wording.** The streak reminder rotates through several messages and never repeats the previous day's.
 - **Limits.** Each message is sent once. One daily reminder, one email every three days, nothing overnight. Push hands over to email after a week away, and after thirty days the learner hears nothing until they return.
 
@@ -115,7 +115,7 @@ I built ByteQuest with Claude Code as a pair programmer. I set the product direc
 | **Where to start a learner** | Ask how experienced they are · test them | A placement quiz, one question per unit | A few seconds of setup, and precision: one question per unit is a coarse test | People misjudge their own level in both directions. A question they can or cannot answer is better evidence. |
 | **When to ask for a profile** | During setup · after the first lesson | After the first lesson, skippable | Knowing the learner's name from the start | Every screen before the first lesson loses people. A profile is easier to ask for once they have finished something. |
 | **Avatar** | Empty until made · build one during setup · assign one at random | Random pixel avatar for everyone, customisable later | A deliberate first choice | Nobody starts with a blank placeholder, there is no extra step, and people are more likely to adjust something they were given. |
-| **Reminder time** | Learner picks a time · remind when they usually practice | About 23.5 hours after the last lesson, with a fixed time as an option | The feeling of control during setup | A time someone picks is a guess about their day. The time they practiced yesterday is something they already did. |
+| **Reminder time** | Learner picks a time · remind when they usually practice | About 23.5 hours after the last lesson, with no time setting at all | The learner's control over the time | A time someone picks is a guess about their day. The time they practiced yesterday is something they already did. |
 | **Streak freezes** | No protection · spend a freeze per missed day · spend only when it saves the streak | Only when freezes cover the whole gap | Simplicity | A streak with no forgiveness punishes one bad day. Burning freezes on a streak that is lost anyway is a second punishment. |
 | **Lapsed learners** | Remind forever · stop at some point | Push for a week, then email, then silence after thirty days | Some learners who would have come back on day 45 | Messages nobody acts on train people to ignore the app, or to turn everything off. |
 | **Wrong answers** | Hearts that run out · no penalty | No hearts: the question returns at the end, and the wrong sound is soft | The tension that scarcity creates | Beginners are wrong a lot. Locking them out for mistakes punishes the thing learning requires. |
@@ -143,7 +143,7 @@ npm test           # streak, unlock, reminder, badge and save tests
 npx tsx scripts/check-content.ts   # validates every exercise; runs each Python and SQL answer against its tests
 ```
 
-Settings has a **Prototype: unlock all lessons** switch (off by default). Any exercise can be opened directly with `#/lesson/<lesson-id>?at=<index>`, which does not save progress.
+Settings (the gear icon on the profile) has a **Prototype: unlock all lessons** switch, off by default. Any exercise can be opened directly with `#/lesson/<lesson-id>?at=<index>`, which does not save progress.
 
 Built with Vite, React, TypeScript and Tailwind. Python runs in [Pyodide](https://pyodide.org) inside a Web Worker and SQL in [sql.js](https://sql.js.org). Pip, the avatars and the sounds are generated in code: sprites as pixel grids ([src/ui/pixel/sprites.ts](src/ui/pixel/sprites.ts)), sounds with the Web Audio API ([src/sound.ts](src/sound.ts)). The reminder rules are in [src/engine/messaging.ts](src/engine/messaging.ts).
 
