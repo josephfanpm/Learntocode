@@ -43,6 +43,11 @@ export interface LearnerState {
   dailyGoal: number
   /** Hour (0–23, local) for the streak reminder. */
   reminderHour: number
+  /**
+   * smart: remind about 23.5 hours after the last lesson (when they usually
+   * practice). fixed: remind at reminderHour. Missing (older saves) = fixed.
+   */
+  reminderMode?: 'smart' | 'fixed'
   pushEnabled: boolean
   /** Units skipped by the placement test (0 = start at the beginning). */
   placedUnit?: number
@@ -85,6 +90,7 @@ export function newLearner(now: Date): LearnerState {
     motivation: 'curious',
     dailyGoal: 20,
     reminderHour: 19,
+    reminderMode: 'smart',
     pushEnabled: false,
     xp: 0,
     gems: 0,
@@ -97,6 +103,22 @@ export function newLearner(now: Date): LearnerState {
     messages: [],
     dismissed: {},
   }
+}
+
+/**
+ * The hour today's reminder is due. Smart mode: half an hour before the time
+ * of the last lesson (so about 23.5 hours after it), kept between 8am and
+ * 8pm; 7pm until there is a first lesson.
+ */
+export function effectiveReminderHour(s: LearnerState): number {
+  if (s.reminderMode !== 'smart') return s.reminderHour
+  const last = Object.values(s.completed)
+    .map((c) => c.lastAt)
+    .sort()
+    .at(-1)
+  if (!last) return 19
+  const due = new Date(new Date(last).getTime() - 30 * 60_000)
+  return Math.min(20, Math.max(8, due.getHours()))
 }
 
 const practiced = (a?: DayActivity) => !!a && (a.xp > 0 || !!a.frozen)

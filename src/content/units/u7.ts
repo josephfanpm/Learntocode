@@ -37,6 +37,135 @@ INSERT INTO orders VALUES
 const TREATS_COLS = '-- treats: id, name, kind, price, stock\n'
 const BOTH_COLS = '-- treats: id, name, kind, price, stock\n-- orders: id, treat_id, customer, qty\n'
 
+// A school with clubs: one student can join many clubs, one club has many students.
+const CLUBS = `CREATE TABLE students (
+  id INTEGER PRIMARY KEY,
+  name TEXT
+);
+INSERT INTO students VALUES
+  (1, 'Ava'), (2, 'Ben'), (3, 'Cal'), (4, 'Dee'), (5, 'Eli');
+CREATE TABLE clubs (
+  id INTEGER PRIMARY KEY,
+  title TEXT
+);
+INSERT INTO clubs VALUES
+  (1, 'Chess'), (2, 'Choir'), (3, 'Garden');
+CREATE TABLE members (
+  student_id INTEGER REFERENCES students(id),
+  club_id INTEGER REFERENCES clubs(id)
+);
+INSERT INTO members VALUES
+  (1, 1), (1, 2), (2, 1), (3, 3), (4, 1), (4, 3), (5, 2);
+`
+
+const CLUBS_COLS = '-- students: id, name\n-- clubs: id, title\n-- members: student_id, club_id\n'
+
+// An invented music library for the lab.
+const MUSIC = `CREATE TABLE artists (
+  id INTEGER PRIMARY KEY,
+  name TEXT
+);
+INSERT INTO artists VALUES
+  (1, 'Paper Lanterns'),
+  (2, 'Mina Okoro'),
+  (3, 'The Slow Tides'),
+  (4, 'DJ Marmalade');
+CREATE TABLE songs (
+  id INTEGER PRIMARY KEY,
+  title TEXT,
+  artist_id INTEGER REFERENCES artists(id),
+  tempo INTEGER,
+  seconds INTEGER,
+  plays INTEGER
+);
+INSERT INTO songs VALUES
+  (1, 'Rain on Tin', 1, 92, 201, 5400),
+  (2, 'Kite Weather', 1, 128, 185, 8100),
+  (3, 'Borrowed Bicycle', 2, 110, 224, 12000),
+  (4, 'Lemon Moon', 2, 74, 251, 3000),
+  (5, 'Harbour Lights', 3, 84, 312, 4500),
+  (6, 'Slow Train Home', 3, 68, 275, 2600),
+  (7, 'Jam Jar', 4, 140, 170, 9900),
+  (8, 'Marmalade Sky', 4, 150, 163, 15000),
+  (9, 'Paper Boats', 1, 101, 214, 7000),
+  (10, 'Night Bus', 2, 122, 205, 6500);
+`
+
+const MUSIC_COLS = '-- artists: id, name\n-- songs: id, title, artist_id, tempo, seconds, plays\n'
+
+// The town of Pebble Bay, for the mystery lab.
+const TOWN = `CREATE TABLE people (
+  id INTEGER PRIMARY KEY,
+  name TEXT,
+  job TEXT
+);
+INSERT INTO people VALUES
+  (1, 'Ada Brook', 'teacher'),
+  (2, 'Dara Voss', 'caretaker'),
+  (3, 'Milo Finch', 'coach'),
+  (4, 'Petra Lunn', 'band leader'),
+  (5, 'Ivo Marsh', 'costume shop owner'),
+  (6, 'Noor Hale', 'baker'),
+  (7, 'Sam Tully', 'bus driver'),
+  (8, 'Lena Quill', 'librarian');
+CREATE TABLE reports (
+  id INTEGER PRIMARY KEY,
+  day TEXT,
+  place TEXT,
+  description TEXT
+);
+INSERT INTO reports VALUES
+  (1, 'Thursday', 'Library', 'A book came back forty years late.'),
+  (2, 'Friday', 'Gym', 'Puffin costume gone. Side door used after 21:00.'),
+  (3, 'Friday', 'Bakery', 'A bike was left outside all night.'),
+  (4, 'Saturday', 'Bus stop', 'Huge bag with yellow feet seen on the Gull Rock bus.');
+CREATE TABLE door_logs (
+  id INTEGER PRIMARY KEY,
+  person_id INTEGER REFERENCES people(id),
+  door TEXT,
+  day TEXT,
+  time TEXT
+);
+INSERT INTO door_logs VALUES
+  (1, 1, 'main', 'Friday', '08:05'),
+  (2, 2, 'side', 'Friday', '21:10'),
+  (3, 3, 'side', 'Friday', '21:25'),
+  (4, 4, 'side', 'Friday', '21:40'),
+  (5, 6, 'main', 'Friday', '15:30'),
+  (6, 8, 'side', 'Friday', '17:45'),
+  (7, 3, 'main', 'Thursday', '21:30'),
+  (8, 1, 'side', 'Thursday', '22:00');
+CREATE TABLE calls (
+  id INTEGER PRIMARY KEY,
+  caller_id INTEGER REFERENCES people(id),
+  receiver_id INTEGER REFERENCES people(id),
+  day TEXT,
+  minutes INTEGER
+);
+INSERT INTO calls VALUES
+  (1, 2, 6, 'Friday', 12),
+  (2, 3, 1, 'Friday', 1),
+  (3, 4, 5, 'Friday', 1),
+  (4, 8, 7, 'Friday', 1),
+  (5, 4, 6, 'Thursday', 1),
+  (6, 1, 3, 'Friday', 9);
+CREATE TABLE bus_tickets (
+  id INTEGER PRIMARY KEY,
+  person_id INTEGER REFERENCES people(id),
+  destination TEXT,
+  day TEXT
+);
+INSERT INTO bus_tickets VALUES
+  (1, 3, 'Fern Hill', 'Monday'),
+  (2, 4, 'Gull Rock', 'Saturday'),
+  (3, 6, 'Gull Rock', 'Saturday'),
+  (4, 2, 'Fern Hill', 'Sunday'),
+  (5, 7, 'Mill Lane', 'Saturday');
+`
+
+const TOWN_COLS =
+  '-- people: id, name, job\n-- reports: id, day, place, description\n-- door_logs: id, person_id, door, day, time\n-- calls: id, caller_id, receiver_id, day, minutes\n-- bus_tickets: id, person_id, destination, day\n'
+
 export const u7: Unit = {
   id: 'u7',
   week: 7,
@@ -561,6 +690,402 @@ db.execute(f"SELECT * FROM users WHERE name = '{name}'")`,
           hint: "Use `COUNT(*)` with the same `WHERE kind = 'cake'`.",
           solution: "SELECT COUNT(*) FROM treats WHERE kind = 'cake';",
           explain: 'Counting first tells you the size of the change before you make it. Three cakes will get a new price.',
+        },
+      ],
+    },
+    {
+      id: 'u7-subqueries',
+      title: 'Queries inside queries',
+      exercises: [
+        {
+          kind: 'concept',
+          title: 'A query in brackets',
+          body: 'A **subquery** is a whole `SELECT` written in brackets inside another query. SQL runs the inner one first, then uses its answer in the outer one.\n\nHere the inner query finds the average price. The outer query keeps treats that cost more.',
+          code: 'SELECT name FROM treats\nWHERE price > (SELECT AVG(price) FROM treats);',
+          language: 'sql',
+        },
+        {
+          kind: 'steps',
+          prompt: 'Act out the query. The boxes are its four parts, in the order they are written.',
+          cells: ['SELECT name', 'FROM treats', 'WHERE price >', '(SELECT AVG…)'],
+          steps: [
+            { ask: 'Which part does SQL work out first?', answer: 3 },
+            { ask: 'The inner query gives one number. Which part compares each price to it?', answer: 2 },
+            { ask: 'Which part decides what is shown for each row that passes?', answer: 0 },
+          ],
+          explain: 'Inner first: the brackets turn into a single number, and then the outer query runs as if you had typed that number yourself.',
+        },
+        {
+          kind: 'type',
+          prompt: 'The highest treat price is 7. What number does the bracket part turn into? Type it.',
+          code: 'SELECT name FROM treats\nWHERE price = (SELECT MAX(price) FROM treats);',
+          language: 'sql',
+          accept: ['7'],
+          explain: 'The inner query returns one value, 7, so the outer query becomes `WHERE price = 7`.',
+        },
+        {
+          kind: 'write',
+          prompt: 'List the names of treats that cost more than the average price, sorted A to Z.',
+          language: 'sql',
+          setup: BAKERY,
+          starter: TREATS_COLS + 'SELECT name FROM treats\nWHERE price > (SELECT )\nORDER BY name;',
+          tests: [{ expected: 'Cheesecake\nDanish\nSourdough' }],
+          hint: 'Inside the brackets write `SELECT AVG(price) FROM treats`.',
+          solution: 'SELECT name FROM treats WHERE price > (SELECT AVG(price) FROM treats) ORDER BY name;',
+          explain: 'You never had to know the average yourself. If prices change tomorrow, the same query still works.',
+        },
+        {
+          kind: 'concept',
+          title: 'IN: is it on the list?',
+          body: '`IN` checks whether a value is on a list. The list can be typed out, or it can come from a subquery that returns one column.\n\n`NOT IN` keeps the rows that are **not** on the list.',
+          code: "SELECT name FROM treats WHERE kind IN ('bread', 'cake');\n\nSELECT name FROM treats\nWHERE id IN (SELECT treat_id FROM orders);",
+          language: 'sql',
+        },
+        {
+          kind: 'blank',
+          prompt: "Find the names of treats that appear in Ben's orders.",
+          code: "SELECT name FROM treats\nWHERE id ___ (SELECT ___ FROM orders WHERE customer = 'Ben');",
+          language: 'sql',
+          bank: ['IN', 'treat_id', 'customer', '='],
+          answers: ['IN', 'treat_id'],
+          explain: 'The inner query lists the treat ids Ben ordered. `IN` keeps the treats whose id is on that list.',
+        },
+        {
+          kind: 'spot',
+          prompt: 'This query should list every treat that has been ordered, but the inner query gives back many ids, not one. Tap the line with the bug.',
+          lines: ['SELECT name', 'FROM treats', 'WHERE id = (SELECT treat_id FROM orders)', 'ORDER BY name;'],
+          language: 'sql',
+          answer: 2,
+          explain: '`=` compares with a single value. When the inner query returns a whole list, use `IN`.',
+        },
+        {
+          kind: 'write',
+          prompt: 'List the names of the treats Ana has ordered, sorted A to Z. Use `IN` with a subquery.',
+          language: 'sql',
+          setup: BAKERY,
+          starter: BOTH_COLS + 'SELECT name FROM treats\nWHERE id IN (SELECT )\nORDER BY name;',
+          tests: [{ expected: 'Bagel\nBrownie\nCroissant' }],
+          hint: "The inner query is `SELECT treat_id FROM orders WHERE customer = 'Ana'`.",
+          solution:
+            "SELECT name FROM treats WHERE id IN (SELECT treat_id FROM orders WHERE customer = 'Ana') ORDER BY name;",
+          explain: 'The inner query answers "which ids?", and the outer query turns those ids into names.',
+        },
+        {
+          kind: 'write',
+          prompt: 'Which treats has nobody ordered yet? List their names, sorted A to Z.',
+          language: 'sql',
+          setup: BAKERY,
+          starter: BOTH_COLS + 'SELECT name FROM treats\nWHERE id ',
+          tests: [{ expected: 'Baguette\nDanish' }],
+          hint: 'Use `NOT IN (SELECT treat_id FROM orders)`, then `ORDER BY name`.',
+          solution: 'SELECT name FROM treats WHERE id NOT IN (SELECT treat_id FROM orders) ORDER BY name;',
+          explain: '`NOT IN` flips the test: keep every treat whose id never shows up in the orders table.',
+        },
+      ],
+    },
+    {
+      id: 'u7-design',
+      title: 'Designing tables',
+      exercises: [
+        {
+          kind: 'concept',
+          title: 'Every column has a type',
+          body: 'When you create a table, each column gets a **data type**: the kind of value it may hold.\n\n`INTEGER` is a whole number, `REAL` is a number with a decimal point, and `TEXT` is words. `NULL` means "no value here".',
+          code: 'CREATE TABLE students (\n  id INTEGER PRIMARY KEY,\n  name TEXT,\n  height REAL\n);',
+          language: 'sql',
+        },
+        {
+          kind: 'match',
+          prompt: 'Match each fact to the best type for its column.',
+          pairs: [
+            ['How many seats a bus has', 'INTEGER'],
+            ['The name of a street', 'TEXT'],
+            ['A weight like 2.75', 'REAL'],
+            ['A phone number not given yet', 'NULL'],
+          ],
+          explain: 'Whole numbers are INTEGER, decimals are REAL, words are TEXT, and a missing value is NULL.',
+        },
+        {
+          kind: 'concept',
+          title: 'How tables relate',
+          body: '**One-to-many:** one artist has many songs. Each song row holds one foreign key, `artist_id`.\n\n**Many-to-many:** a student joins many clubs, and a club has many students. That needs a third **joining table** where each row pairs one student with one club.',
+          code: 'CREATE TABLE members (\n  student_id INTEGER REFERENCES students(id),\n  club_id INTEGER REFERENCES clubs(id)\n);',
+          language: 'sql',
+        },
+        {
+          kind: 'choice',
+          prompt: 'Ava joins both Chess and Choir. Where is that stored?',
+          options: [
+            'In one students row, with both club names in a single column',
+            'In two rows of the members table, one per club',
+            'In two copies of Ava in the students table',
+            'In the clubs table, in a column named Ava',
+          ],
+          answer: 1,
+          explain: 'Each row of the joining table is one link. Two clubs means two rows, and Ava herself is still stored only once.',
+        },
+        {
+          kind: 'write',
+          prompt: 'List the names of the students in the Chess club, sorted A to Z. The first join is done. Add a second join to `clubs`, then filter and sort.',
+          language: 'sql',
+          setup: CLUBS,
+          starter:
+            CLUBS_COLS +
+            'SELECT students.name\nFROM students\nJOIN members ON members.student_id = students.id\n',
+          tests: [{ expected: 'Ava\nBen\nDee' }],
+          hint: "Add `JOIN clubs ON members.club_id = clubs.id`, then `WHERE clubs.title = 'Chess'` and `ORDER BY students.name`.",
+          solution:
+            "SELECT students.name FROM students JOIN members ON members.student_id = students.id JOIN clubs ON members.club_id = clubs.id WHERE clubs.title = 'Chess' ORDER BY students.name;",
+          explain: 'The joining table is the bridge: students link to members, and members link to clubs.',
+        },
+        {
+          kind: 'concept',
+          title: 'Indexes',
+          body: 'Without help, a database finds a name by checking every row, one by one. An **index** is a sorted copy of one column, like the index at the back of a book, so it can jump close to the answer.\n\nLookups get much faster. The cost is extra space and slightly slower inserts.',
+          code: 'CREATE INDEX name_index ON students (name);',
+          language: 'sql',
+        },
+        {
+          kind: 'steps',
+          prompt: 'The index keeps names sorted, so the database can halve the search each time. Find Fay.',
+          cells: ['Ava', 'Ben', 'Cal', 'Dee', 'Eli', 'Fay', 'Gus'],
+          steps: [
+            { ask: 'All seven names are possible. Which box is checked first?', answer: 3 },
+            { ask: 'Fay comes after Dee, so only Eli, Fay and Gus are left. Which box is checked next?', answer: 5 },
+          ],
+          explain: 'Two checks instead of six. With a million rows, a sorted index needs about 20 checks instead of up to a million.',
+        },
+        {
+          kind: 'concept',
+          title: 'Two buyers, one cheesecake',
+          body: 'A **race condition** is a bug that appears when two things happen at the same moment. Two shoppers both see `stock = 1`, and both buy.\n\nA **transaction** groups steps so they run as one unit, all or nothing, with nobody else cutting in halfway.',
+          code: "BEGIN TRANSACTION;\nUPDATE treats SET stock = stock - 1 WHERE name = 'Cheesecake';\nINSERT INTO orders (treat_id, customer, qty) VALUES (5, 'Ana', 1);\nCOMMIT;",
+          language: 'sql',
+        },
+        {
+          kind: 'type',
+          prompt: 'Stock is 1. Ana and Ben both check it at the same moment, both see 1, and both run `stock = stock - 1`. What is the stock now? Type the number.',
+          accept: ['-1', '−1', 'minus 1', 'minus one'],
+          explain: 'Each check passed before the other sale was saved, so the shop sold a cake it did not have. A transaction makes "check, then buy" one unbroken step.',
+        },
+        {
+          kind: 'blank',
+          prompt: 'Wrap the sale so both changes happen together or not at all.',
+          code: "___ TRANSACTION;\nUPDATE treats SET stock = stock - 1 WHERE id = 5;\nINSERT INTO orders (treat_id, customer, qty) VALUES (5, 'Ben', 1);\n___;",
+          language: 'sql',
+          bank: ['BEGIN', 'COMMIT', 'START NOW', 'SAVE'],
+          answers: ['BEGIN', 'COMMIT'],
+          explain: '`BEGIN TRANSACTION` opens the group and `COMMIT` saves it. If something fails in between, none of it is kept.',
+        },
+      ],
+    },
+    {
+      id: 'u7-lab-music',
+      title: 'Lab: music library',
+      exercises: [
+        {
+          kind: 'concept',
+          title: 'Your music library',
+          body: 'Time to practise on a new database. `artists` has `id` and `name`. `songs` has `id`, `title`, `artist_id`, `tempo` (beats per minute), `seconds` (length) and `plays`.\n\nEach song points to its artist with `artist_id`. The column names are shown above every query.',
+        },
+        {
+          kind: 'write',
+          prompt: 'Find the dance tracks: show the title and tempo of every song with a tempo over 120, fastest first.',
+          language: 'sql',
+          setup: MUSIC,
+          starter: MUSIC_COLS + 'SELECT title, tempo\nFROM songs\n',
+          tests: [{ expected: 'Marmalade Sky|150\nJam Jar|140\nKite Weather|128\nNight Bus|122' }],
+          hint: 'Add `WHERE tempo > 120`, then `ORDER BY tempo DESC`.',
+          solution: 'SELECT title, tempo FROM songs WHERE tempo > 120 ORDER BY tempo DESC;',
+          explain: '`WHERE` keeps the fast songs and `DESC` puts the fastest at the top.',
+        },
+        {
+          kind: 'write',
+          prompt: 'What is the average length of a song, in seconds? Return just that one number.',
+          language: 'sql',
+          setup: MUSIC,
+          starter: MUSIC_COLS + 'SELECT ',
+          tests: [{ expected: '220' }],
+          hint: 'Use `AVG(seconds)` on the `songs` table.',
+          solution: 'SELECT AVG(seconds) FROM songs;',
+          explain: '`AVG` squashes all ten lengths into one number: 220 seconds, a little under four minutes.',
+        },
+        {
+          kind: 'write',
+          prompt: 'Show the title and the artist name of every song longer than 240 seconds, sorted by title A to Z.',
+          language: 'sql',
+          setup: MUSIC,
+          starter: MUSIC_COLS + 'SELECT songs.title, artists.name\nFROM songs\nJOIN artists ON ',
+          tests: [
+            { expected: 'Harbour Lights|The Slow Tides\nLemon Moon|Mina Okoro\nSlow Train Home|The Slow Tides' },
+          ],
+          hint: 'Join on `songs.artist_id = artists.id`, then `WHERE songs.seconds > 240` and `ORDER BY songs.title`.',
+          solution:
+            'SELECT songs.title, artists.name FROM songs JOIN artists ON songs.artist_id = artists.id WHERE songs.seconds > 240 ORDER BY songs.title;',
+          explain: 'The join swaps each `artist_id` number for the artist it points to.',
+        },
+        {
+          kind: 'spot',
+          prompt: 'This query pairs songs with the wrong artists. Tap the line with the bug.',
+          lines: [
+            'SELECT songs.title, artists.name',
+            'FROM songs',
+            'JOIN artists ON songs.id = artists.id',
+            'ORDER BY songs.title;',
+          ],
+          language: 'sql',
+          answer: 2,
+          explain: "It matches a song's own id to an artist's id. The link is the foreign key: `songs.artist_id = artists.id`.",
+        },
+        {
+          kind: 'write',
+          prompt: 'List the titles of every song by Mina Okoro, sorted A to Z. Find her id with a subquery.',
+          language: 'sql',
+          setup: MUSIC,
+          starter: MUSIC_COLS + 'SELECT title FROM songs\nWHERE artist_id IN (SELECT )\nORDER BY title;',
+          tests: [{ expected: 'Borrowed Bicycle\nLemon Moon\nNight Bus' }],
+          hint: "The inner query is `SELECT id FROM artists WHERE name = 'Mina Okoro'`.",
+          solution:
+            "SELECT title FROM songs WHERE artist_id IN (SELECT id FROM artists WHERE name = 'Mina Okoro') ORDER BY title;",
+          explain: 'The subquery looks up her id, so you never have to know it is 2.',
+        },
+        {
+          kind: 'type',
+          prompt: 'There are 10 songs by 4 artists. How many rows does this query return? Type the number.',
+          code: 'SELECT artist_id, COUNT(*)\nFROM songs\nGROUP BY artist_id;',
+          language: 'sql',
+          accept: ['4', 'four'],
+          explain: '`GROUP BY` gives one row per group, and there are four artists.',
+        },
+        {
+          kind: 'write',
+          prompt: 'For each artist, show their name and the average tempo of their songs, sorted by name A to Z.',
+          language: 'sql',
+          setup: MUSIC,
+          starter:
+            MUSIC_COLS + 'SELECT artists.name, AVG(songs.tempo)\nFROM songs\nJOIN artists ON songs.artist_id = artists.id\n',
+          tests: [{ expected: 'DJ Marmalade|145\nMina Okoro|102\nPaper Lanterns|107\nThe Slow Tides|76' }],
+          hint: 'Add `GROUP BY artists.name`, then `ORDER BY artists.name`.',
+          solution:
+            'SELECT artists.name, AVG(songs.tempo) FROM songs JOIN artists ON songs.artist_id = artists.id GROUP BY artists.name ORDER BY artists.name;',
+          explain: 'Join first, then pile the songs up per artist, then average each pile.',
+        },
+        {
+          kind: 'write',
+          prompt: 'Who is played the most? For each artist, show their name and total plays, biggest total first.',
+          language: 'sql',
+          setup: MUSIC,
+          starter: MUSIC_COLS + 'SELECT ',
+          tests: [{ expected: 'DJ Marmalade|24900\nMina Okoro|21500\nPaper Lanterns|20500\nThe Slow Tides|7100' }],
+          hint: 'Same join and `GROUP BY artists.name`, with `SUM(songs.plays)`. End with `ORDER BY SUM(songs.plays) DESC`.',
+          solution:
+            'SELECT artists.name, SUM(songs.plays) FROM songs JOIN artists ON songs.artist_id = artists.id GROUP BY artists.name ORDER BY SUM(songs.plays) DESC;',
+          explain: 'You can sort by an aggregate too. That is how every "top artists" chart is made.',
+        },
+      ],
+    },
+    {
+      id: 'u7-lab-mystery',
+      title: 'Lab: the missing mascot mystery',
+      exercises: [
+        {
+          kind: 'concept',
+          title: 'The case',
+          body: 'On Friday night, the puffin mascot costume vanished from the Pebble Bay school gym. You have the town database.\n\nIts tables are `people`, `reports`, `door_logs`, `calls` and `bus_tickets`. Each query you write reveals the next clue. The column names are shown above every query.',
+        },
+        {
+          kind: 'write',
+          prompt: 'Start with the report. Show the `description` of the report filed on Friday at the Gym.',
+          language: 'sql',
+          setup: TOWN,
+          starter: TOWN_COLS + 'SELECT description\nFROM reports\n',
+          tests: [{ expected: 'Puffin costume gone. Side door used after 21:00.' }],
+          hint: "Add `WHERE day = 'Friday' AND place = 'Gym'`.",
+          solution: "SELECT description FROM reports WHERE day = 'Friday' AND place = 'Gym';",
+          explain: 'First clue: someone came through the side door after 21:00. Times are stored as text like `21:00`.',
+        },
+        {
+          kind: 'write',
+          prompt: "Who used the side door on Friday after 21:00? List their names, sorted A to Z. Text times compare in order, so `time > '21:00'` works.",
+          language: 'sql',
+          setup: TOWN,
+          starter:
+            TOWN_COLS + 'SELECT people.name\nFROM door_logs\nJOIN people ON door_logs.person_id = people.id\n',
+          tests: [{ expected: 'Dara Voss\nMilo Finch\nPetra Lunn' }],
+          hint: "Add `WHERE door_logs.door = 'side' AND door_logs.day = 'Friday' AND door_logs.time > '21:00'`, then `ORDER BY people.name`.",
+          solution:
+            "SELECT people.name FROM door_logs JOIN people ON door_logs.person_id = people.id WHERE door_logs.door = 'side' AND door_logs.day = 'Friday' AND door_logs.time > '21:00' ORDER BY people.name;",
+          explain: 'Three tests joined by `AND` cut the whole door log down to the people worth a closer look.',
+        },
+        {
+          kind: 'type',
+          prompt: 'How many suspects do you have now? Type the number.',
+          accept: ['3', 'three'],
+          explain: 'Dara, Milo and Petra. Their ids in the `people` table are 2, 3 and 4.',
+        },
+        {
+          kind: 'choice',
+          prompt: 'A neighbour says: "Right after, I heard someone outside the gym make a very short phone call." Which table do you search next?',
+          options: ['reports', 'bus_tickets', 'calls', 'door_logs'],
+          answer: 2,
+          explain: 'The `calls` table records who rang whom, on which day, and for how many minutes.',
+        },
+        {
+          kind: 'write',
+          prompt: 'Which suspects (ids 2, 3 and 4) made a call on Friday that lasted less than 2 minutes? List the callers\' names, sorted A to Z.',
+          language: 'sql',
+          setup: TOWN,
+          starter: TOWN_COLS + 'SELECT people.name\nFROM calls\nJOIN people ON calls.caller_id = people.id\n',
+          tests: [{ expected: 'Milo Finch\nPetra Lunn' }],
+          hint: "Add `WHERE calls.day = 'Friday' AND calls.minutes < 2 AND calls.caller_id IN (2, 3, 4)`, then `ORDER BY people.name`.",
+          solution:
+            "SELECT people.name FROM calls JOIN people ON calls.caller_id = people.id WHERE calls.day = 'Friday' AND calls.minutes < 2 AND calls.caller_id IN (2, 3, 4) ORDER BY people.name;",
+          explain: 'Dara is in the clear: her call lasted 12 minutes. Two suspects left, with ids 3 and 4.',
+        },
+        {
+          kind: 'spot',
+          prompt: 'A helper wrote this to show who made each call, but it shows the people who were rung instead. Tap the line with the bug.',
+          lines: [
+            'SELECT people.name, calls.minutes',
+            'FROM calls',
+            'JOIN people ON calls.receiver_id = people.id',
+            "WHERE calls.day = 'Friday'",
+            'ORDER BY people.name;',
+          ],
+          language: 'sql',
+          answer: 2,
+          explain: 'A call has two foreign keys. Joining on `receiver_id` gives the person rung; the caller needs `caller_id`.',
+        },
+        {
+          kind: 'write',
+          prompt: 'New report: a huge bag with yellow feet was seen on the Gull Rock bus on Saturday. Which suspect (id 3 or 4) holds a Saturday ticket to Gull Rock? Show their name.',
+          language: 'sql',
+          setup: TOWN,
+          starter:
+            TOWN_COLS + 'SELECT people.name\nFROM bus_tickets\nJOIN people ON bus_tickets.person_id = people.id\n',
+          tests: [{ expected: 'Petra Lunn' }],
+          hint: "Add `WHERE bus_tickets.day = 'Saturday' AND bus_tickets.destination = 'Gull Rock' AND bus_tickets.person_id IN (3, 4)`.",
+          solution:
+            "SELECT people.name FROM bus_tickets JOIN people ON bus_tickets.person_id = people.id WHERE bus_tickets.day = 'Saturday' AND bus_tickets.destination = 'Gull Rock' AND bus_tickets.person_id IN (3, 4);",
+          explain: 'The baker also rode to Gull Rock that day, but she was never at the side door. Only one suspect fits every clue.',
+        },
+        {
+          kind: 'type',
+          prompt: 'Who took the mascot costume? Type the name.',
+          accept: ['Petra Lunn', 'Petra', 'Lunn', 'Petra Lunn.'],
+          explain: 'Petra Lunn used the side door after 21:00, made a short call, and took the Saturday bus to Gull Rock.',
+        },
+        {
+          kind: 'write',
+          prompt: 'One loose end: who did Petra (id 4) ring on Friday? Show that person\'s name and job, using a subquery on `calls`.',
+          language: 'sql',
+          setup: TOWN,
+          starter: TOWN_COLS + 'SELECT name, job\nFROM people\nWHERE id IN (SELECT )',
+          tests: [{ expected: 'Ivo Marsh|costume shop owner' }],
+          hint: "The inner query is `SELECT receiver_id FROM calls WHERE caller_id = 4 AND day = 'Friday'`.",
+          solution:
+            "SELECT name, job FROM people WHERE id IN (SELECT receiver_id FROM calls WHERE caller_id = 4 AND day = 'Friday');",
+          explain: 'Case closed: the puffin was on its way to a costume shop. You solved it with nothing but SELECT, WHERE, JOIN and a subquery.',
         },
       ],
     },

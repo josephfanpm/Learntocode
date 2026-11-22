@@ -24,6 +24,8 @@ export function Spot({ ex, locked, reveal, register }: ExProps<SpotExercise>) {
         {ex.lines.map((line, i) => {
           const good = locked && i === ex.answer && (reveal || pick === i)
           const bad = locked && pick === i && i !== ex.answer
+          // Blank lines are spacing, not answers.
+          if (!line.trim()) return <div key={i} className="h-3" aria-hidden />
           return (
             <button
               key={i}
@@ -120,7 +122,7 @@ export function Steps({ ex, locked, reveal, register }: ExProps<StepsExercise>) 
           return (
             <li key={i} className={`flex items-start gap-2.5 rounded-xl px-3 py-2 text-[0.95rem] ${current ? 'bg-cobalt-soft font-medium' : 'text-ink-2'}`}>
               <span className={`mt-0.5 grid size-6 shrink-0 place-items-center rounded-full text-xs font-bold ${locked && done ? (right ? 'bg-good text-white' : 'bg-bad text-white') : current ? 'bg-cobalt text-white' : 'bg-rule'}`}>{i + 1}</span>
-              <span>
+              <span className="whitespace-pre-wrap">
                 <Inline text={st.ask} />
                 {done && <span className="ml-1.5 font-mono font-semibold text-ink">→ {ex.cells[picks[i]]}</span>}
                 {locked && reveal && done && !right && <span className="ml-1.5 text-good">(should be {ex.cells[st.answer]})</span>}

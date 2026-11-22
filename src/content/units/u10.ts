@@ -370,6 +370,14 @@ export const u10: Unit = {
           explain: 'The average is the total (`sum`) divided by how many there are (`len`). Testing with a small example caught the bug.',
         },
         {
+          kind: 'spot',
+          prompt: 'An AI wrote this to check whether a number is even, but it says 4 is not even. Tap the line with the bug.',
+          lines: ['def is_even(n):', '    if n % 2 == 1:', '        return True', '    return False'],
+          language: 'python',
+          answer: 1,
+          explain: 'A remainder of 1 means the number is odd. Even numbers leave a remainder of 0, so the test should be `n % 2 == 0`.',
+        },
+        {
           kind: 'concept',
           title: 'Keep secrets out',
           body: 'Things you type into a chatbot may be stored or seen by others. Never paste **secrets**: passwords, **API keys** (secret codes that let a program use a paid service), or private data about real people.\n\nReplace them with fake stand-ins like `MY_KEY`.',
@@ -424,6 +432,378 @@ export const u10: Unit = {
             ['AI code seems to work', 'Test it with a few examples anyway'],
           ],
           explain: 'AI speeds you up, but understanding, checking and protecting secrets stay your job.',
+        },
+      ],
+    },
+    {
+      id: 'u10-search',
+      title: 'Thinking ahead in games',
+      exercises: [
+        {
+          kind: 'concept',
+          title: 'Game trees',
+          body: 'One of the oldest kinds of AI plays games by looking ahead. From any position, each possible move leads to a new position, and each of those leads to more.\n\nDrawn out, this branching picture is called a **game tree**. The AI explores it to find a good move.',
+        },
+        {
+          kind: 'type',
+          prompt: 'A tic-tac-toe board is empty and X goes first. How many different first moves can X choose from? Type the number.',
+          accept: ['9', 'nine'],
+          explain: 'Nine empty squares means nine branches from the top of the tree. Each one then has eight replies.',
+        },
+        {
+          kind: 'steps',
+          prompt: 'The nine boxes are a tic-tac-toe board read row by row: the first three boxes are the top row, the next three the middle row, the last three the bottom row. Numbers are empty squares.',
+          cells: ['X', 'X', '3', 'O', 'O', '6', '7', '8', '9'],
+          steps: [
+            { ask: 'It is X\'s turn. Tap the square where X wins at once.', answer: 2 },
+            { ask: 'Suppose X carelessly plays square 9 instead. Tap the square where O then wins.', answer: 5 },
+          ],
+          explain: 'You just looked two moves down the game tree: your move, then the reply. A game AI does the same, only deeper.',
+        },
+        {
+          kind: 'concept',
+          title: 'Minimax',
+          body: 'Give each ending a score: `1` if X wins, `-1` if O wins, `0` for a draw. X wants the highest score and O wants the lowest.\n\n**Minimax** means: assume your opponent will pick their best reply. So a move is only worth the *worst* score the opponent can force.',
+        },
+        {
+          kind: 'type',
+          prompt: 'X is thinking about a move. After it, O gets to choose between an ending scored 1 and an ending scored -1. O wants the lowest. What is the move really worth to X? Type the number.',
+          accept: ['-1', '−1', 'minus 1', 'minus one'],
+          explain: 'O will not hand X the win. O picks -1, so that is what the move is worth, however tempting the 1 looks.',
+        },
+        {
+          kind: 'steps',
+          prompt: 'Each box is a move for X, followed by the two scores O can choose between afterwards. O always picks the lower one.',
+          cells: ['A: 5 or -3', 'B: 2 or 1', 'C: 4 or 0'],
+          steps: [
+            { ask: 'Tap the move that turns out worst for X once O replies.', answer: 0 },
+            { ask: 'Tap the move worth exactly 0 after O replies.', answer: 2 },
+            { ask: 'X wants the highest worth. Tap the move X should play.', answer: 1 },
+          ],
+          explain: 'A is worth -3, B is worth 1 and C is worth 0. The move holding the biggest number, A, is actually the worst.',
+        },
+        {
+          kind: 'write',
+          prompt: 'Score a finished board. Read 9 characters like `XXXOO....` (row by row, `.` is empty). Print `1` if X has three in a line, `-1` if O does, and `0` otherwise. `LINES` lists the eight winning lines.',
+          language: 'python',
+          starter: `LINES = [(0, 1, 2), (3, 4, 5), (6, 7, 8), (0, 3, 6), (1, 4, 7), (2, 5, 8), (0, 4, 8), (2, 4, 6)]
+board = input()
+score = 0
+
+for a, b, c in LINES:
+    # set score to 1 or -1 if this line is all X or all O
+    pass
+
+print(score)
+`,
+          tests: [
+            { stdin: ['XXXOO....'], expected: '1' },
+            { stdin: ['X.XOOOX..'], expected: '-1' },
+            { stdin: ['XOXOXOOXO'], expected: '0' },
+          ],
+          hint: 'if board[a] == "X" and board[b] == "X" and board[c] == "X": score = 1. Then the same with "O" and -1.',
+          solution: `LINES = [(0, 1, 2), (3, 4, 5), (6, 7, 8), (0, 3, 6), (1, 4, 7), (2, 5, 8), (0, 4, 8), (2, 4, 6)]
+board = input()
+score = 0
+
+for a, b, c in LINES:
+    if board[a] == "X" and board[b] == "X" and board[c] == "X":
+        score = 1
+    if board[a] == "O" and board[b] == "O" and board[c] == "O":
+        score = -1
+
+print(score)
+`,
+          explain: 'This is the bottom of the game tree: a rule that turns a finished board into a number the AI can compare.',
+        },
+        {
+          kind: 'write',
+          prompt: 'Now choose like minimax. `moves` holds, for each move, the scores the opponent can pick from (two scores for C are read from input). A move is worth its lowest score. Print the move with the highest worth and that worth, like `B 1`.',
+          language: 'python',
+          starter: `moves = {"A": [5, -3], "B": [2, 1], "C": [int(input()), int(input())]}
+
+best_move = "A"
+best_worth = min(moves["A"])
+
+print(best_move, best_worth)
+`,
+          tests: [
+            { stdin: ['4', '0'], expected: 'B 1' },
+            { stdin: ['6', '3'], expected: 'C 3' },
+          ],
+          hint: 'for move, scores in moves.items(): worth = min(scores). If worth > best_worth, update best_move and best_worth.',
+          solution: `moves = {"A": [5, -3], "B": [2, 1], "C": [int(input()), int(input())]}
+
+best_move = "A"
+best_worth = min(moves["A"])
+for move, scores in moves.items():
+    worth = min(scores)
+    if worth > best_worth:
+        best_move = move
+        best_worth = worth
+
+print(best_move, best_worth)
+`,
+          explain: '`min` plays the opponent and "keep the highest" plays you. That pair of steps, repeated down the tree, is the whole minimax idea.',
+        },
+        {
+          kind: 'choice',
+          prompt: 'Tic-tac-toe has a small game tree, so a computer can search all of it. Chess has more possible games than there are atoms in the universe. What do chess programs do?',
+          options: [
+            'Search every game anyway, it just takes a few minutes',
+            'Pick moves at random and hope',
+            'Only ever copy moves from old games',
+            'Look a limited number of moves ahead, then estimate how good each position is',
+          ],
+          answer: 3,
+          explain: 'They stop at a set depth and score the position with an estimate, such as who has more pieces. Good estimates are where learning comes in.',
+        },
+      ],
+    },
+    {
+      id: 'u10-training',
+      title: 'Training and testing a model',
+      exercises: [
+        {
+          kind: 'concept',
+          title: 'Hold some examples back',
+          body: 'Before training, the examples are split in two. **Training data** is what the model learns from. **Test data** is kept hidden until the end.\n\nIt is like an exam: questions you have never seen show what you really learned.',
+        },
+        {
+          kind: 'choice',
+          prompt: 'Why test a model on examples it never saw during training?',
+          options: [
+            'Because test examples are always easier',
+            'To find out whether it learned patterns or only memorised its examples',
+            'Because the training data is thrown away afterwards',
+            'To make the training run faster',
+          ],
+          answer: 1,
+          explain: 'In real use, every example is new. Only unseen test data tells you how the model will do then.',
+        },
+        {
+          kind: 'concept',
+          title: 'Accuracy',
+          body: '**Accuracy** is the share of answers a model gets right: the number correct divided by the total.\n\nCompare each **prediction** (the model\'s guess) with the true label, and count the matches.',
+          code: 'predictions = ["spam", "ok", "ok", "spam"]\nlabels      = ["spam", "ok", "spam", "spam"]\n# 3 of 4 match: 75% accuracy',
+          language: 'python',
+        },
+        {
+          kind: 'type',
+          prompt: 'A model labels 10 test emails and gets 8 right. What is its accuracy as a percentage? Type the number.',
+          accept: ['80', '80%', '80 %', '80 percent'],
+          explain: '8 ÷ 10 = 0.8, which is 80%.',
+        },
+        {
+          kind: 'write',
+          prompt: 'Measure a model. Its predictions are read from input as words separated by spaces. Count how many match `labels` at the same position and print the accuracy as a whole percentage, like `80%`.',
+          language: 'python',
+          starter: `labels = ["spam", "ok", "ok", "spam", "ok"]
+predictions = input().split()
+correct = 0
+
+percent = correct * 100 // len(labels)
+print(f"{percent}%")
+`,
+          tests: [
+            { stdin: ['spam ok ok spam spam'], expected: '80%' },
+            { stdin: ['ok ok ok ok ok'], expected: '60%' },
+            { stdin: ['spam ok ok spam ok'], expected: '100%' },
+          ],
+          hint: 'for i in range(len(labels)): if predictions[i] == labels[i]: correct += 1',
+          solution: `labels = ["spam", "ok", "ok", "spam", "ok"]
+predictions = input().split()
+correct = 0
+for i in range(len(labels)):
+    if predictions[i] == labels[i]:
+        correct += 1
+
+percent = correct * 100 // len(labels)
+print(f"{percent}%")
+`,
+          explain: 'Notice the middle test: a "model" that always says ok still scores 60%. Accuracy alone can flatter a lazy model.',
+        },
+        {
+          kind: 'concept',
+          title: 'Overfitting',
+          body: '**Overfitting** is when a model memorises its training examples, quirks and all, instead of learning the general pattern.\n\nThe sign: very high accuracy on training data, much lower on test data. Like learning last year\'s exam answers by heart.',
+        },
+        {
+          kind: 'steps',
+          prompt: 'Three models were scored twice. Each box shows accuracy on the training data, then accuracy on hidden test data.',
+          cells: ['A: 99% / 60%', 'B: 90% / 88%', 'C: 62% / 61%'],
+          steps: [
+            { ask: 'Tap the model that has overfitted.', answer: 0 },
+            { ask: 'Tap the model that has not learned much at all.', answer: 2 },
+            { ask: 'Tap the model you would trust on new emails.', answer: 1 },
+          ],
+          explain: 'A memorised its examples. C learned too little. B does nearly as well on unseen data as on its training data, which is the goal.',
+        },
+        {
+          kind: 'spot',
+          prompt: 'This check reports a wonderful score that means nothing. Tap the line with the mistake.',
+          lines: [
+            'train = emails[:80]',
+            'test = emails[80:]',
+            'model = learn(train)',
+            'score = accuracy(model, train)',
+            'print(score)',
+          ],
+          language: 'python',
+          answer: 3,
+          explain: 'It marks the model on the same emails it learned from. The score must come from `test`, the examples it never saw.',
+        },
+        {
+          kind: 'write',
+          prompt: 'Split the data yourself. Put the first 80% of `data` in `train` and the rest in `test`, then print the two lengths, like `8 2`.',
+          language: 'python',
+          starter: `count = int(input())
+data = list(range(1, count + 1))
+cut = len(data) * 8 // 10
+
+train = data
+test = []
+
+print(len(train), len(test))
+`,
+          tests: [
+            { stdin: ['10'], expected: '8 2' },
+            { stdin: ['25'], expected: '20 5' },
+          ],
+          hint: 'A slice does it: train = data[:cut] and test = data[cut:].',
+          solution: `count = int(input())
+data = list(range(1, count + 1))
+cut = len(data) * 8 // 10
+
+train = data[:cut]
+test = data[cut:]
+
+print(len(train), len(test))
+`,
+          explain: '`data[:cut]` is everything before the cut and `data[cut:]` is everything from it onwards, so no example lands in both piles.',
+        },
+      ],
+    },
+    {
+      id: 'u10-prompts',
+      title: 'Prompts that work',
+      exercises: [
+        {
+          kind: 'concept',
+          title: 'Four habits',
+          body: 'An AI chatbot only knows what your prompt tells it. Four habits get better answers.\n\n**Be specific** about what you want. **Give an example** of a good result. **Ask for steps** so you can follow the reasoning. **Check the answer** before you trust it.',
+        },
+        {
+          kind: 'match',
+          prompt: 'Match each habit to a line that does it.',
+          pairs: [
+            ['Be specific', 'Write a Python function that adds up a list of prices'],
+            ['Give an example', 'For [2, 3, 4] the answer should be 9'],
+            ['Ask for steps', 'Explain what each line does, one at a time'],
+            ['Check the answer', 'Run it on a list you already know the total of'],
+          ],
+          explain: 'The first three go in the prompt. The last one is your job after the answer arrives.',
+        },
+        {
+          kind: 'spot',
+          prompt: 'Three lines of this prompt help the AI. Tap the one that is too vague to act on.',
+          lines: [
+            'I am new to Python and have not learned functions yet.',
+            'Make my code better.',
+            'It should print the numbers 1 to 5, one per line.',
+            'Explain each change in one short sentence.',
+          ],
+          answer: 1,
+          explain: '"Better" could mean shorter, faster or easier to read. The other lines say who it is for, what the code must do, and how to answer.',
+        },
+        {
+          kind: 'order',
+          prompt: 'Build a strong prompt: who you are, the task, an example, then how to answer.',
+          lines: [
+            'I run a small bakery and I am a beginner at Python.',
+            'Write a function that works out the total of a list of prices.',
+            'For example, [2, 3, 4] should give 9.',
+            'Explain it step by step, then show me how to test it.',
+          ],
+          explain: 'Context first, then the task, then an example that pins down exactly what you mean, then the shape of the answer.',
+        },
+        {
+          kind: 'concept',
+          title: 'Check by running it',
+          body: 'AI-written code often looks right and is nearly right. The fastest check is a tiny test where you already know the answer.\n\nIf the result surprises you, tell the AI exactly what you ran, what you expected and what you got.',
+        },
+        {
+          kind: 'type',
+          prompt: 'You asked an AI for a vowel counter and it wrote this. "hello" has 2 vowels. What does the code actually print?',
+          code: 'def count_vowels(word):\n    count = 0\n    for letter in word:\n        if letter in "aeiu":\n            count += 1\n    return count\n\nprint(count_vowels("hello"))',
+          language: 'python',
+          accept: ['1', 'one'],
+          explain: 'The AI left `o` out of its vowel list, so only the `e` is counted. One small test exposed it.',
+        },
+        {
+          kind: 'write',
+          prompt: 'Fix the AI\'s vowel counter so it counts all five vowels: a, e, i, o and u. It prints the count for a word read from input.',
+          language: 'python',
+          starter: `def count_vowels(word):
+    count = 0
+    for letter in word:
+        if letter in "aeiu":
+            count += 1
+    return count
+
+print(count_vowels(input()))
+`,
+          tests: [
+            { stdin: ['hello'], expected: '2' },
+            { stdin: ['audio'], expected: '4' },
+            { stdin: ['sky'], expected: '0' },
+          ],
+          hint: 'The string of vowels is missing one letter. Make it "aeiou".',
+          solution: `def count_vowels(word):
+    count = 0
+    for letter in word:
+        if letter in "aeiou":
+            count += 1
+    return count
+
+print(count_vowels(input()))
+`,
+          explain: 'A one-letter fix, but you could only make it because you read the code and tested it instead of trusting it.',
+        },
+        {
+          kind: 'spot',
+          prompt: 'An AI wrote this to find the largest number. It returns 0 for `[-5, -2, -9]`. Tap the line that causes that.',
+          lines: [
+            'def largest(numbers):',
+            '    best = 0',
+            '    for n in numbers:',
+            '        if n > best:',
+            '            best = n',
+            '    return best',
+          ],
+          language: 'python',
+          answer: 1,
+          explain: 'Starting at 0 assumes some number is at least 0. Start with `best = numbers[0]` so it works for negative numbers too.',
+        },
+        {
+          kind: 'spot',
+          prompt: 'You asked for code that prints 1 to 5. This prints 1 to 4. Tap the line with the bug.',
+          lines: ['print("Counting")', 'for i in range(1, 5):', '    print(i)', 'print("Done")'],
+          language: 'python',
+          answer: 1,
+          explain: '`range` stops just before its second number. To include 5 it must be `range(1, 6)`.',
+        },
+        {
+          kind: 'choice',
+          prompt: 'The vowel counter gave the wrong answer. Which follow-up prompt will get the best help?',
+          options: [
+            'That is wrong.',
+            'Try again but better.',
+            'count_vowels("hello") printed 1 but I expected 2. Find the bug and explain it.',
+            'Are you sure?',
+          ],
+          answer: 2,
+          explain: 'It says what you ran, what you got and what you expected. That is everything the AI needs to find the bug.',
         },
       ],
     },

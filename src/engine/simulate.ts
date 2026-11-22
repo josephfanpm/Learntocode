@@ -76,6 +76,7 @@ export function simulate(persona: Persona, units: Unit[], o: SimOptions): SimDay
     ...newLearner(start),
     onboarded: true,
     reminderHour: o.reminderHour,
+    reminderMode: 'fixed',
     pushEnabled: o.pushEnabled,
     motivation: o.motivation,
     dailyGoal: o.dailyGoal,

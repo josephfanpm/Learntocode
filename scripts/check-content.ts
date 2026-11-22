@@ -59,7 +59,8 @@ const norm = (s: string) =>
     .split('\n')
     .map((l) => l.trimEnd())
     .join('\n')
-    .trim()
+    // Drop blank lines at the start and end, but keep leading spaces: they matter (pyramids).
+    .replace(/^\n+|\n+$/g, '')
 
 function passes(ex: WriteExercise, code: string): string | null {
   for (const [i, t] of ex.tests.entries()) {

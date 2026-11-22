@@ -1,7 +1,8 @@
 import { ArrowLeft, Bell, Code2, Flame, Globe } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { units } from '../content'
 import type { Motivation } from '../engine/state'
+import { play } from '../sound'
 import { useStore } from '../store'
 import { randomAvatar } from './Avatar'
 import type { Go } from './Home'
@@ -40,9 +41,18 @@ export function Onboarding({ go }: { go: Go }) {
   const [source, setSource] = useState<string | null>(null)
   const [why, setWhy] = useState<Motivation | null>(null)
   const [goal, setGoal] = useState(20)
-  const [hour, setHour] = useState(19)
   const [push, setPush] = useState(false)
   const next = () => setStep((s) => s + 1)
+
+  // Tap sound on every option tile in setup, including the placement quiz.
+  useEffect(() => {
+    const onDown = (e: PointerEvent) => {
+      const t = (e.target as HTMLElement).closest('.tile')
+      if (t && !(t as HTMLButtonElement).disabled) play('tap')
+    }
+    window.addEventListener('pointerdown', onDown)
+    return () => window.removeEventListener('pointerdown', onDown)
+  }, [])
 
   const finish = (placed: number) => {
     update((s) => ({
@@ -50,7 +60,7 @@ export function Onboarding({ go }: { go: Go }) {
       onboarded: true,
       motivation: why ?? 'curious',
       dailyGoal: goal,
-      reminderHour: hour,
+      reminderMode: 'smart',
       pushEnabled: push,
       placedUnit: placed,
       source: source ?? undefined,
@@ -159,14 +169,7 @@ export function Onboarding({ go }: { go: Go }) {
         >
           <div className="flex items-center gap-3 rounded-2xl border-2 border-rule bg-white p-4">
             <Bell className="shrink-0 text-flame" size={24} />
-            <p className="text-sm text-ink-2">One reminder a day, only if you haven’t practiced yet. Pick a time:</p>
-          </div>
-          <div className="grid grid-cols-5 gap-2">
-            {HOURS.map((h) => (
-              <button key={h} aria-pressed={hour === h} onClick={() => setHour(h)} className="tile py-3 text-sm font-semibold">
-                {hourLabel(h)}
-              </button>
-            ))}
+            <p className="text-sm text-ink-2">One reminder a day, around the time you usually practice, and only if you haven’t yet. You can pick a fixed time in Settings.</p>
           </div>
         </Talk>
       )}

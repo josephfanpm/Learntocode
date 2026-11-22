@@ -30,15 +30,22 @@ export function Placement({ onDone }: { onDone: (placed: number) => void }) {
   const stop = (n: number) => {
     setPlaced(n)
     setPhase('result')
-    if (n > 0) play('complete')
+    // Let the answer sound finish before the result jingle.
+    if (n > 0) setTimeout(() => play('complete'), 450)
   }
 
   const answer = (choice: number | null) => {
     if (choice !== null && choice === question.answer) {
+      // Same climbing chime as lessons: each right answer in a row plays a step higher.
+      play('correct', q + 1)
       if (q + 1 >= PLACEMENT.length) return stop(q + 1)
       setQ(q + 1)
       setPick(null)
-    } else stop(q)
+    } else {
+      // A wrong pick gets the soft wrong sound; "I don't know" stays silent.
+      if (choice !== null) play('wrong')
+      stop(q)
+    }
   }
 
   if (phase === 'intro')

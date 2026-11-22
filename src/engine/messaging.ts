@@ -12,6 +12,7 @@ import type { Unit } from '../content/types'
 import { addDays, dayKey, daysBetween, parseDay } from './dates'
 import { currentLesson, isUnitDone, reviewPick } from './progress'
 import {
+  effectiveReminderHour,
   FREEZE_PRICE,
   lastPracticeDay,
   practicedToday,
@@ -60,7 +61,9 @@ export interface Facts {
   unitsDone: number
   justFinishedUnit?: string
   pushEnabled: boolean
+  /** Hour today's reminder is due (smart or fixed). */
   reminderHour: number
+  smartReminder: boolean
   hasAvatar: boolean
 }
 
@@ -120,7 +123,8 @@ export function facts(s: LearnerState, units: Unit[], now: Date): Facts {
     unitsDone: done.length,
     justFinishedUnit: finishedToday ? lastDone.title : undefined,
     pushEnabled: s.pushEnabled,
-    reminderHour: s.reminderHour,
+    reminderHour: effectiveReminderHour(s),
+    smartReminder: s.reminderMode === 'smart',
     hasAvatar: !!s.avatar,
   }
 }
@@ -146,6 +150,8 @@ interface Rule {
   /** What the rule is for, shown in the lab. */
   about: string
   when: (f: Facts) => boolean
+  /** Sent even if another push already went out today (the late streak saver). */
+  extra?: boolean
   /** Dedupe key: a key is sent at most once. */
   key: (f: Facts) => string
   copy: (f: Facts) => Pick<Message, 'title' | 'body' | 'cta' | 'why'>
@@ -329,7 +335,7 @@ export const RULES: Rule[] = [
     id: 'push_streak_risk',
     channel: 'push',
     priority: 85,
-    about: 'Evening reminder at the learner’s chosen time when the streak is at risk.',
+    about: 'Daily reminder when the streak is at risk: about 23.5 hours after the last lesson (or at a fixed time the learner chose). Wording rotates so no two days in a row match.',
     when: (f) => f.streak >= 1 && !f.practicedToday && f.hour >= f.reminderHour,
     key: (f) => `push_streak_risk:${f.today}`,
     copy: (f) => {
@@ -340,13 +346,35 @@ export const RULES: Rule[] = [
           cta: nextCta(f),
           why: `Streak ${f.streak}, nothing today, past reminder time, freeze equipped.`,
         }
+      // Rotate wording by day so yesterday's message is never repeated.
+      const variants = [
+        { title: `Your ${f.streak}-day streak ends at midnight`, body: f.nextLesson ? `Next up: ${f.nextLesson.title}. About 3 minutes.` : 'One review lesson keeps it alive.' },
+        { title: `Keep your ${f.streak}-day streak going`, body: 'Three minutes now, and tomorrow you start ahead.' },
+        { title: `Your ${f.streak}-day streak is on the line`, body: 'One quick lesson keeps it.' },
+        { title: `Pip is guarding your ${f.streak}-day streak`, body: f.nextLesson ? `"${f.nextLesson.title}" is ready when you are.` : 'A quick review is ready when you are.' },
+      ]
+      const v = variants[Math.abs(daysBetween('2026-01-01', f.today)) % variants.length]
       return {
-        title: f.streak >= 7 ? `Don’t lose ${f.streak} days of work` : `Your ${f.streak}-day streak ends at midnight`,
-        body: f.nextLesson ? `Next up: ${f.nextLesson.title}. About 3 minutes.` : 'One review lesson keeps it alive.',
+        ...v,
         cta: nextCta(f),
-        why: `Streak ${f.streak}, nothing today, past reminder time${f.freezes ? '' : ', no freeze'}.`,
+        why: `Streak ${f.streak}, nothing today, past reminder time (${f.smartReminder ? 'smart: when they usually practice' : 'fixed'})${f.freezes ? '' : ', no freeze'}.`,
       }
     },
+  },
+  {
+    id: 'push_streak_saver',
+    channel: 'push',
+    priority: 84,
+    extra: true,
+    about: 'Late streak saver: one more nudge at 8pm if a streak of 3+ days is still at risk after the daily reminder.',
+    when: (f) => f.streak >= 3 && !f.practicedToday && f.hour >= 20 && f.reminderHour < 20,
+    key: (f) => `push_streak_saver:${f.today}`,
+    copy: (f) => ({
+      title: `Last call for your ${f.streak}-day streak`,
+      body: 'A few hours left today. One lesson saves it.',
+      cta: nextCta(f),
+      why: `Streak ${f.streak}, still nothing today at 8pm.`,
+    }),
   },
   {
     id: 'push_lapsed_2',
@@ -495,7 +523,7 @@ export function decide(f: Facts, log: { rule: string; channel: Channel; at: stri
     if (r.channel === 'push') {
       if (!f.pushEnabled) held.push({ rule: r.id, channel: r.channel, reason: 'Notifications off' })
       else if (quiet(f)) held.push({ rule: r.id, channel: r.channel, reason: 'Quiet hours' })
-      else if (pushSent) held.push({ rule: r.id, channel: r.channel, reason: 'Daily push cap (1)' })
+      else if (pushSent && !r.extra) held.push({ rule: r.id, channel: r.channel, reason: 'Daily push cap (1)' })
       else {
         sent.push(msg)
         pushSent = true

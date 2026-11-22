@@ -194,7 +194,7 @@ export function Lab() {
             ['Lessons done', f.lessonsDone],
             ['Freezes', f.freezes],
             ['Notifications', f.pushEnabled ? 'On' : 'Off'],
-            ['Reminder', hourLabel(f.reminderHour)],
+            ['Reminder', `${hourLabel(f.reminderHour)}${f.smartReminder ? ' (smart)' : ''}`],
           ].map(([k, v]) => (
             <div key={k as string}>
               <dt className="text-ink-3">{k}</dt>

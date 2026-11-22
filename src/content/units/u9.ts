@@ -449,5 +449,708 @@ export const u9: Unit = {
         },
       ],
     },
+    {
+      id: 'u9-apis',
+      title: 'APIs and JSON',
+      exercises: [
+        {
+          kind: 'concept',
+          title: 'Asking another server',
+          body: 'Your app does not have to know everything. An **API** is a way for one program to ask another server for data, such as today\'s weather or a price.\n\nThe reply is not a page for people. It is plain data for your code to read.',
+          code: 'response = requests.get("https://api.example.com/weather?city=Lima")\ndata = response.json()',
+          language: 'python',
+        },
+        {
+          kind: 'choice',
+          prompt: 'Which of these is an app using an API?',
+          options: [
+            'A page that shows the same photo to everyone',
+            'A travel app asking a weather server for tomorrow\'s forecast',
+            'A visitor typing their name into a form',
+            'A browser storing a cookie',
+          ],
+          answer: 1,
+          explain: 'One program asks another for data and gets data back. No person reads the reply directly.',
+        },
+        {
+          kind: 'concept',
+          title: 'JSON',
+          body: 'Most APIs reply in **JSON**, a text format that looks like Python dictionaries and lists. Names go in double quotes.\n\nJSON arrives as one long string. `json.loads(text)` turns it into a real dictionary you can look things up in.',
+          code: 'import json\n\ntext = \'{"city": "Lima", "temp": 21}\'\ndata = json.loads(text)\nprint(data["city"])   # Lima',
+          language: 'python',
+        },
+        {
+          kind: 'type',
+          prompt: 'What does this print?',
+          code: 'import json\n\ntext = \'{"name": "Ana", "pets": ["cat", "fish"]}\'\ndata = json.loads(text)\nprint(len(data["pets"]))',
+          language: 'python',
+          accept: ['2', 'two'],
+          explain: 'After `json.loads`, `data["pets"]` is an ordinary Python list with two items.',
+        },
+        {
+          kind: 'write',
+          prompt: 'A weather API replied with JSON like `{"city": "Lima", "temp": 21}`. Read that line with `input()`, turn it into a dictionary, and print `Lima: 21 degrees` using its values.',
+          language: 'python',
+          starter: 'import json\n\ntext = input()\nprint(text)\n',
+          tests: [
+            { stdin: ['{"city": "Lima", "temp": 21}'], expected: 'Lima: 21 degrees' },
+            { stdin: ['{"city": "Oslo", "temp": -3}'], expected: 'Oslo: -3 degrees' },
+          ],
+          hint: 'data = json.loads(text), then print data["city"] and data["temp"] in an f-string.',
+          solution: `import json
+
+text = input()
+data = json.loads(text)
+city = data["city"]
+temp = data["temp"]
+print(f"{city}: {temp} degrees")
+`,
+          explain: 'Until you call `json.loads`, the reply is only text. Afterwards it is a dictionary with keys you can use.',
+        },
+        {
+          kind: 'spot',
+          prompt: 'This reply is not valid JSON, so `json.loads` crashes. Tap the line that breaks the rules.',
+          lines: ['{', '  "name": "Ana",', "  'age': 30,", '  "member": true', '}'],
+          answer: 2,
+          explain: 'JSON only allows double quotes around names and text. Python is relaxed about quotes, but JSON is not.',
+        },
+        {
+          kind: 'match',
+          prompt: 'Match each piece of JSON to what `json.loads` turns it into.',
+          pairs: [
+            ['{"a": 1}', 'A dictionary'],
+            ['[1, 2, 3]', 'A list'],
+            ['true', 'True'],
+            ['null', 'None'],
+          ],
+          explain: 'JSON spells a few things differently (`true`, `false`, `null`), and `json.loads` translates them into Python.',
+        },
+        {
+          kind: 'write',
+          prompt: 'A shop API replied with a JSON list of items, like `[{"item": "tea", "price": 3}, {"item": "cake", "price": 5}]`. Read it, add up every price, and print `Total: 8`.',
+          language: 'python',
+          starter: 'import json\n\nitems = json.loads(input())\ntotal = 0\n\nprint(f"Total: {total}")\n',
+          tests: [
+            { stdin: ['[{"item": "tea", "price": 3}, {"item": "cake", "price": 5}]'], expected: 'Total: 8' },
+            { stdin: ['[{"item": "soup", "price": 6}]'], expected: 'Total: 6' },
+          ],
+          hint: 'items is a list of dictionaries. Loop: for item in items: total += item["price"]',
+          solution:
+            'import json\n\nitems = json.loads(input())\ntotal = 0\nfor item in items:\n    total += item["price"]\nprint(f"Total: {total}")\n',
+          explain: 'A JSON list of objects becomes a Python list of dictionaries, which you already know how to loop over.',
+        },
+        {
+          kind: 'blank',
+          prompt: 'Ask the price API about one company and read the JSON reply.',
+          code: 'response = requests.___("https://api.example.com/price?symbol=KITE")\ndata = response.___()\nprint(data["price"])',
+          language: 'python',
+          bank: ['get', 'json', 'post', 'html'],
+          answers: ['get', 'json'],
+          explain: '`requests.get` sends a GET request, just as a browser would. `.json()` does the `json.loads` step for you.',
+        },
+      ],
+    },
+    {
+      id: 'u9-accounts',
+      title: 'Accounts and passwords',
+      exercises: [
+        {
+          kind: 'concept',
+          title: 'Registering and logging in',
+          body: 'To **register** is to create an account: the app saves a new row in a `users` table.\n\nTo **log in** is to prove you own an account: the app compares what you type with what it saved. If they match, it remembers you in the session.',
+        },
+        {
+          kind: 'order',
+          prompt: 'Put the steps of logging in in order.',
+          lines: [
+            'The visitor types a name and password and clicks Log in',
+            'The browser sends them to /login with POST',
+            'The route finds the row for that name in the users table',
+            'The route checks the typed password against the saved one',
+            'The route stores the user id in the session',
+            'The route redirects to the home page',
+          ],
+          explain: 'Only after the check passes does the app write to the session. From then on, every request carries the cookie that proves who you are.',
+        },
+        {
+          kind: 'concept',
+          title: 'Never store the password itself',
+          body: 'If passwords are saved as plain text, one leak hands every password to a thief.\n\nA **hash function** scrambles text into a fixed-length jumble. The same text always gives the same jumble, and it cannot be run backwards. Apps store only the hash.',
+          code: 'import hashlib\n\nprint(hashlib.sha256("hello".encode()).hexdigest())\n# 2cf24dba5fb0a30e26e8...',
+          language: 'python',
+        },
+        {
+          kind: 'choice',
+          prompt: 'The app only stored a hash. How can it check your password when you log in?',
+          options: [
+            'It un-scrambles the stored hash back into your password',
+            'It emails you the password and asks if it looks right',
+            'It lets anyone in who knows your name',
+            'It hashes what you typed and compares the two hashes',
+          ],
+          answer: 3,
+          explain: 'The same text always gives the same hash, so matching hashes mean matching passwords. Nothing is ever un-scrambled.',
+        },
+        {
+          kind: 'write',
+          prompt: 'Finish `make_hash` so it returns the SHA-256 hash of the password. The last line prints the first 8 characters of the hash of a password read from input.',
+          language: 'python',
+          starter:
+            'import hashlib\n\ndef make_hash(password):\n    return password\n\nprint(make_hash(input())[:8])\n',
+          tests: [
+            { stdin: ['teapot42'], expected: 'b7c4c6cd' },
+            { stdin: ['hello'], expected: '2cf24dba' },
+          ],
+          hint: 'return hashlib.sha256(password.encode()).hexdigest()',
+          solution:
+            'import hashlib\n\ndef make_hash(password):\n    return hashlib.sha256(password.encode()).hexdigest()\n\nprint(make_hash(input())[:8])\n',
+          explain: '`.encode()` turns the text into bytes, `sha256` scrambles them, and `.hexdigest()` gives the result as 64 letters and digits.',
+        },
+        {
+          kind: 'write',
+          prompt: 'The `users` dictionary holds each name and a password hash. Finish `login` so it returns `Welcome, NAME` when the name exists and the hash of the typed password matches. Otherwise return `Wrong name or password`.',
+          language: 'python',
+          starter: `import hashlib
+
+def make_hash(password):
+    return hashlib.sha256(password.encode()).hexdigest()
+
+users = {"ana": make_hash("teapot42"), "ben": make_hash("otter7")}
+
+def login(name, password):
+    return "Welcome, " + name
+
+name = input()
+password = input()
+print(login(name, password))
+`,
+          tests: [
+            { stdin: ['ana', 'teapot42'], expected: 'Welcome, ana' },
+            { stdin: ['ana', 'otter7'], expected: 'Wrong name or password' },
+            { stdin: ['zed', 'teapot42'], expected: 'Wrong name or password' },
+          ],
+          hint: 'if name in users and users[name] == make_hash(password): return the welcome. After the if, return the other message.',
+          solution: `import hashlib
+
+def make_hash(password):
+    return hashlib.sha256(password.encode()).hexdigest()
+
+users = {"ana": make_hash("teapot42"), "ben": make_hash("otter7")}
+
+def login(name, password):
+    if name in users and users[name] == make_hash(password):
+        return "Welcome, " + name
+    return "Wrong name or password"
+
+name = input()
+password = input()
+print(login(name, password))
+`,
+          explain: 'One message covers both failures on purpose. Saying "no such user" would tell an attacker which names exist.',
+        },
+        {
+          kind: 'spot',
+          prompt: 'This register route works, but it has a serious security bug. Tap the line.',
+          lines: [
+            '@app.route("/register", methods=["POST"])',
+            'def register():',
+            '    name = request.form.get("name")',
+            '    password = request.form.get("password")',
+            '    db.execute("INSERT INTO users (name, password) VALUES (?, ?)", (name, password))',
+            '    return redirect("/login")',
+          ],
+          language: 'python',
+          answer: 4,
+          explain: 'It saves the password itself. It should save a hash of it, so a leaked database gives away no passwords.',
+        },
+        {
+          kind: 'concept',
+          title: 'Salt, slow hashes and sessions',
+          body: 'Real apps go further. They add **salt**, random text mixed in before hashing, so two people with the same password get different hashes. They also use hashes that are slow on purpose, to make guessing costly.\n\nLibraries do both for you. After a good login, the app stores your id in the session.',
+          code: 'hash = generate_password_hash(password)\n\nif check_password_hash(hash, typed):\n    session["user_id"] = row["id"]',
+          language: 'python',
+        },
+        {
+          kind: 'blank',
+          prompt: 'Finish the login check: remember the user, then send them home.',
+          code: 'if check_password_hash(row["hash"], password):\n    ___["user_id"] = row["id"]\n    return ___("/")\nreturn "Wrong name or password"',
+          language: 'python',
+          bank: ['session', 'redirect', 'request', 'render'],
+          answers: ['session', 'redirect'],
+          explain: 'Putting the id in `session` is what "logged in" means. Every later request can check `session.get("user_id")`.',
+        },
+        {
+          kind: 'type',
+          prompt: 'Two people both choose the password `sunshine`. The app uses a plain hash with no salt. Are their stored hashes the same or different? Type one word.',
+          accept: ['same', 'the same'],
+          explain: 'Same text in, same hash out. A thief who cracks one gets both, which is why real apps add salt.',
+        },
+      ],
+    },
+    {
+      id: 'u9-lab-birthdays',
+      title: 'Lab: birthday book',
+      exercises: [
+        {
+          kind: 'concept',
+          title: 'A birthday book app',
+          body: 'In this lab you build the brains of a small web app that remembers birthdays: add one, list them all, delete one.\n\nA real app keeps them in a database table. Here a list of dictionaries stands in for the table, and each dictionary is one row.',
+          code: 'book = [\n    {"name": "Ana", "month": 3, "day": 14},\n]',
+          language: 'python',
+        },
+        {
+          kind: 'write',
+          prompt: 'Finish `add` so it appends a dictionary with the keys `name`, `month` and `day` to `book`. The code below adds two people, then prints how many there are and the second name.',
+          language: 'python',
+          starter: `book = []
+
+def add(name, month, day):
+    # append a dictionary to book here
+    pass
+
+add("Ana", 3, 14)
+add("Ben", 11, 2)
+print(len(book))
+print(book[1]["name"])
+`,
+          tests: [{ expected: '2\nBen' }],
+          hint: 'book.append({"name": name, "month": month, "day": day})',
+          solution: `book = []
+
+def add(name, month, day):
+    book.append({"name": name, "month": month, "day": day})
+
+add("Ana", 3, 14)
+add("Ben", 11, 2)
+print(len(book))
+print(book[1]["name"])
+`,
+          explain: 'This is the job of an `INSERT`: one new row, with a value for every column.',
+        },
+        {
+          kind: 'write',
+          prompt: 'Now the list page. The "form" values are read from input and added for you. Finish `show` so it prints one line per person, like `Ana: 3/14`.',
+          language: 'python',
+          starter: `book = [
+    {"name": "Ana", "month": 3, "day": 14},
+    {"name": "Ben", "month": 11, "day": 2},
+]
+
+def show():
+    # print one line per person
+    pass
+
+name = input()
+month = int(input())
+day = int(input())
+book.append({"name": name, "month": month, "day": day})
+show()
+`,
+          tests: [
+            { stdin: ['Cleo', '7', '30'], expected: 'Ana: 3/14\nBen: 11/2\nCleo: 7/30' },
+            { stdin: ['Dev', '1', '9'], expected: 'Ana: 3/14\nBen: 11/2\nDev: 1/9' },
+          ],
+          hint: 'for person in book: then print the name, a colon, the month, a slash and the day with an f-string.',
+          solution: `book = [
+    {"name": "Ana", "month": 3, "day": 14},
+    {"name": "Ben", "month": 11, "day": 2},
+]
+
+def show():
+    for person in book:
+        name = person["name"]
+        month = person["month"]
+        day = person["day"]
+        print(f"{name}: {month}/{day}")
+
+name = input()
+month = int(input())
+day = int(input())
+book.append({"name": name, "month": month, "day": day})
+show()
+`,
+          explain: 'In the real app this loop lives in a template: `{% for person in birthdays %}` writes one table row each.',
+        },
+        {
+          kind: 'write',
+          prompt: 'Never trust a form. Finish `check` so it returns `Invalid` unless the month is from 1 to 12 and the day is from 1 to 31. Otherwise it returns `Added`.',
+          language: 'python',
+          starter: `def check(month, day):
+    return "Added"
+
+month = int(input())
+day = int(input())
+print(check(month, day))
+`,
+          tests: [
+            { stdin: ['3', '14'], expected: 'Added' },
+            { stdin: ['13', '2'], expected: 'Invalid' },
+            { stdin: ['5', '0'], expected: 'Invalid' },
+          ],
+          hint: 'if month < 1 or month > 12 or day < 1 or day > 31: return "Invalid"',
+          solution: `def check(month, day):
+    if month < 1 or month > 12 or day < 1 or day > 31:
+        return "Invalid"
+    return "Added"
+
+month = int(input())
+day = int(input())
+print(check(month, day))
+`,
+          explain: 'A browser form can be bypassed, so the server always checks the values again before saving them.',
+        },
+        {
+          kind: 'spot',
+          prompt: 'The form sends its data with POST, but this route always saves the name as `None`. Tap the line with the bug.',
+          lines: [
+            '@app.route("/add", methods=["POST"])',
+            'def add():',
+            '    name = request.args.get("name")',
+            '    db.execute("INSERT INTO birthdays (name) VALUES (?)", (name,))',
+            '    return redirect("/")',
+          ],
+          language: 'python',
+          answer: 2,
+          explain: '`request.args` holds GET data from the URL. POST data arrives in `request.form`.',
+        },
+        {
+          kind: 'write',
+          prompt: 'Add a delete button. Finish `delete` so it returns a new list without the person whose name was given. A name read from input is deleted, then the remaining names are printed.',
+          language: 'python',
+          starter: `book = [
+    {"name": "Ana", "month": 3, "day": 14},
+    {"name": "Ben", "month": 11, "day": 2},
+    {"name": "Cleo", "month": 7, "day": 30},
+]
+
+def delete(book, name):
+    kept = []
+    # add every person except the named one to kept
+    return book
+
+book = delete(book, input())
+for person in book:
+    print(person["name"])
+`,
+          tests: [
+            { stdin: ['Ben'], expected: 'Ana\nCleo' },
+            { stdin: ['Zed'], expected: 'Ana\nBen\nCleo' },
+          ],
+          hint: 'for person in book: if person["name"] != name: kept.append(person). Then return kept.',
+          solution: `book = [
+    {"name": "Ana", "month": 3, "day": 14},
+    {"name": "Ben", "month": 11, "day": 2},
+    {"name": "Cleo", "month": 7, "day": 30},
+]
+
+def delete(book, name):
+    kept = []
+    for person in book:
+        if person["name"] != name:
+            kept.append(person)
+    return kept
+
+book = delete(book, input())
+for person in book:
+    print(person["name"])
+`,
+          explain: 'Deleting a name that is not there changes nothing and causes no crash, just like SQL.',
+        },
+        {
+          kind: 'type',
+          prompt: 'In the real app the birthdays live in a database table. Which SQL command removes a row? Type the one word.',
+          accept: ['DELETE', 'DELETE FROM'],
+          explain: '`DELETE FROM birthdays WHERE id = ?` removes one row. The `WHERE` matters: without it, every row goes.',
+        },
+        {
+          kind: 'blank',
+          prompt: 'Here is the real route. Save the new birthday, then send the visitor back to the list.',
+          code: '@app.route("/add", methods=["POST"])\ndef add():\n    name = request.form.get("name")\n    month = request.form.get("month")\n    day = request.form.get("day")\n    db.execute("___ INTO birthdays (name, month, day) VALUES (?, ?, ?)", (name, month, day))\n    return ___("/")',
+          language: 'python',
+          bank: ['INSERT', 'redirect', 'SELECT', 'render_template'],
+          answers: ['INSERT', 'redirect'],
+          explain: 'Same shape as your Python version: take the form values, add a row, go back to the list page.',
+        },
+        {
+          kind: 'write',
+          prompt: 'One more feature: read a month number and print the names of everyone with a birthday that month, sorted A to Z, one per line. If there is nobody, print `None this month`.',
+          language: 'python',
+          starter: `book = [
+    {"name": "Cleo", "month": 3, "day": 1},
+    {"name": "Ben", "month": 11, "day": 2},
+    {"name": "Ana", "month": 3, "day": 14},
+    {"name": "Dev", "month": 7, "day": 30},
+]
+
+month = int(input())
+names = []
+
+print("None this month")
+`,
+          tests: [
+            { stdin: ['3'], expected: 'Ana\nCleo' },
+            { stdin: ['7'], expected: 'Dev' },
+            { stdin: ['5'], expected: 'None this month' },
+          ],
+          hint: 'Loop over book and append matching names to names. If names is empty print the message, else loop over sorted(names).',
+          solution: `book = [
+    {"name": "Cleo", "month": 3, "day": 1},
+    {"name": "Ben", "month": 11, "day": 2},
+    {"name": "Ana", "month": 3, "day": 14},
+    {"name": "Dev", "month": 7, "day": 30},
+]
+
+month = int(input())
+names = []
+for person in book:
+    if person["month"] == month:
+        names.append(person["name"])
+
+if len(names) == 0:
+    print("None this month")
+else:
+    for name in sorted(names):
+        print(name)
+`,
+          explain: 'In SQL this whole loop is one line: `SELECT name FROM birthdays WHERE month = ? ORDER BY name`.',
+        },
+      ],
+    },
+    {
+      id: 'u9-project-trader',
+      title: 'Project: play-money stock trader',
+      exercises: [
+        {
+          kind: 'concept',
+          title: 'A pretend trading app',
+          body: 'A **share** is a small slice of a company that you can buy and sell. In this project you build the logic of an app for trading shares with play money.\n\nOur companies are invented, each with a short **symbol**. A real app asks an API for prices; here a dictionary does the job.',
+          code: 'PRICES = {"KITE": 25, "MOSS": 110, "ZEST": 8}',
+          language: 'python',
+        },
+        {
+          kind: 'write',
+          prompt: 'Step 1, quote. Finish `lookup` so it returns the price for a symbol typed in any capitals, or `None` if the symbol is unknown. The rest prints the price or `Unknown symbol`.',
+          language: 'python',
+          starter: `PRICES = {"KITE": 25, "MOSS": 110, "ZEST": 8}
+
+def lookup(symbol):
+    return PRICES[symbol]
+
+price = lookup(input())
+if price is None:
+    print("Unknown symbol")
+else:
+    print(price)
+`,
+          tests: [
+            { stdin: ['kite'], expected: '25' },
+            { stdin: ['MOSS'], expected: '110' },
+            { stdin: ['abc'], expected: 'Unknown symbol' },
+          ],
+          hint: 'return PRICES.get(symbol.upper()). With no default, .get gives None for a missing key.',
+          solution: `PRICES = {"KITE": 25, "MOSS": 110, "ZEST": 8}
+
+def lookup(symbol):
+    return PRICES.get(symbol.upper())
+
+price = lookup(input())
+if price is None:
+    print("Unknown symbol")
+else:
+    print(price)
+`,
+          explain: '`.upper()` forgives lowercase typing, and `.get` turns a missing symbol into `None` instead of a crash.',
+        },
+        {
+          kind: 'write',
+          prompt: 'Step 2, buy. You have 1000 in cash. Read a symbol and a number of shares. If the cost is more than your cash, print `Not enough cash`. Otherwise take the cost off your cash and print `Bought 4 KITE, cash left 900`.',
+          language: 'python',
+          starter: `PRICES = {"KITE": 25, "MOSS": 110, "ZEST": 8}
+cash = 1000
+
+symbol = input()
+shares = int(input())
+cost = PRICES[symbol] * shares
+
+print(f"Bought {shares} {symbol}, cash left {cash}")
+`,
+          tests: [
+            { stdin: ['KITE', '4'], expected: 'Bought 4 KITE, cash left 900' },
+            { stdin: ['MOSS', '10'], expected: 'Not enough cash' },
+            { stdin: ['ZEST', '125'], expected: 'Bought 125 ZEST, cash left 0' },
+          ],
+          hint: 'if cost > cash: print("Not enough cash"). else: cash = cash - cost, then the Bought line.',
+          solution: `PRICES = {"KITE": 25, "MOSS": 110, "ZEST": 8}
+cash = 1000
+
+symbol = input()
+shares = int(input())
+cost = PRICES[symbol] * shares
+
+if cost > cash:
+    print("Not enough cash")
+else:
+    cash = cash - cost
+    print(f"Bought {shares} {symbol}, cash left {cash}")
+`,
+          explain: 'Check first, then change. Spending exactly all your cash is allowed, which is why the test is `>` and not `>=`.',
+        },
+        {
+          kind: 'spot',
+          prompt: 'This buy function refuses every purchase you can afford and allows the ones you cannot. Tap the line with the bug.',
+          lines: [
+            'def buy(cash, price, shares):',
+            '    cost = price * shares',
+            '    if cost < cash:',
+            '        return "Not enough cash"',
+            '    return cash - cost',
+          ],
+          language: 'python',
+          answer: 2,
+          explain: 'The comparison is backwards. You are short of cash when the cost is **greater** than your cash: `cost > cash`.',
+        },
+        {
+          kind: 'write',
+          prompt: 'Step 3, sell. Read a symbol and a number of shares. If you own fewer than that (or none), print `Not enough shares`. Otherwise remove them, add the money to your cash, and print `Sold 4 KITE, cash now 600`.',
+          language: 'python',
+          starter: `PRICES = {"KITE": 25, "MOSS": 110, "ZEST": 8}
+cash = 500
+portfolio = {"KITE": 10, "ZEST": 40}
+
+symbol = input()
+shares = int(input())
+owned = portfolio.get(symbol, 0)
+
+print(f"Sold {shares} {symbol}, cash now {cash}")
+`,
+          tests: [
+            { stdin: ['KITE', '4'], expected: 'Sold 4 KITE, cash now 600' },
+            { stdin: ['KITE', '11'], expected: 'Not enough shares' },
+            { stdin: ['MOSS', '1'], expected: 'Not enough shares' },
+          ],
+          hint: 'if shares > owned: print the message. else: portfolio[symbol] = owned - shares, cash = cash + PRICES[symbol] * shares, then print.',
+          solution: `PRICES = {"KITE": 25, "MOSS": 110, "ZEST": 8}
+cash = 500
+portfolio = {"KITE": 10, "ZEST": 40}
+
+symbol = input()
+shares = int(input())
+owned = portfolio.get(symbol, 0)
+
+if shares > owned:
+    print("Not enough shares")
+else:
+    portfolio[symbol] = owned - shares
+    cash = cash + PRICES[symbol] * shares
+    print(f"Sold {shares} {symbol}, cash now {cash}")
+`,
+          explain: 'A **portfolio** is the set of shares you own. `.get(symbol, 0)` treats a company you never bought as zero shares.',
+        },
+        {
+          kind: 'type',
+          prompt: 'KITE costs 25 and ZEST costs 8. What is this portfolio worth? Type the number.',
+          code: 'portfolio = {"KITE": 2, "ZEST": 5}',
+          language: 'python',
+          accept: ['90', '$90'],
+          explain: '2 × 25 = 50 and 5 × 8 = 40, and 50 + 40 = 90. Shares times price, added up for every company.',
+        },
+        {
+          kind: 'write',
+          prompt: 'Step 4, the home page total. Read your cash from input. Add the value of every holding in `portfolio` (shares times price) and print `Total: 1290`.',
+          language: 'python',
+          starter: `PRICES = {"KITE": 25, "MOSS": 110, "ZEST": 8}
+portfolio = {"KITE": 10, "MOSS": 2, "ZEST": 40}
+
+cash = int(input())
+total = cash
+
+print(f"Total: {total}")
+`,
+          tests: [
+            { stdin: ['500'], expected: 'Total: 1290' },
+            { stdin: ['0'], expected: 'Total: 790' },
+          ],
+          hint: 'for symbol, shares in portfolio.items(): total += shares * PRICES[symbol]',
+          solution: `PRICES = {"KITE": 25, "MOSS": 110, "ZEST": 8}
+portfolio = {"KITE": 10, "MOSS": 2, "ZEST": 40}
+
+cash = int(input())
+total = cash
+for symbol, shares in portfolio.items():
+    total += shares * PRICES[symbol]
+
+print(f"Total: {total}")
+`,
+          explain: 'Cash plus what your shares are worth right now. When prices change, the total changes with them.',
+        },
+        {
+          kind: 'write',
+          prompt: 'Step 5, history. Trades arrive as one line like `buy KITE 3,sell ZEST 5`. Finish `record` so it appends a dictionary with the keys `kind`, `symbol` and `shares` to `history`. The rest prints the list.',
+          language: 'python',
+          starter: `history = []
+
+def record(kind, symbol, shares):
+    # append a dictionary to history here
+    pass
+
+for trade in input().split(","):
+    kind, symbol, shares = trade.split()
+    record(kind, symbol, int(shares))
+
+number = 1
+for t in history:
+    print(f"{number}. {t['kind']} {t['shares']} {t['symbol']}")
+    number += 1
+print(f"Trades: {len(history)}")
+`,
+          tests: [
+            { stdin: ['buy KITE 3,sell ZEST 5'], expected: '1. buy 3 KITE\n2. sell 5 ZEST\nTrades: 2' },
+            { stdin: ['buy MOSS 1'], expected: '1. buy 1 MOSS\nTrades: 1' },
+          ],
+          hint: 'history.append({"kind": kind, "symbol": symbol, "shares": shares})',
+          solution: `history = []
+
+def record(kind, symbol, shares):
+    history.append({"kind": kind, "symbol": symbol, "shares": shares})
+
+for trade in input().split(","):
+    kind, symbol, shares = trade.split()
+    record(kind, symbol, int(shares))
+
+number = 1
+for t in history:
+    print(f"{number}. {t['kind']} {t['shares']} {t['symbol']}")
+    number += 1
+print(f"Trades: {len(history)}")
+`,
+          explain: 'History only ever grows: every buy and sell adds a row and none are changed. In the real app it is its own database table.',
+        },
+        {
+          kind: 'blank',
+          prompt: 'Here is the real buy route. It reads the form, works out the cost, and refuses if the user is short.',
+          code: '@app.route("/buy", methods=["___"])\ndef buy():\n    symbol = request.___.get("symbol")\n    shares = int(request.form.get("shares"))\n    cost = lookup(symbol) * shares\n    if cost > get_cash(session["user_id"]):\n        return "Not enough cash", 400',
+          language: 'python',
+          bank: ['POST', 'form', 'GET', 'args'],
+          answers: ['POST', 'form'],
+          explain: 'Buying changes data, so the form uses POST and its values arrive in `request.form`. The `400` is a status code meaning "bad request".',
+        },
+        {
+          kind: 'spot',
+          prompt: 'This sell route crashes because it compares text with a number. Tap the line where the fix belongs.',
+          lines: [
+            '@app.route("/sell", methods=["POST"])',
+            'def sell():',
+            '    symbol = request.form.get("symbol")',
+            '    shares = request.form.get("shares")',
+            '    if shares > get_shares(session["user_id"], symbol):',
+            '        return "Not enough shares", 400',
+            '    return redirect("/")',
+          ],
+          language: 'python',
+          answer: 3,
+          explain: 'Everything from a form arrives as text. Wrap it in `int(...)` before doing maths with it.',
+        },
+      ],
+    },
   ],
 }

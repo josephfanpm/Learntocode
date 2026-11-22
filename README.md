@@ -8,21 +8,30 @@ The course follows the topics of Harvard's [CS50x](https://cs50.harvard.edu/x/),
 
 ## The course
 
-| Unit | CS50 week | Topic |
-|---|---|---|
-| 0 | 0 (Scratch) | Thinking like a computer: binary, text and colour as numbers, algorithms |
-| 1 | 1 (C) | Your first programs: print, variables, input, decisions, loops, functions |
-| 2 | 2 (Arrays) | Lists and text, ending with a shift cipher |
-| 3 | 3 (Algorithms) | Searching, sorting, big O, recursion |
-| 4 | 4 (Memory) | Hexadecimal, names and values, copying, files |
-| 5 | 5 (Data structures) | Stacks, queues, linked lists, hash tables, trees |
-| 6 | 6 (Python) | Dictionaries, f-strings, errors, comprehensions, CSV |
-| 7 | 7 (SQL) | SELECT, WHERE, GROUP BY, JOIN, safe changes, SQL injection |
-| 8 | 8 (HTML, CSS, JS) | How the web works, HTML, forms, CSS, a first taste of JavaScript |
-| 9 | 9 (Flask) | Routes, forms, templates, sessions |
-| 10 | AI | Learning from examples, how chatbots write, using AI well |
+| Unit | CS50 week | Topic | Labs and projects |
+|---|---|---|---|
+| 0 | 0 (Scratch) | Thinking like a computer: binary, text, colour, images and sound as numbers, algorithms | Design a program |
+| 1 | 1 (C) | First programs: print, variables, input, decisions, loops, functions; compiling, types and their limits, the command line | Pyramids and coins; checksum |
+| 2 | 2 (Arrays) | Lists and text, debugging, arguments and how strings end | Word scores and reading level; shift and substitution ciphers |
+| 3 | 3 (Algorithms) | Searching, sorting, big O, recursion, records, merge sort | Run an election; which sort is this? |
+| 4 | 4 (Memory) | Hexadecimal, names and values, copying, files, pointers, memory care, images as numbers | Sound volume and lost photos |
+| 5 | 5 (Data structures) | Stacks, queues, linked lists, hash tables, trees, tries | Family tree; spell checker |
+| 6 | 6 (Python) | Dictionaries, f-strings, errors, comprehensions, CSV, classes, libraries | DNA detective |
+| 7 | 7 (SQL) | SELECT, WHERE, GROUP BY, JOIN, subqueries, table design, safe changes | Music library; the missing mascot mystery |
+| 8 | 8 (HTML, CSS, JS) | How the web and the internet work, HTML, forms, CSS, layout, JavaScript | Your homepage; quiz page |
+| 9 | 9 (Flask) | Routes, forms, templates, sessions, APIs and JSON, accounts and passwords | Birthday book; play-money stock trader |
+| 10 | AI | Learning from examples, game search, training and testing, how chatbots write, prompts | |
+| 11 | Cybersecurity | Passwords, hashing, encryption, staying safe, keeping your own code safe | |
+| 12 | Final project | Scope an idea, then build, save, test and share a habit tracker | The project itself |
 
-55 lessons, 522 exercises in six types: concept cards, multiple choice, fill the gap, put lines in order, match pairs, and write real code. Match questions are drag-to-slot (each answer lands next to its partner), with tap-then-tap as a no-drag alternative. CS50 teaches weeks 1–5 in C; this course uses Python throughout, because beginners can run it in a browser tab and the syntax gets out of the way.
+107 lessons and 1,038 exercises in ten types. Six are the basics: concept cards, multiple choice, fill the gap, put lines in order (drag or arrows), match pairs (drag to slot or tap), and write real code. Four are hands-on formats:
+
+- **Spot the bug:** tap the line of code that's wrong.
+- **Bit switches:** flip on/off switches to make a number in binary.
+- **Step through:** act out an algorithm by tapping the box you'd check next (binary search, walking a linked list, a sort's next swap).
+- **Type the answer:** type what the code prints, instead of picking from options.
+
+Each unit covers its CS50 week's lecture ideas plus the ideas behind that week's labs and problem sets, rewritten as original small-step lessons. CS50 teaches weeks 1-5 in C; this course uses Python throughout, because beginners can run it in a browser tab, and shows C in read-only snippets where the idea needs it (compiling, types, pointers, memory).
 
 **Code runs in the browser.** Python runs in [Pyodide](https://pyodide.org) inside a Web Worker, so an endless loop is stopped after 6 seconds instead of freezing the page. SQL runs in [sql.js](https://sql.js.org) (SQLite). HTML is checked by CSS selectors against a sandboxed preview. Python errors are translated into one plain sentence ("Line 3: Python doesn't know the name "nme"…").
 
@@ -35,7 +44,7 @@ Setup borrows the structure that Duolingo is known for, with our own content: Pi
 3. Why do you want to learn? Pip replies to the answer, and it personalises later messages.
 4. What you'll be able to do.
 5. Daily goal.
-6. Reminders: Pip explains why first, then the browser asks permission. "Not now" is fine.
+6. Reminders: Pip explains why first, then the browser asks permission. "Not now" is fine. No time to pick; see Reminder timing below.
 7. Starting point: start from scratch, or find your level.
 8. Lesson one.
 9. After lesson one: lesson-done screen, streak screen, then **Create your profile** (name and avatar), which can be skipped with "Later".
@@ -76,6 +85,8 @@ All sprites are drawn in code as pixel grids ([src/ui/pixel/sprites.ts](src/ui/p
 - **Unlocks:** lessons open strictly in order; finishing a unit opens the next one.
 - **Mistakes come back:** a wrong answer returns at the end of the lesson. Code exercises let you retry, with the answer offered after two misses.
 
+**Reminder timing.** Setup doesn't ask for a reminder time. By default ("Smart") the daily reminder is due about 23.5 hours after the learner's last lesson, which is when they have already shown they can practice, kept between 8am and 8pm. If a streak of 3+ days is still at risk at 8pm, one extra "streak saver" goes out. The reminder's wording rotates so no two days in a row match. A fixed time can be chosen in Settings.
+
 ## Sound
 
 Sounds are synthesised in the browser ([src/sound.ts](src/sound.ts)), so there are no audio files. The rules come from Material Design's sound guidance (sound only at moments that matter; silence is part of the design) and research on earcons (short, abstract, consistent sounds that people learn by hearing them with an action):
@@ -94,12 +105,12 @@ Sound can be turned off from the speaker button in any lesson or in Settings.
 
 ## Targeted messaging
 
-All reminders come from one rules engine ([src/engine/messaging.ts](src/engine/messaging.ts)): 19 pure rules over a snapshot of the learner. Learners are grouped as `new`, `active`, `casual`, `slipping` or `dormant`, and each rule reads things like streak, days away, daily-goal progress, wrong answers in the current lesson, and why they joined.
+All reminders come from one rules engine ([src/engine/messaging.ts](src/engine/messaging.ts)): 20 pure rules over a snapshot of the learner. Learners are grouped as `new`, `active`, `casual`, `slipping` or `dormant`, and each rule reads things like streak, days away, daily-goal progress, wrong answers in the current lesson, and why they joined.
 
 | Channel | Examples |
 |---|---|
 | In-app | first lesson, make your avatar (after lesson one), a freeze saved your streak, your streak ended (fresh start), welcome back with a review, stuck on a lesson, unit finished, streak milestones, close to daily goal, buy a freeze |
-| Push | first lesson (days 1–3), streak at risk at the learner's chosen hour, days 2–4 away, days 5–6 away |
+| Push | first lesson (days 1–3), streak at risk (smart timing, rotating wording), late streak saver at 8pm, days 2–4 away, days 5–6 away |
 | Email | welcome, Sunday recap, 7 days away, 14 days away (suggests a smaller goal), 30 days away (last message) |
 
 Guardrails: every message has a dedupe key and is sent once; at most 1 push a day and 1 email every 3 days; no push from 9pm to 8am except at the learner's chosen time; push hands over to email after a week away; nothing after day 30.

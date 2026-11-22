@@ -30,7 +30,7 @@ const at = (day: string, hour = 12) => {
 
 /** A learner who practiced on each given day. */
 function practicedOn(days: string[], base?: Partial<LearnerState>): LearnerState {
-  let s: LearnerState = { ...newLearner(at(days[0] ?? '2026-11-01')), onboarded: true, ...base }
+  let s: LearnerState = { ...newLearner(at(days[0] ?? '2026-11-01')), onboarded: true, reminderMode: 'fixed', ...base }
   days.forEach((d, i) => {
     ;[s] = completeLesson(s, `x${i}`, 1, at(d))
   })
@@ -126,6 +126,21 @@ describe('messaging', () => {
     expect(pushes).toHaveLength(1)
     const logged = { ...s, messages: pushes.map((m) => ({ rule: m.rule, key: m.key, channel: m.channel, at: at('2026-11-02', 19).toISOString() })) }
     expect(send(logged, at('2026-11-02', 20)).sent.filter((m) => m.channel === 'push')).toHaveLength(0)
+  })
+
+  it('smart mode reminds about when they practiced yesterday', () => {
+    // Lessons at noon: reminder due from 11am (11:30 rounded down to the hour).
+    const s = practicedOn(['2026-11-01', '2026-11-02'], { pushEnabled: true, reminderMode: 'smart', freezes: 0 })
+    expect(send(s, at('2026-11-03', 10)).sent.some((m) => m.rule === 'push_streak_risk')).toBe(false)
+    expect(send(s, at('2026-11-03', 11)).sent.some((m) => m.rule === 'push_streak_risk')).toBe(true)
+  })
+
+  it('sends a late streak saver even after the daily reminder', () => {
+    const s = practicedOn(['2026-11-01', '2026-11-02', '2026-11-03'], { pushEnabled: true, reminderHour: 17, freezes: 0 })
+    const first = send(s, at('2026-11-04', 17)).sent.filter((m) => m.channel === 'push')
+    expect(first.map((m) => m.rule)).toEqual(['push_streak_risk'])
+    const logged = { ...s, messages: first.map((m) => ({ rule: m.rule, key: m.key, channel: m.channel, at: at('2026-11-04', 17).toISOString() })) }
+    expect(send(logged, at('2026-11-04', 20)).sent.filter((m) => m.channel === 'push').map((m) => m.rule)).toEqual(['push_streak_saver'])
   })
 
   it('shows a welcome-back review banner after 3+ days away', () => {

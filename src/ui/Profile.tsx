@@ -133,13 +133,17 @@ export function Profile({ go }: { go: Go }) {
         </div>
         <div>
           <p className="text-sm font-medium">Reminder time</p>
-          <div className="mt-1 grid grid-cols-5 gap-2">
+          <div className="mt-1 grid grid-cols-3 gap-2 sm:grid-cols-6">
+            <button aria-pressed={s.reminderMode === 'smart'} onClick={() => update((p) => ({ ...p, reminderMode: 'smart' }))} className="tile py-2 text-sm font-semibold">
+              Smart
+            </button>
             {HOURS.map((h) => (
-              <button key={h} aria-pressed={s.reminderHour === h} onClick={() => update((p) => ({ ...p, reminderHour: h }))} className="tile py-2 text-sm font-semibold">
+              <button key={h} aria-pressed={s.reminderMode !== 'smart' && s.reminderHour === h} onClick={() => update((p) => ({ ...p, reminderMode: 'fixed', reminderHour: h }))} className="tile py-2 text-sm font-semibold">
                 {hourLabel(h)}
               </button>
             ))}
           </div>
+          <p className="mt-1.5 text-xs text-ink-3">Smart reminds you around the time you practiced the day before.</p>
         </div>
         <div className="flex items-center justify-between rounded-2xl border-2 border-rule bg-white p-4">
           <div>
