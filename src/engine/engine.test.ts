@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import type { Unit } from '../content/types'
 import { addDays } from './dates'
 import { decide, facts } from './messaging'
+import { conceptHint, nudgeHint } from './hints'
 import { badges, path } from './progress'
 import { PERSONAS, simulate } from './simulate'
 import { completeLesson, exportSave, importSave, longestStreak, newLearner, reconcile, streak, type LearnerState } from './state'
@@ -86,6 +87,46 @@ describe('lessons and unlocks', () => {
     for (const id of ['u0-l1', 'u0-l2', 'u0-l3']) [s] = completeLesson(s, id, 1, at('2026-11-01'))
     const p = path(units, s)
     expect(p.map((x) => x.status)).toEqual(['done', 'done', 'done', 'current', 'locked'])
+  })
+})
+
+describe('hints', () => {
+  const lesson = {
+    id: 'x-1',
+    title: 'T',
+    exercises: [
+      { kind: 'concept' as const, title: 'Loops', body: 'A loop repeats steps.' },
+      { kind: 'choice' as const, prompt: 'Q', options: ['a', 'b', 'c', 'd'], answer: 2, explain: '' },
+      { kind: 'concept' as const, title: 'Lists', body: 'A list holds many values.' },
+      { kind: 'bits' as const, prompt: 'Make 5', target: 5, bits: 4, explain: '' },
+    ],
+  }
+
+  it('the first hint is the most recent concept card', () => {
+    expect(conceptHint(lesson, 1).title).toBe('Loops')
+    expect(conceptHint(lesson, 3).title).toBe('Lists')
+    expect(conceptHint(lesson, 0).title).toBe('Take it one step at a time')
+  })
+
+  it('the second hint narrows things down without giving the answer', () => {
+    const choice = nudgeHint(lesson.exercises[1]).body
+    expect(choice).toContain('"a"')
+    expect(choice).not.toContain('"c"') // the right answer is never named
+    expect(nudgeHint(lesson.exercises[3]).body).toBe('You need 2 switches on. The biggest one is the 4.')
+    expect(nudgeHint({ kind: 'type', prompt: '', accept: ['hello'], explain: '' }).body).toContain('5 characters')
+    expect(nudgeHint({ kind: 'spot', prompt: '', lines: ['a', 'b', 'c', 'd', 'e', 'f'], answer: 4, explain: '' }).body).toBe('Look at lines 4 to 6.')
+    expect(nudgeHint({ kind: 'order', prompt: '', lines: ['x = 1', 'y = 2', 'print(x)'], explain: '' }).body).toBe('Start with: `x = 1`')
+  })
+
+  it('every exercise in the course has both hints', async () => {
+    const { units: all } = await import('../content')
+    for (const u of all)
+      for (const l of u.lessons)
+        l.exercises.forEach((ex, i) => {
+          if (ex.kind === 'concept') return
+          expect(conceptHint(l, i).body.length).toBeGreaterThan(0)
+          expect(nudgeHint(ex).body.length).toBeGreaterThan(0)
+        })
   })
 })
 

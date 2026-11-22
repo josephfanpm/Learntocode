@@ -1,6 +1,7 @@
-import { Volume2, VolumeX, X } from 'lucide-react'
+import { Lightbulb, Volume2, VolumeX, X } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { Lesson, Unit } from '../content/types'
+import { hintFor } from '../engine/hints'
 import { completeLesson, type LessonResult } from '../engine/state'
 import { warmPython } from '../runners'
 import { play } from '../sound'
@@ -8,7 +9,7 @@ import { useStore } from '../store'
 import { AfterLesson } from './AfterLesson'
 import { ExerciseView, type Grader } from './exercises'
 import { Pip } from './Pip'
-import { Inline } from './text'
+import { Code, Inline, Prose } from './text'
 
 type Status = 'answering' | 'right' | 'wrong'
 
@@ -31,6 +32,8 @@ export function LessonPlayer({ lesson, unit, color, startAt = 0, onExit, onAvata
   const [result, setResult] = useState<{ r: LessonResult; accuracy: number } | null>(null)
   const [confirmQuit, setConfirmQuit] = useState(false)
   const [attempt, setAttempt] = useState(0)
+  // Hints shown for the current exercise: 0 none, 1 the concept, 2 a nudge as well.
+  const [hintLevel, setHintLevel] = useState<0 | 1 | 2>(0)
   const praise = useRef(PRAISE[0])
   // Right answers in a row, for the climbing correct sound.
   const combo = useRef(0)
@@ -60,6 +63,7 @@ export function LessonPlayer({ lesson, unit, color, startAt = 0, onExit, onAvata
     setStatus('answering')
     setTries(0)
     setReveal(false)
+    setHintLevel(0)
     setGrader(null)
     setAttempt((a) => a + 1)
     if (pos + 1 >= queueNow.length) finish(missed)
@@ -148,6 +152,25 @@ export function LessonPlayer({ lesson, unit, color, startAt = 0, onExit, onAvata
         <div key={`${idx}-${attempt}`}>
           <ExerciseView ex={ex} locked={status !== 'answering'} reveal={reveal} register={register} />
         </div>
+        {hintLevel > 0 && (
+          <aside aria-label="Hint" aria-live="polite" className="mt-6 flex items-start gap-3">
+            <Pip mood="think" size={52} className="mt-1 shrink-0" />
+            <div className="min-w-0 flex-1 space-y-3">
+              {([1, 2] as const)
+                .filter((lv) => lv <= hintLevel)
+                .map((lv) => {
+                  const h = hintFor(lesson, idx, lv)
+                  return (
+                    <div key={lv} className="bubble !animate-none rounded-2xl bg-flame-soft !border-flame/30 text-[0.95rem] before:!hidden">
+                      <p className="font-display font-bold">{h.title}</p>
+                      <Prose text={h.body} className="mt-1 text-ink-2" />
+                      {h.code && <Code code={h.code} lang={h.language} className="mt-2 text-[0.82rem]" />}
+                    </div>
+                  )
+                })}
+            </div>
+          </aside>
+        )}
       </main>
 
       <footer
@@ -179,6 +202,19 @@ export function LessonPlayer({ lesson, unit, color, startAt = 0, onExit, onAvata
             )}
           </div>
           <div className="flex gap-2 sm:w-auto">
+            {status === 'answering' && ex.kind !== 'concept' && (
+              <button
+                className="btn btn-ghost shrink-0 !px-4"
+                disabled={hintLevel >= 2}
+                onClick={() => {
+                  play('tap')
+                  setHintLevel((h) => (h === 0 ? 1 : 2))
+                  requestAnimationFrame(() => document.querySelector('aside[aria-label="Hint"]')?.scrollIntoView({ block: 'nearest', behavior: 'smooth' }))
+                }}
+              >
+                <Lightbulb size={18} /> {hintLevel === 0 ? 'Hint' : hintLevel === 1 ? 'More help' : 'No more hints'}
+              </button>
+            )}
             {status === 'answering' && (
               <button className="btn w-full sm:w-44" disabled={!grader || checking} onClick={onCheck}>
                 {ex.kind === 'concept' ? 'Continue' : checking ? 'Checking…' : 'Check'}

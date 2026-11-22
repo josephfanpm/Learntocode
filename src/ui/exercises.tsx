@@ -1,4 +1,4 @@
-import { Lightbulb, Play, RotateCcw } from 'lucide-react'
+import { Play, RotateCcw } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type {
   BlankExercise,
@@ -255,7 +255,6 @@ export function Write({ ex, locked, reveal, register }: ExProps<WriteExercise>) 
   const [result, setResult] = useState<RunResult | null>(null)
   const [busy, setBusy] = useState(false)
   const [loading, setLoading] = useState(ex.language === 'python')
-  const [hint, setHint] = useState(false)
   const [scratch, setScratch] = useState<{ output: string; error?: string; table?: { columns: string[]; rows: string[][] } } | null>(null)
 
   useEffect(() => {
@@ -316,18 +315,10 @@ export function Write({ ex, locked, reveal, register }: ExProps<WriteExercise>) 
             <Play size={16} /> {loading ? 'Loading Python…' : busy ? 'Running…' : 'Run'}
           </button>
         )}
-        <button className="btn btn-ghost !py-2 text-sm" onClick={() => setHint(true)} disabled={hint}>
-          <Lightbulb size={16} /> Hint
-        </button>
         <button className="btn btn-ghost !py-2 text-sm" onClick={() => { setCode(ex.starter); setResult(null); setScratch(null) }} disabled={locked}>
           <RotateCcw size={16} /> Reset
         </button>
       </div>
-      {hint && (
-        <p className="rounded-xl bg-flame-soft p-3 text-sm">
-          <Inline text={ex.hint} />
-        </p>
-      )}
       {scratch && (
         <div className="space-y-2 text-sm">
           {scratch.error && <div className="rounded-xl bg-bad-soft p-3 whitespace-pre-wrap">{scratch.error}</div>}

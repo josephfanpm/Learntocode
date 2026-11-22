@@ -15,7 +15,7 @@ This is an independent portfolio project. It is not affiliated with or endorsed 
 | **Problem** | The best free way to learn computer science is a university course built from long lectures and multi-hour problem sets. People with jobs and no background start it and stop. |
 | **User** | An adult with no coding experience who wants to change careers, get more done at work, build something, or understand how technology works, and has minutes a day rather than hours. |
 | **Solution** | CS50's full arc, rewritten as 112 three-minute lessons with real code that runs in the browser, wrapped in a habit loop: streaks, a daily goal, a placement quiz, and reminders timed to when the learner usually practices. |
-| **Result** | A working prototype: 14 units, 1,088 exercises, 23 tests on the streak, unlock, reminder, badge and save logic, and a checker that runs every code exercise's answer. No real-world result: nobody has been measured using it. |
+| **Result** | A working prototype: 14 units, 1,088 exercises, 26 tests on the streak, unlock, reminder, hint, badge and save logic, and a checker that runs every code exercise's answer. No real-world result: nobody has been measured using it. |
 | **My role** | Product and build: the problem, the course structure, the habit and reminder rules, the trade-offs, and the prototype. |
 
 ## Problem
@@ -46,6 +46,7 @@ Language-learning apps solved the same shape of problem with short sessions, imm
 - **The whole of CS50, in small steps.** Fourteen units follow the course week by week, from binary to web apps, AI and cybersecurity, then a systems design unit that goes beyond CS50, and a final project. Each unit covers that week's lecture ideas and the ideas behind its labs and problem sets, rewritten as original lessons of 7 to 10 exercises.
 - **Real code, no setup.** Python and SQL run in the browser tab, and web pages are checked as they are built. A program that loops forever is stopped after six seconds, and error messages are rewritten as one plain sentence.
 - **Ten kinds of exercise.** Beyond multiple choice: put lines in order by dragging, match pairs, fill gaps, write code, tap the line with the bug, flip switches to make a binary number, act out an algorithm by tapping the box it would check next, and type what a program prints.
+- **Two-step hints on every question.** The first press recaps the idea being tested; the second gives a specific nudge, such as ruling out two wrong options or revealing which line goes first. Hints are free.
 - **Setup that ends in a lesson.** Pip, the mascot, asks one question per screen. The first lesson comes before any profile details; name and avatar are asked after it and can be skipped.
 - **A placement quiz instead of "have you coded before?"** One question per unit, easiest first. Each right answer skips a unit; the first miss ends the quiz.
 - **A habit loop.** A daily streak, streak freezes for missed days, a daily goal, lessons that unlock in order, and wrong answers that come back at the end of the lesson.
@@ -121,6 +122,7 @@ I built ByteQuest with Claude Code as a pair programmer. I set the product direc
 | **Streak freezes** | No protection · spend a freeze per missed day · spend only when it saves the streak | Only when freezes cover the whole gap | Simplicity | A streak with no forgiveness punishes one bad day. Burning freezes on a streak that is lost anyway is a second punishment. |
 | **Lapsed learners** | Remind forever · fade out quietly · say reminders are stopping, then stop | A last message on day 7 that says reminders are stopping, then silence | Any chance to win someone back after a week, and the later emails an earlier version sent | Duolingo's team reports that this message beat every variant they tried. Saying it and then continuing to email would make it untrue, so the later emails were removed. |
 | **Wrong answers** | Hearts that run out · no penalty | No hearts: the question returns at the end, and the wrong sound is soft | The tension that scarcity creates | Beginners are wrong a lot. Locking them out for mistakes punishes the thing learning requires. |
+| **Hints** | None · show the answer · two steps: the idea, then a nudge | Two steps, free, on every question | A cost that would make learners think before asking; hints are generated from each question's answer, so they are less tailored than hand-written ones | A stuck beginner either gets unstuck or leaves. Explaining the idea first gives them the chance to solve it themselves; the nudge is there if that isn't enough. Charging for help punishes the people who need it. |
 | **Exercise formats** | Multiple choice only · add hands-on formats | Ten formats, including drag, tap-the-bug and step-through | Content cost: each new format needs its own authoring and checking | Recognising an answer is weaker than producing one. Debugging and tracing are skills in their own right. |
 | **Mascot** | None · smooth vector character · pixel art | A pixel-art red panda with seven moods | The fluid motion of a rigged character | A character makes feedback feel like it comes from someone. Pixel art suits the subject, animates frame by frame in code, and is cheap to extend to learner avatars. |
 | **Sound** | None · licensed pack · made in code | Original chip-style sounds made in code; the right-answer sound climbs with each answer in a row | The polish of studio-made effects | Sound marks the moments that matter. Making it in code keeps it original, free of licences, and matched to the art. |
@@ -142,7 +144,7 @@ I built ByteQuest with Claude Code as a pair programmer. I set the product direc
 ```sh
 npm install
 npm run dev        # http://localhost:5173
-npm test           # streak, unlock, reminder, badge and save tests
+npm test           # streak, unlock, reminder, hint, badge and save tests
 npx tsx scripts/check-content.ts   # validates every exercise; runs each Python and SQL answer against its tests
 ```
 
