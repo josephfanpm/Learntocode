@@ -1,0 +1,157 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-display: 'Bricolage Grotesque Variable', system-ui, sans-serif;
+  --font-sans: 'Lexend Variable', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
+
+  --color-paper: #edf1f6;
+  --color-card: #ffffff;
+  --color-ink: #16213e;
+  --color-ink-2: #4a5677;
+  --color-ink-3: #8691ad;
+  --color-rule: #d5dce8;
+  --color-cobalt: #2d5be3;
+  --color-cobalt-deep: #1d3fa8;
+  --color-cobalt-soft: #e3eafc;
+  --color-flame: #ff7a1a;
+  --color-flame-soft: #fff0e3;
+  --color-gem: #7a4ff0;
+  --color-good: #12935a;
+  --color-good-soft: #dff5ea;
+  --color-bad: #d6323a;
+  --color-bad-soft: #fde6e7;
+  --color-code: #1a2238;
+}
+
+html,
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  min-height: 100dvh;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-cobalt);
+  outline-offset: 2px;
+}
+
+/* Tactile button: a solid ledge under the face that compresses on press. */
+.btn {
+  --ledge: var(--color-cobalt-deep);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 14px;
+  padding: 0.85rem 1.25rem;
+  font-weight: 600;
+  background: var(--color-cobalt);
+  color: white;
+  box-shadow: 0 4px 0 var(--ledge);
+  transform: translateY(0);
+  transition: transform 80ms ease, box-shadow 80ms ease, background 120ms ease;
+  user-select: none;
+}
+.btn:active:not(:disabled) {
+  transform: translateY(4px);
+  box-shadow: 0 0 0 var(--ledge);
+}
+.btn:disabled {
+  background: var(--color-rule);
+  color: var(--color-ink-3);
+  box-shadow: 0 4px 0 #c2cadb;
+  cursor: not-allowed;
+}
+.btn-good {
+  background: var(--color-good);
+  --ledge: #0b6b41;
+}
+.btn-bad {
+  background: var(--color-bad);
+  --ledge: #9e1f26;
+}
+.btn-ghost {
+  background: white;
+  color: var(--color-ink);
+  --ledge: var(--color-rule);
+  border: 2px solid var(--color-rule);
+}
+
+/* Selectable tile (answer options, word chips, lines). */
+.tile {
+  border: 2px solid var(--color-rule);
+  border-bottom-width: 4px;
+  background: white;
+  border-radius: 12px;
+  transition: border-color 120ms ease, background 120ms ease, transform 80ms ease;
+}
+.tile:active:not(:disabled) {
+  transform: translateY(2px);
+}
+.tile[aria-pressed='true'] {
+  border-color: var(--color-cobalt);
+  background: var(--color-cobalt-soft);
+}
+.tile:disabled {
+  cursor: default;
+}
+
+.code {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  background: var(--color-code);
+  color: #e6ebf5;
+  border-radius: 12px;
+  padding: 0.9rem 1rem;
+  overflow-x: auto;
+  white-space: pre;
+  tab-size: 4;
+}
+.tok-k { color: #ff9e64; }
+.tok-s { color: #9ece6a; }
+.tok-n { color: #7dcfff; }
+.tok-c { color: #7f8aa8; font-style: italic; }
+.tok-f { color: #bb9af7; }
+.tok-t { color: #f7768e; }
+
+@keyframes pop {
+  0% { transform: scale(0.6); opacity: 0; }
+  70% { transform: scale(1.08); opacity: 1; }
+  100% { transform: scale(1); }
+}
+@keyframes rise {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 rgb(45 91 227 / 0.45); }
+  100% { box-shadow: 0 0 0 16px rgb(45 91 227 / 0); }
+}
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
+.anim-pop { animation: pop 420ms cubic-bezier(0.2, 0.8, 0.3, 1.2) both; }
+.anim-rise { animation: rise 220ms cubic-bezier(0.2, 0.8, 0.3, 1) both; }
+.anim-pulse { animation: pulse-ring 1.6s ease-out infinite; }
+.anim-shake { animation: shake 260ms ease; }
+
+@media (prefers-reduced-motion: reduce) {
+  .anim-pop, .anim-rise, .anim-pulse, .anim-shake { animation: none; }
+  .btn, .tile { transition: none; }
+}
