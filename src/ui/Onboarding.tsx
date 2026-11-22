@@ -96,17 +96,16 @@ export function Onboarding({ go }: { go: Go }) {
     return (
       <Scene kind="mountain" className="h-dvh w-full">
         <Sparkles />
-        <div className="relative mx-auto flex h-full max-w-md flex-col items-center px-5 pt-[16vh] pb-10 text-center">
-          <p className="pixel rise-in text-[0.6rem] tracking-[0.3em] text-[#ffe9b0]">START YOUR</p>
-          <h1 className="pixel rise-in mt-3 text-[1.9rem] text-white sm:text-[2.4rem]" style={{ ['--i' as string]: 1, textShadow: '0 4px 0 #060817, 4px 0 0 #060817, -4px 0 0 #060817, 0 -4px 0 #060817, 0 8px 0 #c2410c' }}>
-            <span className="px-float inline-block">
-              <span className="text-gold">Byte</span>Quest
-            </span>
-          </h1>
-          <p className="rise-in mt-5 text-lg font-medium text-white" style={{ ['--i' as string]: 3, textShadow: '0 2px 0 #060817' }}>Learn to code, a few minutes a day.</p>
-          <button className="btn px-glow rise-in mt-6 w-full max-w-xs" style={{ ['--i' as string]: 5 }} onClick={next}>Get started</button>
-          <div className="rise-in mt-auto self-start" style={{ ['--i' as string]: 4 }}>
-            <Pip mood="wave" size={110} />
+        <div className="relative mx-auto flex h-full max-w-md flex-col items-center justify-center px-5 pb-[12vh] text-center">
+          <div className="rise-in flex w-full flex-col items-center border-4 border-[#060817] bg-[#0b0f24]/85 px-6 py-8 shadow-[0_6px_0_#060817]">
+            <p className="pixel text-[0.6rem] tracking-[0.3em] text-[#ffe9b0]">START YOUR</p>
+            <h1 className="pixel mt-3 text-[1.9rem] text-white sm:text-[2.4rem]" style={{ textShadow: '0 4px 0 #060817, 4px 0 0 #060817, -4px 0 0 #060817, 0 -4px 0 #060817, 0 8px 0 #c2410c' }}>
+              <span className="px-float inline-block">
+                <span className="text-gold">Byte</span>Quest
+              </span>
+            </h1>
+            <p className="mt-5 text-lg font-medium text-white">Learn to code, a few minutes a day.</p>
+            <button className="btn px-glow mt-6 w-full max-w-xs" onClick={next}>Get started</button>
           </div>
         </div>
       </Scene>
