@@ -65,6 +65,8 @@ export interface LearnerState {
   avatar?: AvatarSpec
   /** Interface sounds. Missing (older saves) means on. */
   sound?: boolean
+  /** Animations: 'on' or 'off' overrides the device's reduce-motion setting; missing follows the device. */
+  motion?: 'on' | 'off'
   xp: number
   gems: number
   freezes: number

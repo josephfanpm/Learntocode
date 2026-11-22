@@ -3,6 +3,7 @@ import { courseUnits } from './content'
 import { dayKey } from './engine/dates'
 import { decide, facts, type Message } from './engine/messaging'
 import { load, reconcile, save, type LearnerState } from './engine/state'
+import { setMotionPref } from './motion'
 import { setSoundEnabled } from './sound'
 
 interface Store {
@@ -19,6 +20,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const ref = useRef(s)
   ref.current = s
   setSoundEnabled(s.sound !== false)
+  setMotionPref(s.motion)
 
   const update = useCallback((f: (s: LearnerState) => LearnerState) => {
     setS((prev) => {

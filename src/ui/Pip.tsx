@@ -6,6 +6,7 @@
 // Frame swaps are instant, as in sprite animation; whole-body moves (hop,
 // shake, bob) are CSS on transform. Reduced motion: no frames, no moves.
 import { useEffect, useMemo, useState } from 'react'
+import { useReducedMotion } from '../motion'
 import { PixelSprite } from './pixel/PixelSprite'
 import { critter, type Face } from './pixel/sprites'
 
@@ -43,16 +44,8 @@ const BODY: Record<Mood, string> = {
   oops: 'pip-shake',
 }
 
-export function useReducedMotion(): boolean {
-  const [reduce, setReduce] = useState(() => typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches)
-  useEffect(() => {
-    const mq = matchMedia('(prefers-reduced-motion: reduce)')
-    const on = () => setReduce(mq.matches)
-    mq.addEventListener('change', on)
-    return () => mq.removeEventListener('change', on)
-  }, [])
-  return reduce
-}
+// Re-exported so existing imports keep working.
+export { useReducedMotion }
 
 export function Pip({ mood = 'happy', size = 96, className = '', title, still = false }: { mood?: Mood; size?: number; className?: string; title?: string; still?: boolean }) {
   const reduce = useReducedMotion()

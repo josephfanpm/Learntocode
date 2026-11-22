@@ -4,6 +4,7 @@ import { units } from '../content'
 import { addDays, dayKey, parseDay } from '../engine/dates'
 import { badges } from '../engine/progress'
 import { buyFreeze, exportSave, FREEZE_PRICE, importSave, longestStreak, MAX_FREEZES, practicedToday, reset, streak } from '../engine/state'
+import { useDeviceReduces, useReducedMotion } from '../motion'
 import { play, setSoundEnabled } from '../sound'
 import { useStore } from '../store'
 import { Avatar } from './Avatar'
@@ -237,6 +238,8 @@ export function Settings({ go }: { go: Go }) {
   const { s, update } = useStore()
   const [confirmReset, setConfirmReset] = useState(false)
   const [notice, setNotice] = useState('')
+  const motionReduced = useReducedMotion()
+  const deviceSaysReduce = useDeviceReduces()
 
   const togglePush = async () => {
     if (s.pushEnabled) return update((p) => ({ ...p, pushEnabled: false }))
@@ -286,6 +289,9 @@ export function Settings({ go }: { go: Go }) {
               }
             }}
           />
+        </Row>
+        <Row title="Animations" note={deviceSaysReduce && s.motion === undefined ? 'Off because your device is set to reduce motion.' : 'Pip, confetti and screen transitions.'}>
+          <Toggle on={!motionReduced} label="Animations" onClick={() => update((p) => ({ ...p, motion: motionReduced ? 'on' : 'off' }))} />
         </Row>
         <Row title="Reminders" note="One a day, around the time you usually practice.">
           <Toggle on={s.pushEnabled} label="Reminders" onClick={togglePush} />

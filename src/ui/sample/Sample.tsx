@@ -2,7 +2,9 @@ import '@fontsource/press-start-2p'
 import { Check, Lock } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { play } from '../../sound'
-import { Pip, useReducedMotion } from '../Pip'
+import { setMotionPref, useDeviceReduces, useReducedMotion } from '../../motion'
+import { useStore } from '../../store'
+import { Pip } from '../Pip'
 import { DRIFT, drift, easeOut, HERO, progress, twinkle, typed } from './timeline'
 
 // A sample of the pixel-adventure direction: a welcome screen and one course
@@ -148,6 +150,61 @@ function CodeScene({ t, forest = false }: { t: number; forest?: boolean }) {
   )
 }
 
+// ---------- Ambient life: always moving, a little ----------
+
+const SPARKS = [
+  [22, 18], [70, 9], [118, 26], [160, 12], [205, 30], [240, 8], [48, 44], [186, 52],
+]
+
+/** Four-point pixel sparkles that fade in and out, each a beat after the last. */
+function Sparkles() {
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} className="absolute inset-0 size-full" shapeRendering="crispEdges" preserveAspectRatio="xMidYMin slice" aria-hidden>
+      {SPARKS.map(([x, y], i) => (
+        <g key={i} className="px-spark" style={{ ['--i' as string]: i }} fill="#fff6d8">
+          <rect x={x} y={y - 2} width="1" height="5" />
+          <rect x={x - 2} y={y} width="5" height="1" />
+        </g>
+      ))}
+    </svg>
+  )
+}
+
+const CLOUDS = [
+  { x: 10, y: 14, w: 34 }, { x: 96, y: 30, w: 26 }, { x: 170, y: 10, w: 40 }, { x: 236, y: 38, w: 22 },
+]
+
+/** Soft pixel clouds drifting across the sky. Drawn twice side by side so the loop has no seam. */
+function Clouds() {
+  return (
+    <div className="px-clouds absolute inset-y-0 left-0 w-[200%]" aria-hidden>
+      <svg viewBox={`0 0 ${W * 2} ${H}`} className="size-full" shapeRendering="crispEdges" preserveAspectRatio="none">
+        {[0, W].map((dx) =>
+          CLOUDS.map((c, i) => (
+            <g key={`${dx}-${i}`} fill="#ffffff" opacity="0.22">
+              <rect x={c.x + dx} y={c.y + 3} width={c.w} height="4" />
+              <rect x={c.x + dx + 4} y={c.y} width={c.w - 12} height="3" />
+              <rect x={c.x + dx + 8} y={c.y + 7} width={c.w - 14} height="2" />
+            </g>
+          )),
+        )}
+      </svg>
+    </div>
+  )
+}
+
+/** Fireflies near the ground, for the forest banner. */
+function Fireflies() {
+  const dots = [[30, 120], [78, 104], [122, 128], [164, 110], [210, 124], [250, 100]]
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} className="absolute inset-0 size-full" shapeRendering="crispEdges" preserveAspectRatio="xMidYMax slice" aria-hidden>
+      {dots.map(([x, y], i) => (
+        <rect key={i} className="px-firefly" style={{ ['--i' as string]: i }} x={x} y={y} width="2" height="2" fill="#fff3a6" />
+      ))}
+    </svg>
+  )
+}
+
 // ---------- Shared pieces ----------
 
 function Scene({ art, t, forest = false, children, className = '' }: { art: Art; t: number; forest?: boolean; children?: React.ReactNode; className?: string }) {
@@ -180,10 +237,14 @@ function Welcome({ art, t }: { art: Art; t: number }) {
   const said = typed(subtitle, progress(t, HERO.subtitle))
   return (
     <Scene art={art} t={t} className="aspect-[9/16] w-full rounded-[28px] border-4 border-[#0b0f24] sm:aspect-[4/5]">
+      <Clouds />
+      <Sparkles />
       <div className="absolute inset-0 flex flex-col items-center px-5 pt-[18%] text-center">
         <p className="text-[0.6rem] tracking-[0.3em] text-[#ffe9b0]" style={{ ...pixelFont, ...rise(HERO.line1) }}>START YOUR</p>
         <h2 className="mt-3 text-[1.7rem] leading-[1.25] text-white sm:text-[2.1rem]" style={{ ...pixelFont, ...rise(HERO.line2), textShadow: '0 4px 0 #0b0f24, 4px 0 0 #0b0f24, -4px 0 0 #0b0f24, 0 -4px 0 #0b0f24, 0 8px 0 #c2410c' }}>
-          <span className="text-[#ffd166]">Byte</span>Quest
+          <span className="px-float inline-block">
+            <span className="text-[#ffd166]">Byte</span>Quest
+          </span>
         </h2>
         <p className="mt-5 min-h-10 max-w-64 text-[0.95rem] font-medium text-white" aria-label={subtitle} style={{ textShadow: '0 2px 0 #0b0f24' }}>
           <span aria-hidden>{said}</span>
@@ -194,7 +255,8 @@ function Welcome({ art, t }: { art: Art; t: number }) {
         </div>
       </div>
       <div className="absolute bottom-[7%] left-[9%]" style={rise(HERO.pip)}>
-        <Pip mood={progress(t, HERO.cta) >= 1 ? 'wave' : 'happy'} size={86} />
+        {/* Pip waves when the button lands, then again every six seconds. */}
+        <Pip mood={progress(t, HERO.cta) >= 1 && (t - HERO.cta[0]) % 6000 < 1600 ? 'wave' : 'happy'} size={86} />
       </div>
     </Scene>
   )
@@ -210,6 +272,7 @@ function World({ art, t }: { art: Art; t: number }) {
   return (
     <div className="w-full overflow-hidden rounded-[28px] border-4 border-[#0b0f24] bg-[#0f1535]">
       <Scene art={art} t={t} forest className="aspect-[16/7] w-full">
+        <Fireflies />
         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#0f1535] to-transparent pt-10 pb-3 pl-4">
           <p className="text-[0.55rem] tracking-[0.25em] text-[#ffe9b0]" style={pixelFont}>WORLD 1</p>
           <h3 className="mt-1.5 text-[0.85rem] leading-relaxed text-white" style={{ ...pixelFont, textShadow: '0 3px 0 #0b0f24' }}>Thinking like a computer</h3>
@@ -245,6 +308,9 @@ function World({ art, t }: { art: Art; t: number }) {
 export function Sample() {
   const t = useClock()
   const [art, setArt] = useState<Art>('pack')
+  const { s, update } = useStore()
+  const still = useReducedMotion()
+  const deviceSaysReduce = useDeviceReduces()
   const [run, setRun] = useState(0)
   const startedAt = useRef(0)
   // Replaying restarts the entrance beats without restarting the parallax.
@@ -261,6 +327,22 @@ export function Sample() {
         <p className="mt-2 max-w-prose text-[#aab3d8]">
           A welcome screen and one course world, not yet applied to the app. Switch the scenery to compare a free art pack with scenery drawn in code.
         </p>
+        {still && (
+          <div className="mt-5 flex flex-wrap items-center gap-3 border-2 border-[#ffc531] bg-[#1c2552] p-3 text-sm text-[#ffe9a0]">
+            <p className="flex-1">
+              {deviceSaysReduce && s.motion !== 'off' ? 'Nothing is moving because your device is set to reduce motion.' : 'Animations are turned off in Settings.'}
+            </p>
+            <button
+              className="px-tab px-tab-on"
+              onClick={() => {
+                setMotionPref('on')
+                update((p) => ({ ...p, motion: 'on' }))
+              }}
+            >
+              Play animations
+            </button>
+          </div>
+        )}
         <div className="mt-5 flex flex-wrap items-center gap-2">
           {(['pack', 'code'] as const).map((a) => (
             <button key={a} aria-pressed={art === a} onClick={() => setArt(a)} className={`px-tab ${art === a ? 'px-tab-on' : ''}`}>

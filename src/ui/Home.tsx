@@ -5,6 +5,7 @@ import { dayKey } from '../engine/dates'
 import type { Message } from '../engine/messaging'
 import { path, unitProgress } from '../engine/progress'
 import { practicedToday, streak } from '../engine/state'
+import { useDeviceReduces } from '../motion'
 import { useStore } from '../store'
 import { Avatar } from './Avatar'
 import { Pip, type Mood } from './Pip'
@@ -114,6 +115,7 @@ const OFFSETS = [0, 34, 52, 34, 0, -34, -52, -34]
 export function Home({ go }: { go: Go }) {
   const { s, update, banners, dismiss } = useStore()
   const course = s.course ?? 'cs'
+  const deviceSaysReduce = useDeviceReduces()
   const units = courseUnits(course)
   const p = path(units, s)
   const current = useRef<HTMLButtonElement>(null)
@@ -124,6 +126,13 @@ export function Home({ go }: { go: Go }) {
 
   return (
     <div className="mx-auto max-w-xl px-4 pb-28">
+      {deviceSaysReduce && s.motion === undefined && (
+        <div className="mt-4 flex items-center gap-3 rounded-2xl border-2 border-rule bg-white p-3 text-sm">
+          <p className="flex-1 text-ink-2">Animations are off because your device is set to reduce motion.</p>
+          <button className="btn !min-h-0 shrink-0 !px-3 !py-2 text-sm" onClick={() => update((p) => ({ ...p, motion: 'on' }))}>Turn on</button>
+          <button className="shrink-0 font-semibold text-ink-3" onClick={() => update((p) => ({ ...p, motion: 'off' }))}>Keep off</button>
+        </div>
+      )}
       <div className="mt-4 grid grid-cols-3 gap-2" role="tablist" aria-label="Course">
         {COURSES.map((c) => (
           <button

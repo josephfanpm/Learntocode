@@ -1,6 +1,7 @@
 import { ChevronDown, ChevronUp, GripVertical } from 'lucide-react'
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import type { OrderExercise } from '../content/types'
+import { reduced } from '../motion'
 import type { ExProps } from './exercises'
 import { Code, highlight, Inline } from './text'
 
@@ -42,7 +43,7 @@ export function Order({ ex, locked, reveal, register }: ExProps<OrderExercise>) 
       const top = el.offsetTop
       if (prev !== undefined && prev !== top && id !== dragRef.current?.id) {
         el.animate([{ transform: `translateY(${prev - top}px)` }, { transform: 'translateY(0)' }], {
-          duration: matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 160,
+          duration: reduced() ? 0 : 160,
           easing: 'cubic-bezier(0.2, 0.8, 0.3, 1)',
         })
       }
