@@ -5,11 +5,11 @@ import type {
   ChoiceExercise,
   ConceptExercise,
   Exercise,
-  OrderExercise,
   WriteExercise,
 } from '../content/types'
 import { check, runPythonFree, runSqlQuery, warmPython, type RunResult } from '../runners'
 import { Match } from './match'
+import { Order } from './order'
 import { Code, highlight, Inline, Prose } from './text'
 
 export type Grader = () => boolean | Promise<boolean>
@@ -30,16 +30,6 @@ function shuffle<T>(arr: T[]): T[] {
     ;[a[i], a[j]] = [a[j], a[i]]
   }
   return a
-}
-
-/** Shuffle, but never leave it already solved. */
-function shuffleApart<T>(arr: T[]): T[] {
-  if (arr.length < 2) return arr
-  for (let k = 0; k < 10; k++) {
-    const s = shuffle(arr)
-    if (s.some((x, i) => x !== arr[i])) return s
-  }
-  return [...arr].reverse()
 }
 
 const Prompt = ({ text }: { text: string }) => (
@@ -172,55 +162,6 @@ export function Blank({ ex, locked, reveal, register }: ExProps<BlankExercise>) 
           </button>
         ))}
       </div>
-    </div>
-  )
-}
-
-// ---------- Order ----------
-
-export function Order({ ex, locked, reveal, register }: ExProps<OrderExercise>) {
-  const pool = useMemo(() => shuffleApart(ex.lines.map((_, i) => i)), [ex])
-  const [picked, setPicked] = useState<number[]>([])
-  useEffect(
-    () => register(picked.length === ex.lines.length ? () => picked.every((p, i) => ex.lines[p] === ex.lines[i]) : null),
-    [picked, ex, register],
-  )
-  return (
-    <div className="space-y-5">
-      <Prompt text={ex.prompt} />
-      <div className="min-h-24 space-y-2 rounded-2xl border-2 border-dashed border-rule p-2">
-        {picked.length === 0 && <p className="p-3 text-ink-3">Tap the lines below in order.</p>}
-        {picked.map((p, i) => {
-          const ok = ex.lines[p] === ex.lines[i]
-          return (
-            <button
-              key={p}
-              disabled={locked}
-              onClick={() => setPicked(picked.filter((x) => x !== p))}
-              className={`tile block w-full px-3 py-2 text-left font-mono text-[0.92rem] whitespace-pre ${
-                locked ? (ok ? '!border-good !bg-good-soft' : '!border-bad !bg-bad-soft') : ''
-              }`}
-            >
-              {highlight(ex.lines[p], ex.language)}
-            </button>
-          )
-        })}
-      </div>
-      <div className="space-y-2">
-        {pool
-          .filter((p) => !picked.includes(p))
-          .map((p) => (
-            <button
-              key={p}
-              disabled={locked}
-              onClick={() => setPicked([...picked, p])}
-              className="tile block w-full px-3 py-2 text-left font-mono text-[0.92rem] whitespace-pre"
-            >
-              {highlight(ex.lines[p].trimStart(), ex.language)}
-            </button>
-          ))}
-      </div>
-      {locked && reveal && <Code code={ex.lines.join('\n')} lang={ex.language} />}
     </div>
   )
 }
