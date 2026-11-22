@@ -64,6 +64,11 @@ export const u26: Unit = {
           explain: 'Training makes the model. Inference is running it, and that is what you pay for each time you use one.',
         },
         {
+          kind: 'concept',
+          title: 'A chat does not retrain it',
+          body: 'Say you tell a chat "call me Sam". For the rest of that chat it does. That is only because your message is part of the text it is reading.\n\nThe settings inside the model were fixed when training ended. Someone else opening the same model gets it exactly as it was.',
+        },
+        {
           kind: 'choice',
           prompt: 'In a chat you tell the model "you got that wrong, the capital of Australia is Canberra". A stranger asks the same model the same question tomorrow. What has changed inside the model?',
           options: [
@@ -175,6 +180,11 @@ export const u26: Unit = {
           explain: 'Some tokens are whole words, but many are fragments or punctuation.',
         },
         {
+          kind: 'concept',
+          title: 'Two counts for every message',
+          body: 'Tokens you send are **input tokens**. Tokens the model writes back are **output tokens**. They are counted separately.\n\nSend a 300-character question and get a 600-character answer: by the course estimate that is about 100 input tokens and 200 output tokens.\n\nAn estimate is only a guide. Each model family cuts text its own way.',
+        },
+        {
           kind: 'match',
           prompt: 'Match each thing to how it is measured.',
           pairs: [
@@ -279,6 +289,11 @@ export const u26: Unit = {
           ],
           answer: 2,
           explain: 'Even at the lowest setting, replies are not promised to be identical. If you need the same result twice, save the reply.',
+        },
+        {
+          kind: 'concept',
+          title: 'The loop has to end',
+          body: 'The loop cannot run for ever. It ends in one of two ways.\n\nThe model can predict that the reply is **finished**, in the same way it predicts any next token. Or the reply reaches a **length limit** set for it, and is cut off wherever it happens to be.',
         },
         {
           kind: 'choice',
@@ -444,6 +459,11 @@ export const u26: Unit = {
           explain: 'It supplies the source, asks for a quote you can check, and gives the model a way out if the answer is missing.',
         },
         {
+          kind: 'concept',
+          title: 'Check where a mistake would hurt',
+          body: 'Checking takes time, so spend it where being wrong costs something.\n\nA list of gift ideas: read it and move on. A medicine dose, a price or a booking reference: look it up in a real source.\n\nCode is a special case. You can run it and see what it does.',
+        },
+        {
           kind: 'steps',
           prompt: 'How much checking does each output need before you rely on it? Tap the better box.',
           cells: ['Fine after a read-through', 'Verify against a real source', 'Run it and see'],
@@ -455,6 +475,11 @@ export const u26: Unit = {
             { ask: 'A short Python function it wrote for you.', answer: 2 },
           ],
           explain: 'Match the checking to the cost of being wrong. Ideas and rewording are low risk. Dates, law and links are not. Code has the best check of all: running it.',
+        },
+        {
+          kind: 'concept',
+          title: 'Strong with words, weak with exact details',
+          body: 'A model is at its best working with language that is in front of it: shortening a letter you pasted, or rewording it.\n\nIt is weaker at exact sums with long numbers, and at small precise details like a phone number. And it cannot know anything new, such as today\'s train times, unless someone shows it.',
         },
         {
           kind: 'match',

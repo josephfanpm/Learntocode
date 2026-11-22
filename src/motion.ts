@@ -1,9 +1,8 @@
 // One place decides whether the app animates.
 //
-// By default it follows the device ("reduce motion" in the system's
-// accessibility settings). The learner can override that for ByteQuest in
-// Settings: 'on' plays animations even when the device asks for less, 'off'
-// stops them even when it doesn't. CSS reads the result from a class on
+// Animations are on by default. The learner can turn them off in Settings,
+// and when the device asks for reduced motion the Learn tab offers that
+// choice up front, once. CSS reads the result from a class on
 // <html>; components read it with useReducedMotion().
 
 import { useSyncExternalStore } from 'react'
@@ -21,7 +20,7 @@ export function deviceReduces(): boolean {
 
 /** True when animations should be reduced right now. */
 export function reduced(): boolean {
-  return pref === 'off' || (pref === undefined && deviceReduces())
+  return pref === 'off'
 }
 
 function apply() {

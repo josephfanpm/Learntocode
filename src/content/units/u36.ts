@@ -168,6 +168,11 @@ export const u36: Unit = {
           explain: 'A typo fix has no business in the payment code. An unrequested change is the first place to look, however small it seems.',
         },
         {
+          kind: 'concept',
+          title: 'What the save point buys you',
+          body: 'Say you commit, then ask the agent to tidy one function. It rewrites half the file, and the tests now fail.\n\nBecause you started clean, every change since your commit is the agent\'s. Git can drop those uncommitted changes and put the files back exactly as they were at your commit.',
+        },
+        {
           kind: 'choice',
           prompt: 'You started clean. The agent\'s change turns out to be wrong from top to bottom. What is the easiest way forward?',
           options: [
@@ -270,6 +275,22 @@ export const u36: Unit = {
           explain: 'The test was describing what the code should do. Changing it to match a bug turns the guard rail into a decoration.',
         },
         {
+          kind: 'concept',
+          title: 'Try the awkward cases',
+          body: '`//` divides and throws away the decimal part. `/` keeps it. And dividing by zero crashes, so `share` checks for zero first and returns early.\n\nTwo small cases, one uneven and one empty, are enough to show both problems.',
+          language: 'python',
+          code: `def share(total, people):
+    if people == 0:
+        return 0
+    return total / people
+
+print(7 // 2)
+print(7 / 2)
+print(share(7, 2))
+print(share(7, 0))`,
+          output: '3\n3.5\n3.5\n0',
+        },
+        {
           kind: 'write',
           prompt:
             'An agent wrote `average`, but two of the three tests fail. Fix the function so that the average of `2 3` prints `2.5`, an empty line of input prints `0`, and `4 4 4` prints `4.0`. Leave the last two lines alone.',
@@ -295,6 +316,22 @@ numbers = [int(word) for word in input().split()]
 print(average(numbers))
 `,
           explain: 'The code looked fine and worked for `4 4 4`. Only the tests for an uneven split and for no numbers at all showed the two mistakes.',
+        },
+        {
+          kind: 'concept',
+          title: 'Every, or any?',
+          body: '`"Paris".isupper()` asks whether **every** letter is a capital, so it is False. To ask whether **any** letter is, loop over the characters and remember a hit.\n\nThe last line is a reminder: "at least 8" includes 8 itself, which is `>=`, not `>`.',
+          language: 'python',
+          code: `def has_capital(word):
+    found = False
+    for ch in word:
+        if ch.isupper():
+            found = True
+    return found
+
+print("Paris".isupper(), has_capital("Paris"))
+print(8 > 8, 8 >= 8)`,
+          output: 'False True\nFalse True',
         },
         {
           kind: 'write',
@@ -398,6 +435,22 @@ else:
           language: 'python',
           answer: 1,
           explain: 'There are 100 cents in a dollar, not 10. The function runs without error and prints a neat price that is ten times too big.',
+        },
+        {
+          kind: 'concept',
+          title: 'Hold the code against the request',
+          body: 'The request was: "List who scored 50 or more, in the order given."\n\n"50 or more" is `>=`. With `>`, zoe would be dropped. And `sorted` puts the names in alphabetical order, which nobody asked for. The first line printed is the right answer. The second is not.',
+          language: 'python',
+          code: `scores = [("zoe", 50), ("al", 49), ("mia", 72)]
+
+passed = []
+for name, score in scores:
+    if score >= 50:
+        passed.append(name)
+
+print(passed)
+print(sorted(passed))`,
+          output: "['zoe', 'mia']\n['mia', 'zoe']",
         },
         {
           kind: 'write',

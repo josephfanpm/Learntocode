@@ -99,6 +99,14 @@ export const u2: Unit = {
           explain: 'bread is at index 0, so that is the one to replace. append then adds eggs to the end.',
         },
         {
+          kind: 'concept',
+          title: 'An index in a variable',
+          body: 'The index does not have to be a number typed into the code. It can be a variable that holds a number.\n\nHere `n` holds 2, so `pets[n]` means the same as `pets[2]`.',
+          code: 'pets = ["dog", "cat", "fish"]\nn = 2\nprint(pets[n])',
+          language: 'python',
+          output: 'fish',
+        },
+        {
           kind: 'write',
           prompt: 'The list `days` is already made. Read a whole number and print the item at that index. Typing `0` should print `Mon`.',
           language: 'python',
@@ -174,6 +182,14 @@ export const u2: Unit = {
           explain: 'The total is 12 and there are 3 items, so 12 / 3 is 4.0. Dividing with / always gives a decimal.',
         },
         {
+          kind: 'concept',
+          title: 'Looping over the positions',
+          body: 'Sometimes you want each position as well as each item. `len(pets)` is 3, so `range(len(pets))` gives 0, 1, 2: every index in the list.\n\nInside the loop, `pets[i]` is the item at that position.',
+          code: 'pets = ["dog", "cat", "fish"]\nfor i in range(len(pets)):\n    print(i, pets[i])',
+          language: 'python',
+          output: '0 dog\n1 cat\n2 fish',
+        },
+        {
           kind: 'blank',
           prompt: 'Fill the gaps to print each position and name, like 0 Ann, 1 Bo.',
           code: 'names = ["Ann", "Bo"]\nfor i in ___(___(names)):\n    print(i, names[i])',
@@ -215,6 +231,14 @@ export const u2: Unit = {
           hint: 'Start total = 0, loop over nums adding each one, then print total after the loop.',
           solution: 'nums = []\nfor i in range(3):\n    nums.append(int(input()))\n\ntotal = 0\nfor n in nums:\n    total = total + n\nprint(total)',
           explain: 'A running total that starts at 0 and grows inside the loop works for a list of any length.',
+        },
+        {
+          kind: 'concept',
+          title: 'Counting the ones that match',
+          body: 'To count only some items, put an `if` inside the loop and add 1 when it is true.\n\nThe `if` is indented once, to sit inside the loop. The line that adds 1 is indented twice, to sit inside the `if`.',
+          code: 'temps = [3, -2, 8, -5]\ncold = 0\nfor t in temps:\n    if t < 0:\n        cold = cold + 1\nprint(cold)',
+          language: 'python',
+          output: '2',
         },
         {
           kind: 'write',
@@ -326,6 +350,14 @@ export const u2: Unit = {
           explain: 'upper changes every letter to a capital and leaves spaces and symbols alone.',
         },
         {
+          kind: 'concept',
+          title: 'Is it one of these?',
+          body: '`in` works on strings too: `ch in "bn"` is `True` when `ch` is b or n.\n\nThis loop walks through a small-letter copy of the text, so the capital B is counted as well.',
+          code: 'text = "Banana Bread"\ncount = 0\nfor ch in text.lower():\n    if ch in "bn":\n        count = count + 1\nprint(count)',
+          language: 'python',
+          output: '4',
+        },
+        {
           kind: 'write',
           prompt: 'Read a line of text. Print how many vowels (a, e, i, o, u) it has, counting capitals too. `Hello World` should print `3`.',
           language: 'python',
@@ -427,6 +459,7 @@ export const u2: Unit = {
           body: 'Shifting Z by 1 should give A, not a symbol. Number the letters 0 to 25 by taking away `ord("A")`. Add the shift, then use `% 26` so 26 wraps back to 0.',
           code: 'pos = ord("Z") - ord("A")   # 25\nnew = (pos + 1) % 26        # 0\nprint(chr(new + ord("A")))  # A',
           language: 'python',
+          output: 'A',
         },
         {
           kind: 'choice',
@@ -493,6 +526,9 @@ export const u2: Unit = {
           kind: 'concept',
           title: 'Checking a character',
           body: 'Strings have methods that answer questions with `True` or `False`.\n\n`.isupper()` checks for a capital letter. `.islower()` checks for a small letter. `.isalpha()` checks for any letter. Spaces and punctuation give `False` for all three.',
+          code: 'print("A".isupper())\nprint("a".isupper())\nprint("a".isalpha())\nprint("!".isalpha())',
+          language: 'python',
+          output: 'True\nFalse\nTrue\nFalse',
         },
         {
           kind: 'match',
@@ -518,6 +554,14 @@ export const u2: Unit = {
           explain: 'A space is character number 32. Adding the key would give a symbol like # instead of a space.',
         },
         {
+          kind: 'concept',
+          title: 'Building a new string',
+          body: 'To make new text one character at a time, start with an empty string `""`. Each time round the loop, join one more character onto the end.\n\nAfter the loop, the variable holds the whole new string.',
+          code: 'result = ""\nfor ch in "abc":\n    result = result + ch.upper()\nprint(result)',
+          language: 'python',
+          output: 'ABC',
+        },
+        {
           kind: 'order',
           prompt: 'Put the lines in order to shift a message of capital letters. Read the message first, then the key, then start an empty result.',
           lines: [
@@ -531,6 +575,14 @@ export const u2: Unit = {
           ],
           language: 'python',
           explain: 'The loop works out each letter position, shifts it with wrapping, and adds the new letter to result. Printing happens once, after the loop.',
+        },
+        {
+          kind: 'concept',
+          title: 'Change some, keep the rest',
+          body: 'An `if` inside the loop can treat characters differently. Here every letter is swapped for a star. Anything else goes down the `else` and is copied across unchanged.',
+          code: 'result = ""\nfor ch in "Hi, you":\n    if ch.isalpha():\n        result = result + "*"\n    else:\n        result = result + ch\nprint(result)',
+          language: 'python',
+          output: '**, ***',
         },
         {
           kind: 'blank',
@@ -555,10 +607,18 @@ export const u2: Unit = {
           explain: 'Each capital is turned into a position, shifted with wrapping, and turned back. Everything else passes straight through.',
         },
         {
-          kind: 'write',
-          prompt: 'Now handle small letters too. Read a message and a key, then shift capitals and small letters, keeping each in its own case. Leave everything else unchanged. `Hello, World` with key `1` gives `Ifmmp, Xpsme`.',
+          kind: 'concept',
+          title: 'A third case',
+          body: 'With `if`, `elif` and `else` you can sort each character into three groups: capitals, small letters and everything else.\n\nRemember that small letters start at `ord("a")`, which is 97, not at `ord("A")`.',
+          code: 'for ch in "Hi!":\n    if ch.isupper():\n        print(ch, "capital")\n    elif ch.islower():\n        print(ch, "small")\n    else:\n        print(ch, "other")',
           language: 'python',
-          starter: 'text = input()\nkey = int(input())\n',
+          output: 'H capital\ni small\n! other',
+        },
+        {
+          kind: 'write',
+          prompt: 'Now handle small letters too. The starter is the program from the last step. Change it to shift capitals and small letters, keeping each in its own case. Leave everything else unchanged. `Hello, World` with key `1` gives `Ifmmp, Xpsme`.',
+          language: 'python',
+          starter: 'text = input()\nkey = int(input())\nresult = ""\nfor ch in text:\n    if ch.isupper():\n        pos = ord(ch) - ord("A")\n        result = result + chr((pos + key) % 26 + ord("A"))\n    else:\n        result = result + ch\nprint(result)\n',
           tests: [
             { stdin: ['Hello, World', '1'], expected: 'Ifmmp, Xpsme' },
             { stdin: ['zebra', '4'], expected: 'difve' },
@@ -775,12 +835,21 @@ export const u2: Unit = {
           body: 'In many word games each letter is worth points. You can store the values in a list of 26 numbers: index 0 for a, index 1 for b, up to index 25 for z.\n\n`ord(ch) - ord("a")` turns a small letter into its index.',
           code: '# vowels 1, most letters 2, rare letters 5 or 8\n#         a  b  c  d  e\nvalues = [1, 2, 2, 2, 1]\nprint(values[ord("c") - ord("a")])   # 2',
           language: 'python',
+          output: '2',
         },
         {
           kind: 'type',
           prompt: 'In our table, vowels (a, e, i, o, u) are worth 1 and most other letters are worth 2. What does the word `cat` score?',
           accept: ['5', 'five'],
           explain: 'c is 2, a is 1 and t is 2. Added together that is 5.',
+        },
+        {
+          kind: 'concept',
+          title: 'Look up, then add',
+          body: 'A running total can add up values it looks up in a list. Here each number in `order` is an index into `prices`.\n\nThe loop variable picks the index, and the index picks the price.',
+          code: 'prices = [5, 3, 8]\norder = [0, 2, 2]\ntotal = 0\nfor item in order:\n    total = total + prices[item]\nprint(total)',
+          language: 'python',
+          output: '21',
         },
         {
           kind: 'spot',
@@ -810,6 +879,14 @@ export const u2: Unit = {
           explain: 'The letter picks the index, and the index picks the value. One list replaces 26 separate if checks.',
         },
         {
+          kind: 'concept',
+          title: 'Comparing two results',
+          body: 'A function hands back a value with `return`, so you can call it twice and compare the two answers.\n\n`if`, `elif` and `else` cover the three cases: the first is bigger, the second is bigger, or they are the same.',
+          code: 'def area(w, h):\n    return w * h\n\nif area(2, 5) > area(3, 3):\n    print("First is bigger")\nelif area(2, 5) < area(3, 3):\n    print("Second is bigger")\nelse:\n    print("Same size")',
+          language: 'python',
+          output: 'First is bigger',
+        },
+        {
           kind: 'write',
           prompt: 'Two players each type a word. The `score` function is written for you: it ignores capitals and anything that is not a letter. Print `Player 1 wins`, `Player 2 wins` or `Tie`.',
           language: 'python',
@@ -835,6 +912,14 @@ export const u2: Unit = {
           explain: 'There are 3 spaces, and 3 + 1 = 4 words. The rule works when words are separated by single spaces.',
         },
         {
+          kind: 'concept',
+          title: 'Several counts, one loop',
+          body: 'One loop can keep more than one count. Each character goes down the `if` and `elif` checks and adds to at most one of them.\n\n`ch in "0123456789"` is true when `ch` is any digit.',
+          code: 'digits = 0\ngaps = 0\nfor ch in "a1 b22":\n    if ch in "0123456789":\n        digits = digits + 1\n    elif ch == " ":\n        gaps = gaps + 1\nprint(digits, gaps)',
+          language: 'python',
+          output: '3 1',
+        },
+        {
           kind: 'write',
           prompt: 'Read a line of text. Print three numbers, each on its own line: the count of letters, then words, then sentences. For `Hi there. How are you?` print 16, 5 and 2.',
           language: 'python',
@@ -846,6 +931,14 @@ export const u2: Unit = {
           hint: 'Add elif ch == " ": words = words + 1, and elif ch in ".!?": sentences = sentences + 1.',
           solution: 'text = input()\nletters = 0\nwords = 1\nsentences = 0\nfor ch in text:\n    if ch.isalpha():\n        letters = letters + 1\n    elif ch == " ":\n        words = words + 1\n    elif ch in ".!?":\n        sentences = sentences + 1\nprint(letters)\nprint(words)\nprint(sentences)',
           explain: 'One pass over the text does all three counts. words starts at 1 because the last word has no space after it.',
+        },
+        {
+          kind: 'concept',
+          title: 'A formula, then a message',
+          body: '`round()` gives the nearest whole number. Work the number out first and store it.\n\nThen check the special cases with `if` and `elif`, and let `else` print the ordinary answer. Here the formula gives 12.8, which rounds to 13.',
+          code: 'mark = round(0.5 * 30 - 2.2)\nif mark < 5:\n    print("Too low")\nelif mark >= 20:\n    print("Mark 20+")\nelse:\n    print("Mark", mark)',
+          language: 'python',
+          output: 'Mark 13',
         },
         {
           kind: 'write',
@@ -910,6 +1003,22 @@ export const u2: Unit = {
           explain: 'If A and B both became Q, the person reading the message could not tell which one each Q stood for.',
         },
         {
+          kind: 'concept',
+          title: 'Asking the opposite',
+          body: '`not` flips `True` to `False` and `False` to `True`. Put it in front of a check to ask the opposite question.\n\n`"7".isalpha()` is `False`, so `not "7".isalpha()` is `True` and the message prints.',
+          code: 'ch = "7"\nif not ch.isalpha():\n    print(ch, "is not a letter")',
+          language: 'python',
+          output: '7 is not a letter',
+        },
+        {
+          kind: 'concept',
+          title: 'Seen it before?',
+          body: 'To catch repeats, keep a list of everything met so far. Before adding each item, check whether it is already in the list.\n\nThe second 4 is found in `seen`, so it is a repeat.',
+          code: 'seen = []\nfor n in [4, 7, 4]:\n    if n in seen:\n        print(n, "is a repeat")\n    seen.append(n)',
+          language: 'python',
+          output: '4 is a repeat',
+        },
+        {
           kind: 'write',
           prompt: 'Check a key before using it. Read a key. Print `OK` if it has 26 characters, all of them letters, with no letter used twice. Otherwise print `Bad key`. The length check is done for you.',
           language: 'python',
@@ -923,6 +1032,14 @@ export const u2: Unit = {
           hint: 'Two checks inside the loop: if not ch.isalpha(): ok = False, and if ch in seen: ok = False. Keep them above seen.append(ch).',
           solution: 'key = input().upper()\nok = True\nif len(key) != 26:\n    ok = False\n\nseen = []\nfor ch in key:\n    if not ch.isalpha():\n        ok = False\n    if ch in seen:\n        ok = False\n    seen.append(ch)\n\nif ok:\n    print("OK")\nelse:\n    print("Bad key")',
           explain: 'The seen list remembers every letter so far. Meeting one that is already there means the key repeats a letter.',
+        },
+        {
+          kind: 'concept',
+          title: 'A string as a lookup table',
+          body: 'A string can work as a lookup table: an index picks one character from it.\n\nThis loop looks up three positions in `code` and builds the answer one character at a time, starting from an empty string.',
+          code: 'code = "XYZ"\nresult = ""\nfor n in [2, 0, 1]:\n    result = result + code[n]\nprint(result)',
+          language: 'python',
+          output: 'ZXY',
         },
         {
           kind: 'spot',
@@ -949,6 +1066,14 @@ export const u2: Unit = {
           hint: 'result = result + key[ord(ch) - ord("A")]',
           solution: 'key = input()\ntext = input()\nresult = ""\nfor ch in text:\n    if ch.isupper():\n        result = result + key[ord(ch) - ord("A")]\n    else:\n        result = result + ch\nprint(result)',
           explain: 'ord(ch) - ord("A") turns the letter into an index from 0 to 25, and the key gives the letter to use in its place.',
+        },
+        {
+          kind: 'concept',
+          title: 'Keeping small letters small',
+          body: 'A lookup in a table of capitals gives a capital. Adding `.lower()` straight after the lookup gives the small version.\n\nA small letter finds its index by taking away `ord("a")`, not `ord("A")`. For c that is 2.',
+          code: 'codes = "XYZ"\nprint(codes[1])\nprint(codes[1].lower())\nprint(ord("c") - ord("a"))',
+          language: 'python',
+          output: 'Y\ny\n2',
         },
         {
           kind: 'write',

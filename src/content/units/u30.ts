@@ -29,6 +29,14 @@ export const u30: Unit = {
           explain: 'The JSON reply has a known key with a real number. The others would need fragile guessing to find the count.',
         },
         {
+          kind: 'concept',
+          title: 'From text to a dict',
+          body: '`reply` is only text until `json.loads` turns it into a dict. After that you read each value by its key.\n\nThe age arrives as a real number, so you can do maths with it straight away.',
+          code: 'import json\n\nreply = \'{"name": "Ada", "age": 36}\'\ndata = json.loads(reply)\nprint(data["name"])\nprint(data["age"] + 1)',
+          language: 'python',
+          output: 'Ada\n37',
+        },
+        {
           kind: 'type',
           prompt: 'What does this print?',
           code: 'import json\n\nreply = \'{"dish": "soup", "tags": ["hot", "vegan"]}\'\ndata = json.loads(reply)\nprint(data["tags"][1])',
@@ -73,6 +81,14 @@ export const u30: Unit = {
             ['"Reply with only the JSON"', 'A chatty sentence around the data'],
           ],
           explain: 'Each instruction closes one gap the model would otherwise fill by guessing.',
+        },
+        {
+          kind: 'concept',
+          title: 'Key order does not matter',
+          body: 'A model may write the keys in any order. That is fine: you ask for each value by name, so `data["item"]` finds it wherever it sits.',
+          code: 'import json\n\nreply = \'{"price": 3, "item": "tea"}\'\ndata = json.loads(reply)\nprint(data["item"])\nprint(data["price"] * 2)',
+          language: 'python',
+          output: 'tea\n6',
         },
         {
           kind: 'write',
@@ -125,6 +141,14 @@ export const u30: Unit = {
           explain: 'The whole text must be JSON. The friendly words at the start make the parse fail before `data` even exists.',
         },
         {
+          kind: 'concept',
+          title: 'Catching a bad reply',
+          body: 'Put the risky line under `try`. If `json.loads` raises `json.JSONDecodeError`, Python skips to the `except` block and the program carries on.\n\nHere the first reply parses and the second does not.',
+          code: 'import json\n\nfor reply in [\'{"total": 12}\', \'Total: 12\']:\n    try:\n        data = json.loads(reply)\n        print(data["total"])\n    except json.JSONDecodeError:\n        print("could not parse")',
+          language: 'python',
+          output: '12\ncould not parse',
+        },
+        {
           kind: 'blank',
           prompt: 'Catch a reply that is not JSON so the program does not crash.',
           code: 'import json\n\n___:\n    data = json.loads(reply)\n___ json.JSONDecodeError:\n    print("not json")',
@@ -151,6 +175,7 @@ export const u30: Unit = {
           body: 'Two small checks cover most problems.\n\n**Is the key there?** `"age" in data`\n\n**Is the value the right type?** `isinstance(data["age"], int)`\n\n`isinstance(value, type)` gives `True` or `False`. Check the key first: reading a missing key raises `KeyError`.',
           code: 'data = {"name": "Ana", "age": 31}\nprint("age" in data)                  # True\nprint(isinstance(data["age"], int))   # True\nprint(isinstance(data["name"], int))  # False',
           language: 'python',
+          output: 'True\nTrue\nFalse',
         },
         {
           kind: 'type',
@@ -171,6 +196,14 @@ export const u30: Unit = {
             'Use the data in the rest of your program',
           ],
           explain: 'Each check protects the next step. You cannot check keys before parsing, or types before you know the keys exist.',
+        },
+        {
+          kind: 'concept',
+          title: 'One function for the checks',
+          body: 'Put the checks in a function that answers `True` or `False`. Return `False` at the first problem: a missing key, then a wrong type.\n\nOnly data that gets past every check is valid.',
+          code: 'def valid(data):\n    if "title" not in data:\n        return False\n    return isinstance(data["title"], str)\n\nprint(valid({"title": "Dune"}))\nprint(valid({"title": 7}))\nprint(valid({"pages": 300}))',
+          language: 'python',
+          output: 'True\nFalse\nFalse',
         },
         {
           kind: 'write',
@@ -278,6 +311,14 @@ export const u30: Unit = {
           explain: '`while True` only ends on a valid reply. Use `for attempt in range(3):` so the loop gives up after three tries.',
         },
         {
+          kind: 'concept',
+          title: 'A loop that gives up',
+          body: '`range(1, 3)` gives attempts 1 and 2, and `replies[attempt - 1]` is the reply for that attempt. `found` remembers whether any try worked.\n\nThe third reply here is good, but the limit is two tries, so the loop gives up.',
+          code: 'replies = ["maybe", "no idea", "yes"]\nfound = False\nfor attempt in range(1, 3):\n    if replies[attempt - 1] == "yes":\n        print("attempt", attempt)\n        found = True\n        break\nif not found:\n    print("gave up")',
+          language: 'python',
+          output: 'gave up',
+        },
+        {
           kind: 'write',
           prompt: 'The input is a list of simulated model replies separated by `|`, in the order the model would give them. Try them in order, at most 3. A reply is valid if it parses as a dict with the key `answer`. For the first valid one, print `attempt` and its number, then the answer on a second line, and stop. If no valid reply turns up in 3 attempts, print `gave up`.',
           language: 'python',
@@ -371,6 +412,14 @@ export const u30: Unit = {
           explain: '`in` checks whether one string appears inside another. It is the simplest possible check that a quote is real.',
         },
         {
+          kind: 'concept',
+          title: 'Checking a quote in code',
+          body: 'Checking a quote is an `if` around `in`. A quote that appears word for word in the document is supported.\n\nOne that does not appear was made up, however sure it sounds.',
+          code: 'document = "Tea costs 3 pounds. Coffee costs 4 pounds."\nfor quote in ["Coffee costs 4 pounds.", "Cake costs 5 pounds."]:\n    if quote in document:\n        print("supported")\n    else:\n        print("unsupported")',
+          language: 'python',
+          output: 'supported\nunsupported',
+        },
+        {
           kind: 'write',
           prompt: 'Read the document with input(), then a model reply: JSON with the keys `answer` and `quote`. If the answer is `I don\'t know`, print `no answer`. Otherwise, if the quote appears in the document, print the answer. If it does not, print `unsupported`.',
           language: 'python',
@@ -462,6 +511,22 @@ export const u30: Unit = {
           explain: 'Use the simplest grader that works. Code checks are free and never vary. Save the judge for text with many good answers.',
         },
         {
+          kind: 'concept',
+          title: 'Exact match in code',
+          body: 'Exact match is one `==` per case. Walk both lists by position and compare the pair at each index.\n\nCount the `True` ones and you have a score.',
+          code: 'expected = ["cat", "dog", "cat"]\noutputs = ["cat", "cat", "cat"]\nfor i in range(len(expected)):\n    print(expected[i], outputs[i], outputs[i] == expected[i])',
+          language: 'python',
+          output: 'cat cat True\ndog cat False\ncat cat True',
+        },
+        {
+          kind: 'concept',
+          title: 'A whole-number percentage',
+          body: 'Multiply by 100 first, then divide with `//`, which drops the remainder. 2 right out of 3 comes out as 66.',
+          code: 'correct = 2\ntotal = 3\nprint(correct * 100 // total)',
+          language: 'python',
+          output: '66',
+        },
+        {
           kind: 'write',
           prompt: 'Line 1 holds the expected labels for an eval set, separated by spaces. Line 2 holds the labels a prompt actually gave, in the same order. Grade by exact match. Print how many are correct, then the accuracy as a whole-number percentage on a second line.',
           language: 'python',
@@ -503,6 +568,14 @@ export const u30: Unit = {
           ],
           answer: 2,
           explain: 'The versions faced different cases, so the scores cannot be compared. Always run both on the same set.',
+        },
+        {
+          kind: 'concept',
+          title: 'Cases as pairs',
+          body: 'Each case is a pair: an input and the answer you expect. `for question, answer in cases` takes one pair per trip.\n\n`show` is handed a function and calls it `version`, so the same loop can test any version you pass in.',
+          code: 'cases = [("2 + 2", "4"), ("3 + 3", "6")]\n\ndef always_four(question):\n    return "4"\n\ndef show(version):\n    for question, answer in cases:\n        print(question, version(question) == answer)\n\nshow(always_four)',
+          language: 'python',
+          output: '2 + 2 True\n3 + 3 False',
         },
         {
           kind: 'write',

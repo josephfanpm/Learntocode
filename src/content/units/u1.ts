@@ -16,6 +16,7 @@ export const u1: Unit = {
           body: '**Python** is a programming language: a way of writing instructions that a computer can follow.\n\nYour first instruction is `print`. It shows whatever is inside the brackets on the screen.',
           code: 'print("Hello, world")',
           language: 'python',
+          output: 'Hello, world',
         },
         {
           kind: 'choice',
@@ -35,6 +36,11 @@ export const u1: Unit = {
           kind: 'concept',
           title: 'Strings',
           body: 'Text inside quotes is called a **string** (a string of characters). The quotes tell Python where the text starts and ends.\n\nYou can use double quotes `"hi"` or single quotes `\'hi\'`, but both ends must match.',
+        },
+        {
+          kind: 'concept',
+          title: 'Capital letters matter',
+          body: 'Python is strict about spelling and capital letters. `print` works. `Print` or `PRINT` gives an error, because Python treats them as different words that it does not know.\n\nAn **error** is Python telling you it could not follow a line.',
         },
         {
           kind: 'choice',
@@ -60,9 +66,10 @@ export const u1: Unit = {
         {
           kind: 'concept',
           title: 'Top to bottom',
-          body: 'A program runs one line at a time, from the top down. Each `print` starts a new line on the screen.\n\nA line starting with `#` is a **comment**: a note for people that Python skips.',
+          body: 'A program runs one line at a time, from the top down. Each `print` starts a new line on the screen.',
           code: 'print("One")\nprint("Two")',
           language: 'python',
+          output: 'One\nTwo',
         },
         {
           kind: 'order',
@@ -86,6 +93,14 @@ export const u1: Unit = {
           explain: 'Inside quotes, 2 + 2 is just text, so Python shows it exactly as written. It does not do the maths.',
         },
         {
+          kind: 'concept',
+          title: 'Comments',
+          body: 'A line starting with `#` is a **comment**: a note for people. Python skips it, so it never shows on the screen.\n\nThe box where you write code often starts with a comment telling you what to do.',
+          code: '# Two things I like\nprint("Tea")\nprint("Cake")',
+          language: 'python',
+          output: 'Tea\nCake',
+        },
+        {
           kind: 'write',
           prompt: 'Write a program that prints two lines. The first line is exactly `Hello, world` and the second is exactly `I am learning Python`.',
           language: 'python',
@@ -107,6 +122,7 @@ export const u1: Unit = {
           body: 'A **variable** is a name that stores a value, like a labelled box. The `=` sign puts a value into the box.\n\nTo use the value later, write the name without quotes.',
           code: 'name = "Sam"\nprint(name)',
           language: 'python',
+          output: 'Sam',
         },
         {
           kind: 'choice',
@@ -156,6 +172,7 @@ export const u1: Unit = {
           body: 'The `+` sign joins two strings into one. Spaces are not added for you, so include them inside the quotes.\n\nYou can also give `print` several things separated by commas. It puts a space between each.',
           code: 'name = "Sam"\nprint("Hi, " + name)\nprint("Hi,", name)',
           language: 'python',
+          output: 'Hi, Sam\nHi, Sam',
         },
         {
           kind: 'blank',
@@ -170,7 +187,7 @@ export const u1: Unit = {
           kind: 'concept',
           title: 'Asking for input',
           body: '`input()` waits for the person to type something and press Enter. It gives back what they typed, as a string, so you can store it in a variable.\n\nIn these exercises, leave the brackets empty so the only output is what you print.',
-          code: 'name = input()\nprint("Hello, " + name)',
+          code: 'colour = input()\nprint("I like " + colour)',
           language: 'python',
         },
         {
@@ -194,15 +211,23 @@ export const u1: Unit = {
           explain: 'input() stores whatever was typed, and + joins it onto the greeting.',
         },
         {
-          kind: 'write',
-          prompt: 'Read a city, then read a country (two separate inputs). Print them on one line with a comma and a space between, like `Lima, Peru`.',
+          kind: 'concept',
+          title: 'Joining three pieces',
+          body: 'You can join more than two pieces with `+`. A piece can be a variable or text in quotes.\n\nHere the middle piece is a comma and a space, so they sit between the two names.',
+          code: 'first = "Ada"\nlast = "Lovelace"\nprint(last + ", " + first)',
           language: 'python',
-          starter: 'city = input()\n',
+          output: 'Lovelace, Ada',
+        },
+        {
+          kind: 'write',
+          prompt: 'This program reads a city, then a country. Each `input()` reads the next line the person types. Print the two on one line with a comma and a space between, like `Lima, Peru`.',
+          language: 'python',
+          starter: 'city = input()\ncountry = input()\n',
           tests: [
             { stdin: ['Lima', 'Peru'], expected: 'Lima, Peru' },
             { stdin: ['Oslo', 'Norway'], expected: 'Oslo, Norway' },
           ],
-          hint: 'Use a second input() for the country, then join city + ", " + country.',
+          hint: 'Join three pieces inside print: city + ", " + country.',
           solution: 'city = input()\ncountry = input()\nprint(city + ", " + country)',
           explain: 'Each input() reads one line. Joining the pieces with + lets you control exactly where the comma and space go.',
         },
@@ -218,6 +243,7 @@ export const u1: Unit = {
           body: 'Numbers are written without quotes. Python can do maths with them: `+` adds, `-` subtracts, `*` multiplies and `/` divides.\n\nLike in school, `*` and `/` happen before `+` and `-`. Use brackets to change the order.',
           code: 'print(3 + 4)\nprint(2 * (3 + 1))',
           language: 'python',
+          output: '7\n8',
         },
         {
           kind: 'choice',
@@ -237,6 +263,9 @@ export const u1: Unit = {
           kind: 'concept',
           title: 'Whole-number division',
           body: '`/` always gives a decimal: `7 / 2` is `3.5`.\n\n`//` divides and drops the part after the decimal point: `7 // 2` is `3`.\n\n`%` gives the **remainder**, what is left over: `7 % 2` is `1`.',
+          code: 'print(17 / 5)\nprint(17 // 5)\nprint(17 % 5)',
+          language: 'python',
+          output: '3.4\n3\n2',
         },
         {
           kind: 'match',
@@ -300,6 +329,14 @@ export const u1: Unit = {
           explain: 'Without int(), + joins two strings. With int(), + adds two numbers.',
         },
         {
+          kind: 'concept',
+          title: 'Whole lots and left-overs',
+          body: '`//` and `%` work as a pair. 17 days is 2 whole weeks with 3 days left over.\n\nGive `print` both values with a comma between them and it shows them on one line, with a space between.',
+          code: 'days = 17\nprint(days // 7)\nprint(days % 7)\nprint(days // 7, days % 7)',
+          language: 'python',
+          output: '2\n3\n2 3',
+        },
+        {
           kind: 'write',
           prompt: 'Read a whole number of minutes. Print the hours and the minutes left over, separated by a space. For example, `135` should print `2 15`.',
           language: 'python',
@@ -325,6 +362,7 @@ export const u1: Unit = {
           body: '`if` runs some lines only when a condition is true. The line ends with a colon `:`.\n\nThe lines that belong to the `if` are **indented**: pushed in by 4 spaces. Lines that are not indented run either way.',
           code: 'age = 20\nif age >= 18:\n    print("You can vote")\nprint("Done")',
           language: 'python',
+          output: 'You can vote\nDone',
         },
         {
           kind: 'choice',
@@ -339,6 +377,14 @@ export const u1: Unit = {
           ],
           answer: 1,
           explain: '2 is not greater than 3, so the indented line is skipped. "done" is not indented, so it always runs.',
+        },
+        {
+          kind: 'concept',
+          title: 'Comparisons',
+          body: 'A condition is usually a **comparison**. It gives `True` or `False`.\n\n`==` means "is equal to" and `!=` means "is not equal to". `<` is less than, `>` is greater than. Add `=` for "or equal to": `<=`, `>=`.\n\nOne `=` stores a value. Two `==` compare.',
+          code: 'print(5 > 3)\nprint(5 == 3)\nprint(5 != 3)\nprint(5 <= 3)',
+          language: 'python',
+          output: 'True\nFalse\nTrue\nFalse',
         },
         {
           kind: 'match',
@@ -367,8 +413,9 @@ export const u1: Unit = {
           kind: 'concept',
           title: 'else and elif',
           body: '`else` runs when the `if` condition is false.\n\n`elif` (short for "else if") adds another condition to try. Python checks from the top and runs only the first branch that is true.',
-          code: 'if temp > 25:\n    print("hot")\nelif temp > 15:\n    print("mild")\nelse:\n    print("cold")',
+          code: 'temp = 10\nif temp > 25:\n    print("hot")\nelif temp > 15:\n    print("mild")\nelse:\n    print("cold")',
           language: 'python',
+          output: 'cold',
         },
         {
           kind: 'choice',
@@ -407,6 +454,14 @@ export const u1: Unit = {
           explain: 'Read the number first. Each indented print sits under the line that controls it.',
         },
         {
+          kind: 'concept',
+          title: 'Does it divide exactly?',
+          body: 'A remainder of 0 means one number divides exactly by another.\n\nPython works out `n % 5` first, then `==` checks whether that remainder is 0. 20 divided by 5 leaves nothing over, so the first branch runs.',
+          code: 'n = 20\nif n % 5 == 0:\n    print("multiple of 5")\nelse:\n    print("not a multiple of 5")',
+          language: 'python',
+          output: 'multiple of 5',
+        },
+        {
           kind: 'write',
           prompt: 'Read a whole number. Print `even` if it divides evenly by 2, otherwise print `odd`.',
           language: 'python',
@@ -419,6 +474,14 @@ export const u1: Unit = {
           hint: 'n % 2 gives the remainder after dividing by 2. Even numbers have a remainder of 0.',
           solution: 'n = int(input())\nif n % 2 == 0:\n    print("even")\nelse:\n    print("odd")',
           explain: 'The remainder tells you whether 2 fits exactly. A remainder of 0 means even.',
+        },
+        {
+          kind: 'concept',
+          title: 'Three outcomes',
+          body: 'For three outcomes, check from the lowest up.\n\nWhen Python reaches the `elif`, the `if` has already failed, so the score must be 50 or more. One comparison is enough to say it is 50 to 79.',
+          code: 'score = 72\nif score < 50:\n    print("fail")\nelif score < 80:\n    print("pass")\nelse:\n    print("top marks")',
+          language: 'python',
+          output: 'pass',
         },
         {
           kind: 'write',
@@ -446,6 +509,14 @@ export const u1: Unit = {
           body: 'A `while` loop repeats its indented lines as long as its condition is true.\n\nSomething inside the loop must change, or the condition stays true forever.',
           code: 'i = 1\nwhile i <= 3:\n    print(i)\n    i = i + 1',
           language: 'python',
+        },
+        {
+          kind: 'concept',
+          title: 'Adding 1 to a variable',
+          body: '`count = count + 1` looks odd, but read the right side first: take the value in `count`, add 1, then store the result back in `count`.\n\nThe loop on the last card uses `i = i + 1` in the same way, to move on each time round.',
+          code: 'count = 5\ncount = count + 1\nprint(count)',
+          language: 'python',
+          output: '6',
         },
         {
           kind: 'choice',
@@ -479,6 +550,7 @@ export const u1: Unit = {
           body: 'A `for` loop with `range` repeats a set number of times. The variable takes each value in turn.\n\n`range(3)` gives 0, 1, 2: it starts at 0 and stops **before** 3. `range(1, 4)` gives 1, 2, 3.',
           code: 'for i in range(3):\n    print("Hi")',
           language: 'python',
+          output: 'Hi\nHi\nHi',
         },
         {
           kind: 'match',
@@ -506,6 +578,22 @@ export const u1: Unit = {
           explain: '"#" * 3 makes three copies of "#" joined together.',
         },
         {
+          kind: 'concept',
+          title: 'Using the loop variable',
+          body: 'The loop variable can be used inside the loop. Here `i` is 1, then 2, then 3, so each row is one star longer than the last.',
+          code: 'for i in range(1, 4):\n    print("*" * i)',
+          language: 'python',
+          output: '*\n**\n***',
+        },
+        {
+          kind: 'concept',
+          title: 'Spaces in front',
+          body: 'Spaces can be repeated too. Join spaces and stars with `+` to push a row to the right.\n\nEvery row here is 3 characters wide, so the spaces and the stars always add up to 3.',
+          code: 'print(" " * 2 + "*" * 1)\nprint(" " * 1 + "*" * 2)\nprint(" " * 0 + "*" * 3)',
+          language: 'python',
+          output: '  *\n **\n***',
+        },
+        {
           kind: 'write',
           prompt: 'This program reads a height and prints a staircase of `#` that leans left. Change it so the staircase leans right, by adding spaces before the `#` signs. For height 3, row 1 is 2 spaces and `#`, row 2 is 1 space and `##`, and row 3 is `###`.',
           language: 'python',
@@ -525,6 +613,7 @@ export const u1: Unit = {
           body: 'A **function** is a named set of steps you can use again. `def` creates one. The names in brackets are its inputs.\n\n`return` sends a value back to wherever the function was used.',
           code: 'def add_one(n):\n    return n + 1\n\nprint(add_one(4))',
           language: 'python',
+          output: '5',
         },
         {
           kind: 'blank',
@@ -537,7 +626,7 @@ export const u1: Unit = {
         },
         {
           kind: 'write',
-          prompt: 'Finish the function `double` so it returns its number times 2. The rest of the program reads a whole number and prints `double` of it, so typing 4 should print `8`.',
+          prompt: 'Finish the function `double` so it returns its number times 2. Replace the `pass` line, which is a placeholder that does nothing. The rest of the program reads a whole number and prints `double` of it, so typing 4 should print `8`.',
           language: 'python',
           starter: 'def double(n):\n    # your code here\n    pass\n\nn = int(input())\nprint(double(n))\n',
           tests: [
@@ -620,6 +709,12 @@ export const u1: Unit = {
           explain: '`int` means integer, a whole number. Python works the type out for itself, so you just write age = 20.',
         },
         {
+          kind: 'concept',
+          title: 'C beside Python',
+          body: 'The ideas you know from Python all exist in C, spelled a little differently.\n\nA C comment starts with `//` where Python uses `#`. The condition of an `if` goes inside brackets, and curly brackets hold the lines that belong to it.',
+          code: '// keep the score\nint score = 7;\nif (score > 5)\n{\n    printf("Nice\\n");\n}',
+        },
+        {
           kind: 'match',
           prompt: 'Match each line of C to the Python that does the same job.',
           pairs: [
@@ -672,8 +767,9 @@ export const u1: Unit = {
           kind: 'concept',
           title: 'Changing type',
           body: '`int()` makes a whole number, `float()` makes a decimal number, and `str()` makes text.\n\nGiven a decimal, `int()` **truncates**: it chops off everything after the point. It does not round up.',
-          code: 'print(int(3.9))       # 3\nprint(float("2.5"))   # 2.5\nprint(str(7) + "!")   # 7!',
+          code: 'print(int(3.9))\nprint(float("2.5"))\nprint(str(7) + "!")',
           language: 'python',
+          output: '3\n2.5\n7!',
         },
         {
           kind: 'type',
@@ -695,8 +791,9 @@ export const u1: Unit = {
           kind: 'concept',
           title: 'Decimals are not exact',
           body: 'A computer stores each number in a fixed number of bits. Most decimals cannot fit exactly, so the computer keeps the closest value it can.\n\nThe tiny error is called **floating-point imprecision**. `round()` tidies a result to the nearest whole number.',
-          code: 'print(0.1 + 0.2)          # 0.30000000000000004\nprint(round(2.6))         # 3',
+          code: 'print(0.1 + 0.2)\nprint(round(2.6))',
           language: 'python',
+          output: '0.30000000000000004\n3',
         },
         {
           kind: 'choice',
@@ -715,11 +812,24 @@ export const u1: Unit = {
           explain: 'With all three switches on you get 4 + 2 + 1 = 7. There is no pattern left for 8.',
         },
         {
+          kind: 'concept',
+          title: 'Running out of room',
+          body: 'A counter with a fixed number of places has a biggest value. Go one past it and the count starts again from zero.\n\nA car mileage counter with three wheels goes from 999 back to 000. A counter made of bits does the same.',
+        },
+        {
           kind: 'choice',
           prompt: 'The 3-bit counter shows `111` (7) and you add 1. The true answer `1000` needs a fourth bit that does not exist. What does the counter show?',
           options: ['111', '1000', '8', '000'],
           answer: 3,
           explain: 'The extra bit falls off the end and the counter wraps round to 0. This is **integer overflow**. In C a typical int has 32 bits and overflows just past 2 billion. Python ints grow as needed.',
+        },
+        {
+          kind: 'concept',
+          title: 'Chop or round?',
+          body: 'The tiny error in a decimal matters when you turn it into a whole number.\n\n0.57 times 100 should be 57, but it is stored as a hair under 57. `int()` chops that down to 56. `round()` goes to the nearest whole number, 57.',
+          code: 'print(0.57 * 100)\nprint(int(0.57 * 100))\nprint(round(0.57 * 100))',
+          language: 'python',
+          output: '56.99999999999999\n56\n57',
         },
         {
           kind: 'write',
@@ -830,8 +940,9 @@ export const u1: Unit = {
           kind: 'concept',
           title: 'Repeating text',
           body: 'Multiplying a string by a number repeats it. You can join the pieces with `+`.\n\nThis makes it easy to draw with characters: some spaces, then some blocks.',
-          code: 'print("#" * 3)          # ###\nprint(" " * 2 + "#")    #   #',
+          code: 'print("#" * 3)\nprint(" " * 2 + "#")',
           language: 'python',
+          output: '###\n  #',
         },
         {
           kind: 'type',
@@ -842,8 +953,16 @@ export const u1: Unit = {
           explain: '"ab" * 2 is "abab", and + joins the "!" on the end.',
         },
         {
+          kind: 'concept',
+          title: 'A loop that counts rows',
+          body: 'A `for` loop can use its variable inside the loop. `range(1, 4)` gives 1, 2, 3, so each line here repeats the text one more time than the last.',
+          code: 'for n in range(1, 4):\n    print("ha" * n)',
+          language: 'python',
+          output: 'ha\nhaha\nhahaha',
+        },
+        {
           kind: 'write',
-          prompt: 'Read a height. Print a staircase of `#` blocks: row 1 has one block, row 2 has two, and so on. For height 3, print:\n\n`#`\n`##`\n`###`',
+          prompt: 'Read a height. Print a staircase of `#` blocks: row 1 has one block, row 2 has two, and so on. Replace `pass` (a placeholder that does nothing) with your line. For height 3, print:\n\n`#`\n`##`\n`###`',
           language: 'python',
           starter: 'height = int(input())\nfor row in range(1, height + 1):\n    # print row blocks on one line\n    pass\n',
           tests: [
@@ -861,6 +980,14 @@ export const u1: Unit = {
           language: 'python',
           answer: 1,
           explain: 'range(height) counts 0, 1, 2. The rows should count 1, 2, 3, which is range(1, height + 1).',
+        },
+        {
+          kind: 'concept',
+          title: 'A variable sets the gap',
+          body: 'The number of copies can come from a variable. Here `gap` decides how many spaces, or how many dashes, go in front of the text.',
+          code: 'gap = 3\nprint(" " * gap + "end")\nprint("-" * gap + ">")',
+          language: 'python',
+          output: '   end\n--->',
         },
         {
           kind: 'write',
@@ -881,12 +1008,21 @@ export const u1: Unit = {
           body: 'A **greedy** algorithm always grabs the biggest piece that fits. To give change with the fewest coins, use as many 25s as you can, then 10s, then 5s, then 1s.\n\n`//` tells you how many of a coin fit. `%` tells you what is left over.',
           code: 'cents = 68\nprint(cents // 25)   # 2 coins of 25\nprint(cents % 25)    # 18 cents left',
           language: 'python',
+          output: '2\n18',
         },
         {
           kind: 'type',
           prompt: 'The coins are worth 25, 10, 5 and 1. What is the fewest coins that make 41 cents?',
           accept: ['4', 'four'],
           explain: 'Greedy picks 25, then 10, then 5, then 1. That is 4 coins.',
+        },
+        {
+          kind: 'concept',
+          title: 'Passing on what is left',
+          body: 'To carry on with only the left-over part, store the remainder back in the same variable.\n\nAfter these lines, `seconds` no longer holds 200. It holds the 20 that did not fit into whole minutes.',
+          code: 'seconds = 200\nminutes = seconds // 60\nseconds = seconds % 60\nprint(minutes, seconds)',
+          language: 'python',
+          output: '3 20',
         },
         {
           kind: 'spot',
@@ -925,8 +1061,9 @@ export const u1: Unit = {
           kind: 'concept',
           title: 'Pulling a number apart',
           body: 'Two tools take a whole number apart one digit at a time.\n\n`n % 10` gives the last digit. `n // 10` chops the last digit off.\n\nRepeat both in a loop until nothing is left and you have visited every digit, from right to left.',
-          code: 'n = 472\nprint(n % 10)    # 2\nprint(n // 10)   # 47',
+          code: 'n = 472\nprint(n % 10)\nprint(n // 10)',
           language: 'python',
+          output: '2\n47',
         },
         {
           kind: 'type',
@@ -935,6 +1072,14 @@ export const u1: Unit = {
           language: 'python',
           accept: ['5'],
           explain: 'n // 10 chops 9051 down to 905. Then % 10 gives its last digit, 5.',
+        },
+        {
+          kind: 'concept',
+          title: 'A loop that shrinks a number',
+          body: 'A `while` loop keeps going as long as its condition is true.\n\nEach time round, `n // 2` halves `n` and drops any left-over part. The number keeps shrinking, so it reaches 0 in the end and the loop stops.',
+          code: 'n = 20\nwhile n > 0:\n    print(n)\n    n = n // 2',
+          language: 'python',
+          output: '20\n10\n5\n2\n1',
         },
         {
           kind: 'spot',
@@ -987,6 +1132,22 @@ export const u1: Unit = {
           prompt: 'One of the digits to double is 8. Doubling gives 16, which is more than 9, so you take away 9. What number goes into the total?',
           accept: ['7', 'seven'],
           explain: '8 doubled is 16, and 16 - 9 = 7. That is the same as adding the two digits of 16: 1 + 6.',
+        },
+        {
+          kind: 'concept',
+          title: 'Change it, then test it',
+          body: 'You can change a value on one line and test the new value with an `if` on the next.\n\nHere 8 doubles to 16. That is over 10, so the indented line runs and takes 10 away.',
+          code: 'price = 8\nprice = price * 2\nif price > 10:\n    price = price - 10\nprint(price)',
+          language: 'python',
+          output: '6',
+        },
+        {
+          kind: 'concept',
+          title: 'Does it end in 0?',
+          body: '`% 10` gives the last digit of a whole number. Compare that digit with 0 and you know whether the number ends in 0.',
+          code: 'year = 2030\nif year % 10 == 0:\n    print("new decade")\nelse:\n    print("same decade")',
+          language: 'python',
+          output: 'new decade',
         },
         {
           kind: 'write',

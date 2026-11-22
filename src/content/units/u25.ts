@@ -22,8 +22,9 @@ export const u25: Unit = {
           code: r`import re
 
 m = re.search(r"\d\d\d", "Room 204 is free")
-print(m.group())   # 204`,
+print(m.group())`,
           language: 'python',
+          output: '204',
         },
         {
           kind: 'match',
@@ -45,10 +46,25 @@ print(m.group())   # 204`,
         },
         {
           kind: 'concept',
+          title: 'Find every match',
+          body: '`re.search` stops at the first match. `re.findall(pattern, text)` keeps going and returns a list of every match, each one a string.\n\nNo match at all gives an empty list.',
+          code: r`import re
+
+print(re.findall(r"[aeiou]", "tomato"))
+print(re.findall(r"x", "tomato"))`,
+          language: 'python',
+          output: r`['o', 'a', 'o']
+[]`,
+        },
+        {
+          kind: 'concept',
           title: 'How many times?',
           body: 'A **quantifier** says how many of the thing before it.\n\n`+` one or more. `*` zero or more. `?` zero or one (optional). `{3}` exactly three. `{2,4}` two to four.\n\nSo `\\d+` matches a whole run of digits, and `colou?r` matches both spellings.',
-          code: r`re.findall(r"\d+", "Room 12, floor 3")   # ['12', '3']`,
+          code: r`import re
+
+print(re.findall(r"\d+", "Room 12, floor 3"))`,
           language: 'python',
+          output: r`['12', '3']`,
         },
         {
           kind: 'choice',
@@ -94,6 +110,16 @@ print(sum(int(n) for n in numbers))
           prompt: 'Type a pattern that matches exactly four digits in a row, like a year.',
           accept: [r`\d{4}`, '[0-9]{4}', r`\d\d\d\d`, '[0-9][0-9][0-9][0-9]', r`[\d]{4}`],
           explain: '`{4}` repeats the thing before it exactly four times, which is neater than writing `\\d` four times.',
+        },
+        {
+          kind: 'concept',
+          title: 'Plain characters plus codes',
+          body: 'A pattern can mix plain characters with codes. Here a literal `@` must come first. Then `\\w+` takes one or more letters, digits or underscores.\n\nThe match stops at the first character that does not fit, so the `!` is left out.',
+          code: r`import re
+
+print(re.findall(r"@\w+", "Thanks @ana and @ben_2!"))`,
+          language: 'python',
+          output: r`['@ana', '@ben_2']`,
         },
         {
           kind: 'write',
@@ -169,6 +195,22 @@ re.search(r"^\d{4}$", "abc12345")   # None: not exactly 4 digits`,
           explain: 'Without anchors, the pattern finds four digits inside the longer number. It needs `^\\d{4}$` to check the whole input.',
         },
         {
+          kind: 'concept',
+          title: 'Anchors in an if',
+          body: 'With both anchors, the pattern has to cover the whole text. One extra character before or after, and `re.search` gives `None`.\n\n`None` counts as false in an `if`, so the check reads naturally.',
+          code: r`import re
+
+for text in ["90210", "902101", "zip 90210"]:
+    if re.search(r"^\d{5}$", text):
+        print(text, "ok")
+    else:
+        print(text, "no")`,
+          language: 'python',
+          output: r`90210 ok
+902101 no
+zip 90210 no`,
+        },
+        {
           kind: 'write',
           prompt: 'A product code is two capital letters, a dash, then three digits, like `AB-123`, and nothing else. Read a code with `input()` and print `valid` or `invalid`. The starter is too generous: fix its pattern.',
           language: 'python',
@@ -200,10 +242,14 @@ else:
           kind: 'concept',
           title: 'Groups, either/or, replace',
           body: 'Round brackets make a **group**: a part of the match you can pick out with `m.group(1)`, `m.group(2)` and so on.\n\nA bar means **either/or**: `cat|dog` matches either word.\n\n`re.sub(pattern, new, text)` replaces every match with new text.',
-          code: r`m = re.search(r"(\d+)-(\d+)", "pages 10-25")
-m.group(1)   # '10'
-m.group(2)   # '25'`,
+          code: r`import re
+
+m = re.search(r"(\d+)-(\d+)", "pages 10-25")
+print(m.group(1))
+print(m.group(2))`,
           language: 'python',
+          output: r`10
+25`,
         },
         {
           kind: 'blank',
@@ -216,12 +262,35 @@ print(m.___(1))`,
           explain: '`re.search` finds the match, and `group(1)` is whatever the first pair of brackets caught: `9`.',
         },
         {
+          kind: 'concept',
+          title: 'Replacing with re.sub',
+          body: '`re.sub(pattern, new, text)` gives back a copy of the text with every match swapped for `new`.\n\nHere each run of spaces, however long, becomes a single space.',
+          code: r`import re
+
+print(re.sub(r"\s+", " ", "too    many   spaces"))`,
+          language: 'python',
+          output: 'too many spaces',
+        },
+        {
           kind: 'type',
           prompt: 'What does this print? Type it exactly.',
           code: r`print(re.sub(r"\d", "#", "Card 4521"))`,
           language: 'python',
           accept: ['Card ####'],
           explain: '`re.sub` swaps every match for the new text. Each of the four digits matches `\\d` separately, so each becomes one `#`.',
+        },
+        {
+          kind: 'concept',
+          title: 'Groups that catch a phrase',
+          body: '`.+` means one or more of any character, so a group can catch a whole phrase, spaces included.\n\nPlain characters around the groups, like the `=` here, must be in the text, but they are not handed back.',
+          code: r`import re
+
+m = re.search(r"(\w+)=(.+)", "colour=dark blue")
+print(m.group(1))
+print(m.group(2))`,
+          language: 'python',
+          output: r`colour
+dark blue`,
         },
         {
           kind: 'write',
@@ -284,8 +353,9 @@ print(m.group(2))
           code: r`from datetime import datetime
 
 when = datetime.strptime("2024-03-15 09:30", "%Y-%m-%d %H:%M")
-print(when.strftime("%d/%m/%Y"))   # 15/03/2024`,
+print(when.strftime("%d/%m/%Y"))`,
           language: 'python',
+          output: '15/03/2024',
         },
         {
           kind: 'match',
@@ -342,8 +412,9 @@ print(when.strftime("%Y-%m-%d"))
           code: r`from datetime import datetime, timedelta
 
 start = datetime(2024, 1, 30)
-print(start + timedelta(days=3))   # 2024-02-02 00:00:00`,
+print(start + timedelta(days=3))`,
           language: 'python',
+          output: '2024-02-02 00:00:00',
         },
         {
           kind: 'type',
@@ -389,8 +460,9 @@ print(later.strftime("%Y-%m-%d"))
 
 utc = datetime(2024, 3, 15, 13, 0, tzinfo=timezone.utc)
 local = utc.astimezone(timezone(timedelta(hours=-5)))
-print(local.strftime("%H:%M"))   # 08:00`,
+print(local.strftime("%H:%M"))`,
           language: 'python',
+          output: '08:00',
         },
         {
           kind: 'steps',
@@ -523,6 +595,23 @@ print(average.__annotations__ == {"nums": list[float], "return": float})
           explain: 'Python stores hints on the function in `__annotations__` and otherwise ignores them. Tools read them from there.',
         },
         {
+          kind: 'concept',
+          title: 'Keeping an Optional promise',
+          body: 'The return hint `Optional[str]` is a promise: a string, or `None`.\n\nThe body keeps it by dealing with the empty case first and returning `None`. Only then does it reach for an item, which is now safe.',
+          code: r`from typing import Optional
+
+def last_item(items: list[str]) -> Optional[str]:
+    if not items:
+        return None
+    return items[-1]
+
+print(last_item(["a", "b"]))
+print(last_item([]))`,
+          language: 'python',
+          output: r`b
+None`,
+        },
+        {
           kind: 'write',
           prompt: 'Fix `first_word`. Hint it as taking a `str` and returning `Optional[str]`. Return the first word of the text, or `None` when the text has no words. The last line checks your hints and must print `True`.',
           language: 'python',
@@ -594,10 +683,13 @@ next_year(input())`,
           code: r`from pathlib import Path
 
 p = Path("reports/2024/sales.csv")
-p.name     # 'sales.csv'
-p.stem     # 'sales'
-p.suffix   # '.csv'`,
+print(p.name)
+print(p.stem)
+print(p.suffix)`,
           language: 'python',
+          output: r`sales.csv
+sales
+.csv`,
         },
         {
           kind: 'type',
@@ -655,6 +747,20 @@ print(p.suffix.lower())
           lines: ['name,city,age', 'Ana,Lima,31', 'Ben,Paris, France,28', 'Cy,Oslo,40'],
           answer: 2,
           explain: 'The comma inside the city makes four pieces instead of three. Proper CSV wraps such a value in quotes, and the `csv` module understands them.',
+        },
+        {
+          kind: 'concept',
+          title: 'Reading CSV the safe way',
+          body: '`csv.DictReader` takes the lines, uses the first one as the header, and gives one dict per row. `list(...)` collects them.\n\nQuotes around a value keep its comma inside, so the pet\'s full name arrives in one piece.',
+          code: r`import csv
+
+lines = ["pet,owner", '"Rex, the dog",Ana']
+rows = list(csv.DictReader(lines))
+print(rows)
+print(rows[0]["pet"])`,
+          language: 'python',
+          output: r`[{'pet': 'Rex, the dog', 'owner': 'Ana'}]
+Rex, the dog`,
         },
         {
           kind: 'write',

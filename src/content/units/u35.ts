@@ -245,6 +245,22 @@ export const u35: Unit = {
           body: 'Next you will build a tiny pretend server in plain Python. It is **not** the real protocol.\n\nReal MCP sends JSON-RPC messages with ids and other fields, describes inputs with JSON Schema in a field named `inputSchema`, and has ready-made libraries that do the plumbing. Ours keeps only the core idea: a registry of tools.',
         },
         {
+          kind: 'concept',
+          title: 'Share some fields, keep one back',
+          body: '`PEOPLE.values()` gives each inner dict in turn. The loop builds a new, smaller dict from each one, copying only the fields that are safe to share.\n\nThe `pin` is never copied, so it stays private.',
+          language: 'python',
+          code: `PEOPLE = {
+    "ana": {"name": "ana", "city": "Lima", "pin": 4821},
+    "bo": {"name": "bo", "city": "Oslo", "pin": 7730},
+}
+
+public = []
+for person in PEOPLE.values():
+    public.append({"name": person["name"], "city": person["city"]})
+print(public)`,
+          output: "[{'name': 'ana', 'city': 'Lima'}, {'name': 'bo', 'city': 'Oslo'}]",
+        },
+        {
           kind: 'write',
           prompt:
             'The registry `TOOLS` maps each tool name to its definition, including its Python function. Finish `list_tools()` so it returns a list with one dict per tool holding only `name`, `description` and `schema`. The function stays private. The last lines print each dict.',
@@ -290,6 +306,24 @@ for tool in list_tools():
           prompt: 'The model wants to call the `add` tool from your registry. Its schema says `"required": ["a", "b"]`. How many arguments must the model send? Type the number.',
           accept: ['2', 'two'],
           explain: 'Every name in `required` must be present. The schema is how the server tells the model what a valid call looks like.',
+        },
+        {
+          kind: 'concept',
+          title: 'Is the key already there?',
+          body: '`if seat in SEATS` asks whether that key is already in the dict.\n\nIf it is, the function prints an error and `return` leaves early. The last line never runs, so the second booking cannot overwrite the first.',
+          language: 'python',
+          code: `SEATS = {}
+
+def book(seat, person):
+    if seat in SEATS:
+        print("error: seat " + seat + " is taken")
+        return
+    SEATS[seat] = person
+
+book("4A", "Ana")
+book("4A", "Bo")
+print(SEATS)`,
+          output: "error: seat 4A is taken\n{'4A': 'Ana'}",
         },
         {
           kind: 'write',
@@ -352,6 +386,21 @@ print(len(TOOLS), "tools")
           explain: 'The schema requires `message`, but the property is called `body`. No call could ever satisfy it, so the tool would always be rejected.',
         },
         {
+          kind: 'concept',
+          title: 'Sorted names, joined lists',
+          body: '`sorted(RECIPES)` gives the dict\'s keys in alphabetical order, so `tea` comes before `toast`.\n\n`", ".join(...)` turns a list of words into one string, with a comma and a space between each pair.',
+          language: 'python',
+          code: `RECIPES = {
+    "toast": {"minutes": 3, "needs": ["bread", "butter"]},
+    "tea": {"minutes": 4, "needs": ["water", "teabag", "milk"]},
+}
+
+for name in sorted(RECIPES):
+    recipe = RECIPES[name]
+    print(name + " needs " + ", ".join(recipe["needs"]))`,
+          output: 'tea needs water, teabag, milk\ntoast needs bread, butter',
+        },
+        {
           kind: 'write',
           prompt:
             'Print a menu of the tools for a human to read. For each tool, in alphabetical order by name, print one line like `add(a, b): Add two numbers.` with the required arguments joined by a comma and a space.',
@@ -394,6 +443,24 @@ for name in sorted(TOOLS):
           kind: 'concept',
           title: 'The front desk',
           body: '`call_tool(name, args)` is the front desk of a server. It looks the name up in the registry, checks the arguments, runs the function and returns the result.\n\nUnknown name? Return an error. Missing argument? Also an error. The requests are written by a model, so the server must check everything and never crash.',
+        },
+        {
+          kind: 'concept',
+          title: 'Check first, work last',
+          body: 'Each `if` returns an error dict and leaves the function early. The last line only runs when every check has passed.\n\nThe caller always gets a dict back, holding either `result` or `error`, and nothing crashes.',
+          language: 'python',
+          code: `MENU = {"tea": 2, "cake": 4}
+
+def price(item, count):
+    if item not in MENU:
+        return {"error": "not on the menu: " + item}
+    if count < 1:
+        return {"error": "count must be 1 or more"}
+    return {"result": MENU[item] * count}
+
+print(price("cake", 2))
+print(price("soup", 1))`,
+          output: "{'result': 8}\n{'error': 'not on the menu: soup'}",
         },
         {
           kind: 'order',
@@ -461,6 +528,23 @@ print(json.dumps(call_tool(name, args), sort_keys=True))
           explain: 'The third call is missing `b`. Checking the input against the schema catches this before the function runs and crashes.',
         },
         {
+          kind: 'concept',
+          title: 'Find the first missing one',
+          body: 'The loop walks the required names in order. `key not in form` is True when the dict has no such key.\n\nThe `return` inside the loop stops at the **first** missing name. Only a form with nothing missing reaches the last line.',
+          language: 'python',
+          code: `REQUIRED = ["name", "email", "phone"]
+
+def check_form(form):
+    for key in REQUIRED:
+        if key not in form:
+            return "missing field: " + key
+    return "form is complete"
+
+print(check_form({"name": "Ana"}))
+print(check_form({"name": "Bo", "email": "bo@example.com", "phone": "555-0142"}))`,
+          output: 'missing field: email\nform is complete',
+        },
+        {
           kind: 'write',
           prompt:
             'Now add input validation. After the unknown-tool check, go through the tool\'s required arguments in order. If one is missing from `args`, return `{"error": "missing argument: KEY"}` for the first missing one.',
@@ -522,6 +606,24 @@ print(json.dumps(call_tool(name, args), sort_keys=True))
             { ask: 'The result travels back. Which part turns it into the sentence you read?', answer: 1 },
           ],
           explain: 'Host to client to server to function, then the same path in reverse. Each part has one small job.',
+        },
+        {
+          kind: 'concept',
+          title: 'One field picks the job',
+          body: 'A handler reads one field of the request and uses it to pick what to do. The details it needs sit one level down, in `request["params"]`.\n\nAnything it does not recognise falls through to the error on the last line.',
+          language: 'python',
+          code: `def handle(request):
+    action = request["action"]
+    if action == "greet":
+        return {"result": "Hello " + request["params"]["name"]}
+    if action == "count":
+        return {"result": len(request["params"]["items"])}
+    return {"error": "unknown action: " + action}
+
+print(handle({"action": "greet", "params": {"name": "Bo"}}))
+print(handle({"action": "count", "params": {"items": ["a", "b", "c"]}}))
+print(handle({"action": "dance"}))`,
+          output: "{'result': 'Hello Bo'}\n{'result': 3}\n{'error': 'unknown action: dance'}",
         },
         {
           kind: 'write',

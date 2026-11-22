@@ -69,8 +69,9 @@ export const u9: Unit = {
           kind: 'concept',
           title: 'Pages are just text',
           body: 'The page a web app sends back is just a string, usually full of HTML. So Python can build pages the same way it builds any text, for example with an f-string.',
-          code: 'name = "Ana"\npage = f"<h1>Hi, {name}</h1>"',
+          code: 'name = "Ana"\npage = f"<h1>Hi, {name}</h1>"\nprint(page)',
           language: 'python',
+          output: '<h1>Hi, Ana</h1>',
         },
         {
           kind: 'write',
@@ -153,6 +154,9 @@ export const u9: Unit = {
           kind: 'concept',
           title: 'Routing by hand',
           body: 'Under the hood, routing is a decision: look at the path, pick the page. You can copy that idea in plain Python with `if` and `elif`, plus a fallback for unknown paths.',
+          code: 'def page_for(path):\n    if path == "/menu":\n        return "Bread and cakes"\n    elif path == "/contact":\n        return "Email us"\n    else:\n        return "404 Not Found"\n\nprint(page_for("/contact"))\nprint(page_for("/shop"))',
+          language: 'python',
+          output: 'Email us\n404 Not Found',
         },
         {
           kind: 'write',
@@ -168,6 +172,14 @@ export const u9: Unit = {
           solution:
             'def route(path):\n    if path == "/":\n        return "Home page"\n    elif path == "/about":\n        return "About us"\n    else:\n        return "404 Not Found"\n\nprint(route(input()))\n',
           explain: 'That is the job a router does: match the path to a page, and fall back to "not found".',
+        },
+        {
+          kind: 'concept',
+          title: 'Looking up with a fallback',
+          body: 'A dictionary can do the same matching. `hours["sun"]` would crash here, because there is no such key.\n\n`.get(key, fallback)` looks the key up and gives you the fallback when it is missing.',
+          code: 'hours = {"mon": "9 to 5", "sat": "10 to 2"}\nprint(hours.get("sat", "Closed"))\nprint(hours.get("sun", "Closed"))',
+          language: 'python',
+          output: '10 to 2\nClosed',
         },
         {
           kind: 'write',
@@ -231,6 +243,14 @@ export const u9: Unit = {
           explain: 'Find the pair that starts with `days=`. Everything after the `=` is its value, as text.',
         },
         {
+          kind: 'concept',
+          title: 'Splitting text into pairs',
+          body: '`split` cuts text into a list at a separator. Here the text is cut at each comma, then each piece is cut at its colon.\n\n`key, value = ...` names the two halves, and `prices[key] = value` stores them in the dictionary.',
+          code: 'text = "tea:3,cake:5"\nprices = {}\nfor pair in text.split(","):\n    key, value = pair.split(":")\n    prices[key] = value\nprint(prices)',
+          language: 'python',
+          output: "{'tea': '3', 'cake': '5'}",
+        },
+        {
           kind: 'write',
           prompt: 'Read a query string like `name=Ana&age=30` and turn it into a dictionary. Print the dictionary, e.g. `{\'name\': \'Ana\', \'age\': \'30\'}`.',
           language: 'python',
@@ -252,15 +272,6 @@ export const u9: Unit = {
           language: 'python',
         },
         {
-          kind: 'blank',
-          prompt: 'This route receives a sign-up form sent with POST. Fill the gaps.',
-          code: '@app.route("/signup", methods=["___"])\ndef signup():\n    name = request.___.get("name")\n    return f"Thanks, {name}!"',
-          language: 'python',
-          bank: ['POST', 'form', 'input', 'print'],
-          answers: ['POST', 'form'],
-          explain: 'POST data lives in `request.form`, and the route must list "POST" in methods to accept it.',
-        },
-        {
           kind: 'choice',
           prompt: 'Someone visits `/search?q=jam`. What does this route return?',
           code: '@app.route("/search")\ndef search():\n    q = request.args.get("q")\n    return f"Results for {q}"',
@@ -268,6 +279,15 @@ export const u9: Unit = {
           options: ['Results for jam', 'Results for q', 'Results for {q}', 'Results for q=jam'],
           answer: 0,
           explain: '`request.args.get("q")` gives the value after `q=`, which the f-string drops into the page.',
+        },
+        {
+          kind: 'blank',
+          prompt: 'This route receives a sign-up form sent with POST. Fill the gaps.',
+          code: '@app.route("/signup", methods=["___"])\ndef signup():\n    name = request.___.get("name")\n    return f"Thanks, {name}!"',
+          language: 'python',
+          bank: ['POST', 'form', 'input', 'print'],
+          answers: ['POST', 'form'],
+          explain: 'POST data lives in `request.form`, and the route must list "POST" in methods to accept it.',
         },
       ],
     },
@@ -300,6 +320,14 @@ export const u9: Unit = {
           explain: 'The name you pass must match the name inside the curly braces, without the braces.',
         },
         {
+          kind: 'concept',
+          title: 'Filling a blank by hand',
+          body: 'You can copy what a template does with `.replace(old, new)`. It returns a new string with every `old` swapped for `new`. The original string is left as it was, so keep the result in a variable.',
+          code: 'template = "Dear {{ name }}, your table is at {{ time }}."\npage = template.replace("{{ name }}", "Lee")\npage = page.replace("{{ time }}", "7pm")\nprint(page)',
+          language: 'python',
+          output: 'Dear Lee, your table is at 7pm.',
+        },
+        {
           kind: 'write',
           prompt: 'Fill in a template by hand. Read a name, then a number of messages, and replace `{{ name }}` and `{{ count }}` in `template`. Print the result.',
           language: 'python',
@@ -325,6 +353,14 @@ export const u9: Unit = {
           prompt: 'Order the template that lists every book.',
           lines: ['<ul>', '{% for book in books %}', '  <li>{{ book }}</li>', '{% endfor %}', '</ul>'],
           explain: 'The loop sits inside the list, so each book becomes one `<li>`, and `{% endfor %}` ends the repeated part.',
+        },
+        {
+          kind: 'concept',
+          title: 'The same loop in Python',
+          body: 'Python can do the job of `{% for %}` itself: loop over a list and print one piece of HTML for each item, with an f-string to drop the item in.',
+          code: 'names = ["Ana", "Raj"]\nfor name in names:\n    print(f"<p>Hello, {name}</p>")',
+          language: 'python',
+          output: '<p>Hello, Ana</p>\n<p>Hello, Raj</p>',
         },
         {
           kind: 'write',
@@ -377,7 +413,7 @@ export const u9: Unit = {
         {
           kind: 'concept',
           title: 'Sessions',
-          body: 'A **session** is the server\'s memory about one visitor, linked to them by a cookie.\n\nIn Flask, `session` works like a dictionary that lasts across visits: `session["user"] = "Ana"` now, and `session.get("user")` on a later visit.',
+          body: 'A **session** is the server\'s memory about one visitor, linked to them by a cookie.\n\nIn Flask, `session` works like a dictionary that lasts across visits: `session["user"] = "Ana"` now, and `session.get("user")` on a later visit.\n\n`redirect("/")` sends the browser on to another page, here the home page.',
           code: '@app.route("/login", methods=["POST"])\ndef login():\n    session["user"] = request.form.get("name")\n    return redirect("/")',
           language: 'python',
         },
@@ -389,6 +425,14 @@ export const u9: Unit = {
           bank: ['session', 'redirect', 'cookie', 'print'],
           answers: ['session', 'redirect'],
           explain: '`session.clear()` forgets everything about this visitor, and `redirect("/")` sends their browser to the home page.',
+        },
+        {
+          kind: 'concept',
+          title: 'Counting in a dictionary',
+          body: 'A session is a dictionary, so counting in one works like this.\n\n`.get("apples", 0)` gives 0 the first time, when the key is not there yet, and the saved number after that. Add 1 and store it back.',
+          code: 'basket = {}\nbasket["apples"] = basket.get("apples", 0) + 1\nbasket["apples"] = basket.get("apples", 0) + 1\nprint(basket["apples"])',
+          language: 'python',
+          output: '2',
         },
         {
           kind: 'write',
@@ -476,8 +520,9 @@ export const u9: Unit = {
           kind: 'concept',
           title: 'JSON',
           body: 'Most APIs reply in **JSON**, a text format that looks like Python dictionaries and lists. Names go in double quotes.\n\nJSON arrives as one long string. `json.loads(text)` turns it into a real dictionary you can look things up in.',
-          code: 'import json\n\ntext = \'{"city": "Lima", "temp": 21}\'\ndata = json.loads(text)\nprint(data["city"])   # Lima',
+          code: 'import json\n\ntext = \'{"city": "Lima", "temp": 21}\'\ndata = json.loads(text)\nprint(data["city"])',
           language: 'python',
+          output: 'Lima',
         },
         {
           kind: 'type',
@@ -524,6 +569,14 @@ print(f"{city}: {temp} degrees")
             ['null', 'None'],
           ],
           explain: 'JSON spells a few things differently (`true`, `false`, `null`), and `json.loads` translates them into Python.',
+        },
+        {
+          kind: 'concept',
+          title: 'A list of objects',
+          body: 'JSON that starts with `[` becomes a Python list. Here each item in the list is a dictionary, so inside the loop `team` is one dictionary and `team["points"]` is its number.',
+          code: 'import json\n\ntext = \'[{"team": "Red", "points": 4}, {"team": "Blue", "points": 7}]\'\nteams = json.loads(text)\ntotal = 0\nfor team in teams:\n    total += team["points"]\nprint(total)',
+          language: 'python',
+          output: '11',
         },
         {
           kind: 'write',
@@ -576,8 +629,9 @@ print(f"{city}: {temp} degrees")
           kind: 'concept',
           title: 'Never store the password itself',
           body: 'If passwords are saved as plain text, one leak hands every password to a thief.\n\nA **hash function** scrambles text into a fixed-length jumble. The same text always gives the same jumble, and it cannot be run backwards. Apps store only the hash.',
-          code: 'import hashlib\n\nprint(hashlib.sha256("hello".encode()).hexdigest())\n# 2cf24dba5fb0a30e26e8...',
+          code: 'import hashlib\n\nword = "hello"\nprint(hashlib.sha256(word.encode()).hexdigest())',
           language: 'python',
+          output: '2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824',
         },
         {
           kind: 'choice',
@@ -605,6 +659,14 @@ print(f"{city}: {temp} degrees")
           solution:
             'import hashlib\n\ndef make_hash(password):\n    return hashlib.sha256(password.encode()).hexdigest()\n\nprint(make_hash(input())[:8])\n',
           explain: '`.encode()` turns the text into bytes, `sha256` scrambles them, and `.hexdigest()` gives the result as 64 letters and digits.',
+        },
+        {
+          kind: 'concept',
+          title: 'Comparing hashes',
+          body: 'To check a secret, hash what was typed and compare it with the saved hash.\n\nCheck the name is `in` the dictionary first. `and` stops at the first false part, so a missing name never causes a crash.',
+          code: 'import hashlib\n\ndef make_hash(text):\n    return hashlib.sha256(text.encode()).hexdigest()\n\nlockers = {"red": make_hash("4821")}\nprint("red" in lockers and lockers["red"] == make_hash("4821"))\nprint("blue" in lockers and lockers["blue"] == make_hash("4821"))',
+          language: 'python',
+          output: 'True\nFalse',
         },
         {
           kind: 'write',
@@ -699,6 +761,14 @@ print(login(name, password))
           language: 'python',
         },
         {
+          kind: 'concept',
+          title: 'Reminder: adding a row',
+          body: '`.append` adds one item to the end of a list. The item can be a whole dictionary, written with curly braces and a value for each key.',
+          code: 'pets = []\npets.append({"name": "Rex", "kind": "dog"})\nprint(len(pets))\nprint(pets[0]["name"])',
+          language: 'python',
+          output: '1\nRex',
+        },
+        {
           kind: 'write',
           prompt: 'Finish `add` so it appends a dictionary with the keys `name`, `month` and `day` to `book`. The code below adds two people, then prints how many there are and the second name.',
           language: 'python',
@@ -726,6 +796,14 @@ print(len(book))
 print(book[1]["name"])
 `,
           explain: 'This is the job of an `INSERT`: one new row, with a value for every column.',
+        },
+        {
+          kind: 'concept',
+          title: 'Reminder: one line per row',
+          body: 'Loop over the list and each turn gives you one dictionary. Pull out the values you need by key, then build the line with an f-string.',
+          code: 'pets = [{"name": "Rex", "age": 4}, {"name": "Mog", "age": 9}]\nfor pet in pets:\n    name = pet["name"]\n    age = pet["age"]\n    print(f"{name} is {age}")',
+          language: 'python',
+          output: 'Rex is 4\nMog is 9',
         },
         {
           kind: 'write',
@@ -772,6 +850,14 @@ show()
           explain: 'In the real app this loop lives in a template: `{% for person in birthdays %}` writes one table row each.',
         },
         {
+          kind: 'concept',
+          title: 'Reminder: checking a range',
+          body: 'To reject a number outside a range, test both ends and join the tests with `or`. If either one is true, the value is bad, and the function returns early.',
+          code: 'def check_hour(hour):\n    if hour < 0 or hour > 23:\n        return "Invalid"\n    return "OK"\n\nprint(check_hour(9))\nprint(check_hour(24))',
+          language: 'python',
+          output: 'OK\nInvalid',
+        },
+        {
           kind: 'write',
           prompt: 'Never trust a form. Finish `check` so it returns `Invalid` unless the month is from 1 to 12 and the day is from 1 to 31. Otherwise it returns `Added`.',
           language: 'python',
@@ -812,6 +898,14 @@ print(check(month, day))
           language: 'python',
           answer: 2,
           explain: '`request.args` holds GET data from the URL. POST data arrives in `request.form`.',
+        },
+        {
+          kind: 'concept',
+          title: 'Reminder: keeping all but one',
+          body: 'A safe way to remove something is to build a new list of everything you want to keep. `!=` means "is not equal to".',
+          code: 'scores = [4, 9, 2, 7]\nkept = []\nfor score in scores:\n    if score != 9:\n        kept.append(score)\nprint(kept)',
+          language: 'python',
+          output: '[4, 2, 7]',
         },
         {
           kind: 'write',
@@ -872,6 +966,14 @@ for person in book:
           explain: 'Same shape as your Python version: take the form values, add a row, go back to the list page.',
         },
         {
+          kind: 'concept',
+          title: 'Reminder: sorted, or nothing to show',
+          body: '`sorted(names)` gives a copy of the list in A to Z order. Before printing, check whether the list is empty with `len`, so you can say so instead of printing nothing.',
+          code: 'names = ["Mog", "Ada"]\nif len(names) == 0:\n    print("Nobody yet")\nelse:\n    for name in sorted(names):\n        print(name)',
+          language: 'python',
+          output: 'Ada\nMog',
+        },
+        {
           kind: 'write',
           prompt: 'One more feature: read a month number and print the names of everyone with a birthday that month, sorted A to Z, one per line. If there is nobody, print `None this month`.',
           language: 'python',
@@ -928,6 +1030,14 @@ else:
           language: 'python',
         },
         {
+          kind: 'concept',
+          title: 'Reminder: a forgiving lookup',
+          body: '`.upper()` gives a copy of some text in capital letters. `.get(key)` looks a key up without crashing: when the key is missing it gives `None`, Python\'s word for "nothing here".',
+          code: 'stock = {"TEA": 12, "JAM": 5}\nword = "jam"\nprint(stock.get(word.upper()))\nprint(stock.get("MILK"))',
+          language: 'python',
+          output: '5\nNone',
+        },
+        {
           kind: 'write',
           prompt: 'Step 1, quote. Finish `lookup` so it returns the price for a symbol typed in any capitals, or `None` if the symbol is unknown. The rest prints the price or `Unknown symbol`.',
           language: 'python',
@@ -960,6 +1070,14 @@ else:
     print(price)
 `,
           explain: '`.upper()` forgives lowercase typing, and `.get` turns a missing symbol into `None` instead of a crash.',
+        },
+        {
+          kind: 'concept',
+          title: 'Reminder: check first, then change',
+          body: 'When something can run out, test before you take any away. The `if` branch refuses. The `else` branch is the only place the amount changes.',
+          code: 'battery = 50\nneed = 30\nif need > battery:\n    print("Not enough charge")\nelse:\n    battery = battery - need\n    print(f"Used {need}, {battery} left")',
+          language: 'python',
+          output: 'Used 30, 20 left',
         },
         {
           kind: 'write',
@@ -1010,6 +1128,14 @@ else:
           explain: 'The comparison is backwards. You are short of cash when the cost is **greater** than your cash: `cost > cash`.',
         },
         {
+          kind: 'concept',
+          title: 'Reminder: changing two things',
+          body: 'A sale changes two things at once: fewer items in the dictionary and more money. `.get("TEA", 0)` counts something you never had as zero.',
+          code: 'shelf = {"TEA": 6, "JAM": 2}\ntill = 100\nowned = shelf.get("TEA", 0)\nshelf["TEA"] = owned - 2\ntill = till + 12 * 2\nprint(shelf["TEA"], till)',
+          language: 'python',
+          output: '4 124',
+        },
+        {
           kind: 'write',
           prompt: 'Step 3, sell. Read a symbol and a number of shares. If you own fewer than that (or none), print `Not enough shares`. Otherwise remove them, add the money to your cash, and print `Sold 4 KITE, cash now 600`.',
           language: 'python',
@@ -1053,6 +1179,14 @@ else:
           language: 'python',
           accept: ['90', '$90'],
           explain: '2 × 25 = 50 and 5 × 8 = 40, and 50 + 40 = 90. Shares times price, added up for every company.',
+        },
+        {
+          kind: 'concept',
+          title: 'Reminder: looping over a dictionary',
+          body: '`.items()` hands a loop each key together with its value, so you can name them both. Here the count comes from `basket`, and the same key looks up the cost in `COST`.',
+          code: 'COST = {"TEA": 12, "JAM": 5}\nbasket = {"TEA": 2, "JAM": 3}\ntotal = 0\nfor item, count in basket.items():\n    total += count * COST[item]\nprint(total)',
+          language: 'python',
+          output: '39',
         },
         {
           kind: 'write',

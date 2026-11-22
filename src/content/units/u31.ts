@@ -118,6 +118,11 @@ export const u31: Unit = {
           explain: 'Tools cover what the model lacks: fresh facts, exact maths and hands.',
         },
         {
+          kind: 'concept',
+          title: 'Looking is not the same as changing',
+          body: 'Some tools only read. A tool that fetches a menu can run a hundred times and nothing is different afterwards.\n\nOther tools change things. A tool that places an order spends money, and may be hard to undo. The more a tool can change, the more careful your code should be before running it.',
+        },
+        {
           kind: 'choice',
           prompt: 'You are choosing tools for a shop assistant bot. Which one deserves the most care before your code runs it?',
           options: [
@@ -218,6 +223,24 @@ export const u31: Unit = {
           explain: 'The model never sees your function\'s code. These few fields are all it knows about the tool.',
         },
         {
+          kind: 'concept',
+          title: 'Inside the schema',
+          body: '`properties` is a dict: each input name points to its own small dict holding a `type`.\n\n`required` is a list of the input names that must always be sent. A definition is an ordinary dict, so you can read it back with square brackets.',
+          code: `tool = {
+    "name": "get_order",
+    "input_schema": {
+        "type": "object",
+        "properties": {"order_id": {"type": "string"}},
+        "required": ["order_id"],
+    },
+}
+schema = tool["input_schema"]
+print(schema["properties"]["order_id"]["type"])
+print(schema["required"])`,
+          language: 'python',
+          output: "string\n['order_id']",
+        },
+        {
           kind: 'write',
           prompt: 'Finish the definition for a tool named `get_time`. It takes one input, `city`, which is a string and is required. The four prints check your work.',
           language: 'python',
@@ -294,6 +317,13 @@ print(schema["required"])
           explain: 'Your loop checks for `tool_use`. Any other stop reason means there is nothing for your code to run this round.',
         },
         {
+          kind: 'concept',
+          title: 'Sending the result back',
+          body: 'The result travels back in a message with the role `user`. Its content is a list holding a **`tool_result`** block.\n\n`tool_use_id` repeats the `id` of the request, so the model can pair each answer with the request it belongs to.',
+          code: '{\n    "role": "user",\n    "content": [\n        {"type": "tool_result", "tool_use_id": "toolu_07", "content": "3C snow"}\n    ],\n}',
+          language: 'python',
+        },
+        {
           kind: 'blank',
           prompt: 'Build the message that carries a tool\'s output back to the model.',
           code: 'reply = {\n    "role": "___",\n    "content": [\n        {\n            "type": "___",\n            "tool_use_id": "toolu_01",\n            "content": "18C cloudy",\n        }\n    ],\n}',
@@ -325,6 +355,21 @@ print(schema["required"])
           ],
           answer: 2,
           explain: 'The result must carry the same id as the request it answers: "toolu_A1". Otherwise the model cannot tell which request it belongs to.',
+        },
+        {
+          kind: 'concept',
+          title: 'Looking a function up by name',
+          body: 'A dict can hold functions. Look one up with the name in the block, then call it with the block\'s input.\n\nThe model chose the name and the input. Your code did the running.',
+          code: `def double(inputs):
+    return inputs["number"] * 2
+
+TOOLS = {"double": double}
+block = {"type": "tool_use", "id": "toolu_9", "name": "double", "input": {"number": 21}}
+
+function = TOOLS[block["name"]]
+print(function(block["input"]))`,
+          language: 'python',
+          output: '42',
         },
         {
           kind: 'write',
@@ -372,6 +417,21 @@ result_message = {
 print(json.dumps(result_message, sort_keys=True))
 `,
           explain: 'You looked the function up by name in a dict and passed it the model\'s inputs. That small step is called a **dispatcher**.',
+        },
+        {
+          kind: 'concept',
+          title: 'Keep going while it asks',
+          body: 'The loop runs **while** the stop reason is `tool_use`. Each round ends by asking the model again, which gives a new stop reason.\n\nWhen it is anything else, the loop ends. Here a list stands in for three replies from a model.',
+          code: `stop_reasons = ["tool_use", "tool_use", "end_turn"]
+rounds = 0
+stop_reason = stop_reasons[0]
+while stop_reason == "tool_use":
+    rounds += 1
+    print("round", rounds)
+    stop_reason = stop_reasons[rounds]
+print("finished after", rounds, "rounds")`,
+          language: 'python',
+          output: 'round 1\nround 2\nfinished after 2 rounds',
         },
         {
           kind: 'write',
@@ -474,6 +534,11 @@ print(len(messages))
           explain: 'It names the bad input and shows the right form. The model reads error text just as it reads everything else.',
         },
         {
+          kind: 'concept',
+          title: 'Two ways a tool call can fail',
+          body: 'The **function** can fail: it raises an exception because the booking does not exist.\n\nOr the **request** can be wrong: the model asks for a tool you never defined, perhaps a misspelt name. Looking up a name that is not in a dict raises `KeyError`.\n\nYour dispatcher, the code that runs tools, should catch both.',
+        },
+        {
           kind: 'steps',
           prompt: 'Your dispatcher handles each situation one way. Tap the right one.',
           cells: ['Send the result back', 'Send back an error result', 'Let the program crash'],
@@ -504,6 +569,21 @@ print(len(messages))
           prompt: 'In a `tool_result` block, which key marks the result as a failure? Type it.',
           accept: ['is_error', '"is_error"'],
           explain: 'Set `is_error` to `True` and put the explanation in `content`.',
+        },
+        {
+          kind: 'concept',
+          title: 'Turning a crash into a message',
+          body: '`except Exception as e` catches whatever went wrong and names it `e`. `str(e)` is its message as text.\n\nThat text is what you would send back to the model in place of a crash.',
+          code: `def half(text):
+    return int(text) / 2
+
+for text in ["10", "ten"]:
+    try:
+        print(half(text))
+    except Exception as e:
+        print("Error: " + str(e))`,
+          language: 'python',
+          output: "5.0\nError: invalid literal for int() with base 10: 'ten'",
         },
         {
           kind: 'write',
@@ -664,6 +744,22 @@ print(json.dumps(run_tool(block), sort_keys=True))
             ['delete_account', 'Cannot be undone: confirm, and limit who may ask'],
           ],
           explain: 'Care grows with the damage a mistake could do. Reading is cheap to get wrong. Deleting is not.',
+        },
+        {
+          kind: 'concept',
+          title: 'A check that returns early',
+          body: 'A check function returns at the first problem it finds. Test the **type** before the size: comparing text with a number would crash.\n\nOnly a value that passes every test reaches `ok`.',
+          code: `def check(age):
+    if not isinstance(age, int) or age < 0:
+        return "blocked: bad age"
+    if age > 120:
+        return "blocked: too high"
+    return "ok"
+
+for age in [30, "old", 400]:
+    print(check(age))`,
+          language: 'python',
+          output: 'ok\nblocked: bad age\nblocked: too high',
         },
         {
           kind: 'write',

@@ -106,6 +106,23 @@ rows = db.execute("SELECT name FROM pets").fetchall()`,
           explain: 'The `?` marks the spot, and the tuple after the query supplies the value. One value still needs the trailing comma to be a tuple.',
         },
         {
+          kind: 'concept',
+          title: 'A safe query, start to finish',
+          body: 'The `?` holds the place and `(kind,)` supplies the value. `ORDER BY name` sorts the rows A to Z.\n\nEach row comes back as a tuple, so `row[0]` is its first column.',
+          code: r`import sqlite3
+
+db = sqlite3.connect(":memory:")
+db.execute("CREATE TABLE pets (name TEXT, kind TEXT)")
+db.execute("INSERT INTO pets VALUES ('Rex', 'dog'), ('Tom', 'cat'), ('Ace', 'dog')")
+kind = "dog"
+rows = db.execute("SELECT name FROM pets WHERE kind = ? ORDER BY name", (kind,)).fetchall()
+for row in rows:
+    print(row[0])`,
+          language: 'python',
+          output: r`Ace
+Rex`,
+        },
+        {
           kind: 'write',
           prompt: 'Read an author with `input()`. Select that author\'s titles from `books`, A to Z, using a `?` placeholder, and print one title per line.',
           language: 'python',
@@ -155,6 +172,20 @@ for row in rows:
           language: 'python',
           accept: ['2'],
           explain: '`fetchone` returns a single row, here the tuple `(2,)`, and `[0]` takes the first value out of it.',
+        },
+        {
+          kind: 'concept',
+          title: 'Placeholders work for INSERT too',
+          body: 'Any value can travel through a `?`, not only the ones in a `WHERE`.\n\nThis name has an apostrophe in it. Glued into the SQL text it would end the string early. Sent as a parameter, it is saved exactly as typed.',
+          code: r`import sqlite3
+
+db = sqlite3.connect(":memory:")
+db.execute("CREATE TABLE pets (name TEXT)")
+name = "Rex's twin"
+db.execute("INSERT INTO pets VALUES (?)", (name,))
+print(db.execute("SELECT name FROM pets").fetchone()[0])`,
+          language: 'python',
+          output: r`Rex's twin`,
         },
         {
           kind: 'write',
@@ -222,6 +253,24 @@ db.commit()      # or db.rollback() to undo both`,
           prompt: 'Ana has 100. A transfer takes 50 from her, then crashes before paying Ben, and the transaction rolls back. What is Ana\'s balance now? Type the number.',
           accept: ['100'],
           explain: 'Rollback undoes every change in the transaction, so the half-finished transfer never happened.',
+        },
+        {
+          kind: 'concept',
+          title: 'Rollback in action',
+          body: 'The shop has 3 mugs and someone orders 5. The update runs, and the count reads -2. Nothing is final yet.\n\n`db.rollback()` undoes everything since the last `db.commit()`, so the count is 3 again.',
+          code: r`import sqlite3
+
+db = sqlite3.connect(":memory:")
+db.execute("CREATE TABLE stock (item TEXT, amount INTEGER)")
+db.execute("INSERT INTO stock VALUES ('mug', 3)")
+db.commit()
+db.execute("UPDATE stock SET amount = amount - 5 WHERE item = 'mug'")
+print(db.execute("SELECT amount FROM stock").fetchone()[0])
+db.rollback()
+print(db.execute("SELECT amount FROM stock").fetchone()[0])`,
+          language: 'python',
+          output: r`-2
+3`,
         },
         {
           kind: 'write',
@@ -303,6 +352,23 @@ print(db.execute("SELECT name, balance FROM accounts ORDER BY name").fetchall())
           explain: 'Ana\'s email is already in the table, so `UNIQUE` blocks the second copy. The other rows go in fine.',
         },
         {
+          kind: 'concept',
+          title: 'Catching a refusal',
+          body: 'When a constraint is broken, `sqlite3` raises an error called `IntegrityError` and the program would stop.\n\nPut the risky line inside `try:`. If the error happens, Python jumps to the `except` block and carries on from there.',
+          code: r`import sqlite3
+
+db = sqlite3.connect(":memory:")
+db.execute("CREATE TABLE tags (name TEXT UNIQUE)")
+db.execute("INSERT INTO tags VALUES ('red')")
+try:
+    db.execute("INSERT INTO tags VALUES ('red')")
+    print("added")
+except sqlite3.IntegrityError:
+    print("already there")`,
+          language: 'python',
+          output: 'already there',
+        },
+        {
           kind: 'write',
           prompt: 'Read an email with `input()` and try to insert it. If the database refuses (it raises `sqlite3.IntegrityError`), print `taken`. If it works, print `saved`. The last line prints how many users there are.',
           language: 'python',
@@ -339,6 +405,15 @@ except sqlite3.IntegrityError:
 print(db.execute("SELECT COUNT(*) FROM users").fetchone()[0])
 `,
           explain: 'The database is the judge of "is this email taken?". Your code catches its answer and can turn it into a friendly message, or a 409 in an API.',
+        },
+        {
+          kind: 'concept',
+          title: 'LEFT JOIN shows the gaps',
+          body: 'A plain `JOIN` drops an order when no customer matches it. `LEFT JOIN` keeps every order and fills the missing side with `NULL`.\n\nTo test for a gap, write `IS NULL`. Comparing with `= NULL` never matches.',
+          code: 'SELECT orders.id, customers.name\nFROM orders\nLEFT JOIN customers ON customers.id = orders.customer_id\nORDER BY orders.id;',
+          language: 'sql',
+          setup: SHOP,
+          output: '1|Ana\n2|Ben\n3|NULL\n4|Ana\n5|NULL\n6|Cy',
         },
         {
           kind: 'write',
@@ -400,6 +475,19 @@ print(db.execute("SELECT COUNT(*) FROM users").fetchone()[0])
           explain: 'Every database remembers how far it got and picks up from there. That is how laptops, test servers and production end up with the same schema.',
         },
         {
+          kind: 'concept',
+          title: 'Numbered pairs, in order',
+          body: 'Each step here is a pair: a number and some text. `sorted` orders pairs by their first item, so the numbers decide.\n\n`for number, text in ...` unpacks each pair into two names.',
+          code: r`STEPS = [(2, "pour water"), (3, "stir"), (1, "add tea")]
+
+for number, text in sorted(STEPS):
+    print(number, text)`,
+          language: 'python',
+          output: r`1 add tea
+2 pour water
+3 stir`,
+        },
+        {
           kind: 'write',
           prompt: 'Run every migration in number order. Print `ran N` after each one (for example `ran 1`). The list is jumbled on purpose. The last lines print the columns of `users`.',
           language: 'python',
@@ -455,6 +543,23 @@ print(columns)
           ],
           answer: 3,
           explain: 'Production will never re-run 002, and hand edits leave no record. A new numbered migration fixes every database the same way.',
+        },
+        {
+          kind: 'concept',
+          title: 'Skip what is already done',
+          body: '`continue` skips the rest of this turn of the loop and moves to the next item.\n\nHere the note of finished work is a list. In the next question it is a table, so you record a number with an `INSERT`.',
+          code: r`done = [1, 2]
+
+for number in [1, 2, 3, 4]:
+    if number in done:
+        continue
+    done.append(number)
+    print("ran", number)
+print(done)`,
+          language: 'python',
+          output: r`ran 3
+ran 4
+[1, 2, 3, 4]`,
         },
         {
           kind: 'write',
@@ -527,6 +632,15 @@ print(db.execute("SELECT COUNT(*) FROM done").fetchone()[0])
           prompt: 'The project\'s newest migration is `007`. You need to add a table. What number does your new migration get? Type it.',
           accept: ['008', '8'],
           explain: 'New changes always go at the end of the line. You never slot one in between older migrations.',
+        },
+        {
+          kind: 'concept',
+          title: 'Rows with and without a value',
+          body: '`NULL` means "no value here". You test for it with `IS NULL` or `IS NOT NULL`, never with `=`.\n\nThis query lists the users who do have an email.',
+          code: 'SELECT name FROM users\nWHERE email IS NOT NULL\nORDER BY name;',
+          language: 'sql',
+          setup: USERS_AFTER_MIGRATION,
+          output: 'Ben\nDee',
         },
         {
           kind: 'write',
@@ -604,6 +718,15 @@ user = User.find(3)     # one row, as an object`,
           explain: '`post.author` is not loaded yet, so the ORM fetches it from the database each time round the loop. `post.title` was already loaded.',
         },
         {
+          kind: 'concept',
+          title: 'One query with a JOIN',
+          body: 'A `JOIN` glues each post to its author inside a single query. `ON` says how the rows pair up: the post\'s `author_id` equals the author\'s `id`.\n\nWith two tables in play, write `table.column` so it is clear which one you mean.',
+          code: "SELECT posts.id, authors.name\nFROM posts\nJOIN authors ON authors.id = posts.author_id\nWHERE authors.name = 'Ana'\nORDER BY posts.id;",
+          language: 'sql',
+          setup: BLOG,
+          output: '1|Ana\n3|Ana',
+        },
+        {
           kind: 'write',
           prompt: 'Fix the N+1 by hand: with one query, show each post\'s `title` and its author\'s `name`, sorted by title A to Z.',
           language: 'sql',
@@ -635,6 +758,20 @@ user = User.find(3)     # one row, as an object`,
             { ask: 'After that, which plan line do you hope to see?', answer: 1 },
           ],
           explain: 'Read the plan, add an index on the column you filter by, then read the plan again to confirm it changed.',
+        },
+        {
+          kind: 'concept',
+          title: 'Creating an index',
+          body: '`CREATE INDEX name ON table (column)` builds an index on one column. You pick the name.\n\nThe plan comes back as a row, with its text in `row[3]`. This table has an index on `owner`, so the first word of the plan is `SEARCH`.',
+          code: r`import sqlite3
+
+db = sqlite3.connect(":memory:")
+db.execute("CREATE TABLE pets (name TEXT, owner TEXT)")
+db.execute("CREATE INDEX idx_owner ON pets (owner)")
+row = db.execute("EXPLAIN QUERY PLAN SELECT name FROM pets WHERE owner = 'Ana'").fetchone()
+print(row[3].split()[0])`,
+          language: 'python',
+          output: 'SEARCH',
         },
         {
           kind: 'write',
@@ -680,6 +817,29 @@ print(plan())
           kind: 'concept',
           title: 'Key-value stores',
           body: 'Not every database has tables. A **key-value store** is one giant dictionary: you `set` a value under a key and `get` it back by that key.\n\nIt is very fast and very simple. The price: you can only look things up by key. No JOINs, no "find all where...". Great for caches and login sessions.',
+        },
+        {
+          kind: 'concept',
+          title: 'A dict is a tiny key-value store',
+          body: 'Setting is `store[key] = value`. Getting is `store.get(key, fallback)`, which gives the fallback when the key is missing.\n\nCommands arrive as one line of text. `.split()` cuts the line into its words.',
+          code: r`store = {}
+store["colour"] = "blue"
+print(store.get("colour", "(none)"))
+print(store.get("size", "(none)"))
+print("set size big".split())`,
+          language: 'python',
+          output: r`blue
+(none)
+['set', 'size', 'big']`,
+        },
+        {
+          kind: 'choice',
+          prompt: 'What does this print?',
+          code: 'store = {}\nstore["a"] = "1"\nstore["a"] = "2"\nprint(store.get("a"), store.get("b", "(none)"))',
+          language: 'python',
+          options: ['1 (none)', '2 (none)', '1 2', '2 None'],
+          answer: 1,
+          explain: 'Setting a key a second time replaces the old value, so `a` holds 2. Key `b` was never set, so `.get` hands back the fallback.',
         },
         {
           kind: 'write',
@@ -771,6 +931,15 @@ for _ in range(count):
           ],
           answer: 2,
           explain: 'Backup jobs fail quietly: an empty file, a missing table, a lost password. A practice restore is the only real test.',
+        },
+        {
+          kind: 'concept',
+          title: 'Counting by group',
+          body: '`GROUP BY` puts rows with the same value into one group, and `COUNT(*)` counts the rows in each group.\n\nThis counts the orders for each customer id.',
+          code: 'SELECT customer_id, COUNT(*)\nFROM orders\nGROUP BY customer_id\nORDER BY customer_id;',
+          language: 'sql',
+          setup: SHOP,
+          output: '1|2\n2|1\n3|1\n7|1\n9|1',
         },
         {
           kind: 'write',

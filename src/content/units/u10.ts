@@ -33,6 +33,19 @@ export const u10: Unit = {
           body: 'There are two ways to make a program "smart".\n\n**Rules:** a person writes every `if` by hand.\n\n**Learning:** you show the program many **examples** with the right answers, and it finds the patterns itself.',
         },
         {
+          kind: 'concept',
+          title: 'A rule in code',
+          body: 'A rule is just an `if`. `.lower()` makes the text all lowercase first, so capitals stop mattering. `in` checks whether one piece of text sits inside another, and `or` lets either clue count.',
+          code: `message = "Huge SALE ends today"
+text = message.lower()
+if "sale" in text or "discount" in text:
+    print("advert")
+else:
+    print("ok")`,
+          language: 'python',
+          output: 'advert',
+        },
+        {
           kind: 'write',
           prompt: 'Write a rule-based spam filter. Read a message. If it contains `free money` or `winner` (in any capitals), print `spam`, otherwise print `ok`.',
           language: 'python',
@@ -107,6 +120,17 @@ export const u10: Unit = {
           explain: '"prize" is common in spam and rare in normal mail. "the" is everywhere, so it tells you nothing.',
         },
         {
+          kind: 'concept',
+          title: 'Counting with a dictionary',
+          body: 'A dictionary can keep a tally. `counts.get(letter, 0)` gives the count so far, or 0 the first time a letter is seen. Add 1 and store it back.',
+          code: `counts = {}
+for letter in "banana":
+    counts[letter] = counts.get(letter, 0) + 1
+print(counts)`,
+          language: 'python',
+          output: "{'b': 1, 'a': 3, 'n': 2}",
+        },
+        {
           kind: 'blank',
           prompt: 'Count how many times each word appears.',
           code: 'counts = {}\nfor word in text.split():\n    counts[word] = counts.___(word, ___) + 1',
@@ -114,6 +138,20 @@ export const u10: Unit = {
           bank: ['get', '0', '1', 'count'],
           answers: ['get', '0'],
           explain: '`counts.get(word, 0)` gives the count so far, or 0 the first time a word is seen. Then we add 1.',
+        },
+        {
+          kind: 'concept',
+          title: 'Many messages, one tally',
+          body: 'To count across several messages, put one loop inside another: the outer loop takes each message, the inner loop takes each of its words.\n\nAsking with `.get(word, 0)` is safe for a word that was never seen: it gives 0.',
+          code: `notes = ["red blue", "blue green"]
+counts = {}
+for note in notes:
+    for word in note.split():
+        counts[word] = counts.get(word, 0) + 1
+print(counts.get("blue", 0))
+print(counts.get("pink", 0))`,
+          language: 'python',
+          output: '2\n0',
         },
         {
           kind: 'write',
@@ -198,6 +236,7 @@ export const u10: Unit = {
           body: 'With single numbers, "how close" is the gap between them. Python\'s `abs()` gives the **absolute value**: the number without its minus sign. So `abs(a - b)` is the distance, whichever is bigger.',
           code: 'print(abs(3 - 10))  # 7\nprint(abs(10 - 3))  # 7',
           language: 'python',
+          output: '7\n7',
         },
         {
           kind: 'choice',
@@ -218,6 +257,20 @@ export const u10: Unit = {
             'Give the new item that example\'s label',
           ],
           explain: 'Measure everything, pick the closest, copy its label. That is the whole method.',
+        },
+        {
+          kind: 'concept',
+          title: 'Keeping the best so far',
+          body: 'You stand at 6 on a street and want the nearest shop. Start `best_gap` bigger than any real gap, so the first shop always beats it. Each closer shop then replaces the best so far.',
+          code: `shops = [(2, "bakery"), (9, "bank"), (5, "cafe")]
+best_gap = 999
+for spot, name in shops:
+    if abs(6 - spot) < best_gap:
+        best_gap = abs(6 - spot)
+        best_name = name
+print(best_name)`,
+          language: 'python',
+          output: 'cafe',
         },
         {
           kind: 'blank',
@@ -278,6 +331,31 @@ export const u10: Unit = {
           kind: 'concept',
           title: 'A tiny next-word model',
           body: 'You can build a very small version: go through some text and count which word comes after which. To predict, pick the word that followed most often.\n\nReal LLMs are far bigger and smarter, but the goal is the same.',
+        },
+        {
+          kind: 'concept',
+          title: 'A dictionary of dictionaries',
+          body: 'The tally has two levels. The outer key is a word. Its value is another dictionary: each word that came next, with how many times.\n\nSo `follows["the"]` is the little tally for "the".',
+          code: `follows = {"the": {"cat": 2, "mat": 1}, "sat": {"on": 1}}
+print(follows["the"])
+print(follows["the"]["cat"])`,
+          language: 'python',
+          output: "{'cat': 2, 'mat': 1}\n2",
+        },
+        {
+          kind: 'concept',
+          title: 'Pick the biggest count',
+          body: '`.items()` gives each key with its value. Keep the best pair seen so far, and swap it whenever a bigger count turns up.',
+          code: `votes = {"pizza": 2, "soup": 5, "rice": 1}
+best = ""
+best_count = 0
+for food, count in votes.items():
+    if count > best_count:
+        best = food
+        best_count = count
+print(best)`,
+          language: 'python',
+          output: 'soup',
         },
         {
           kind: 'write',
@@ -350,6 +428,16 @@ export const u10: Unit = {
           kind: 'concept',
           title: 'AI as a coding helper',
           body: 'AI chatbots can explain error messages, suggest code, and answer "why" questions at any hour. They are great helpers.\n\nBut you are still the programmer. If the code goes wrong, it\'s your program, so you check it.',
+        },
+        {
+          kind: 'concept',
+          title: 'Check with a tiny example',
+          body: 'The quickest check of any code, yours or an AI\'s, is a small example whose answer you can work out in your head.\n\nTwo helpers for lists: `sum` adds the items up and `len` counts them.',
+          code: `numbers = [2, 4, 6]
+print(sum(numbers))
+print(len(numbers))`,
+          language: 'python',
+          output: '12\n3',
         },
         {
           kind: 'choice',
@@ -483,6 +571,18 @@ export const u10: Unit = {
           explain: 'A is worth -3, B is worth 1 and C is worth 0. The move holding the biggest number, A, is actually the worst.',
         },
         {
+          kind: 'concept',
+          title: 'A board as text',
+          body: 'A board can be a string of 9 squares, numbered 0 to 8. A line is three of those positions. Here `(0, 3, 6)` is the left column, and `and` checks that all three squares hold X.',
+          code: `board = "XO.XO.X.."
+a, b, c = (0, 3, 6)
+print(board[a], board[b], board[c])
+if board[a] == "X" and board[b] == "X" and board[c] == "X":
+    print("X has this line")`,
+          language: 'python',
+          output: 'X X X\nX has this line',
+        },
+        {
           kind: 'write',
           prompt: 'Score a finished board. Read 9 characters like `XXXOO....` (row by row, `.` is empty). Print `1` if X has three in a line, `-1` if O does, and `0` otherwise. `LINES` lists the eight winning lines.',
           language: 'python',
@@ -515,6 +615,16 @@ for a, b, c in LINES:
 print(score)
 `,
           explain: 'This is the bottom of the game tree: a rule that turns a finished board into a number the AI can compare.',
+        },
+        {
+          kind: 'concept',
+          title: 'min plays the opponent',
+          body: '`min` gives the smallest number in a list. That is the reply your opponent would pick, so it is what the move is really worth.\n\nHere `left` is worth 3 and `right` is worth 4, so right is the better move.',
+          code: `replies = {"left": [3, 7], "right": [4, 5]}
+for move, scores in replies.items():
+    print(move, min(scores))`,
+          language: 'python',
+          output: 'left 3\nright 4',
         },
         {
           kind: 'write',
@@ -595,6 +705,20 @@ print(best_move, best_worth)
           explain: '8 ÷ 10 = 0.8, which is 80%.',
         },
         {
+          kind: 'concept',
+          title: 'Counting matches',
+          body: 'To compare two lists item by item, loop over the positions. `range(len(answers))` gives 0, 1, 2, and the same `i` picks the matching item from each list.',
+          code: `guesses = ["cat", "dog", "dog"]
+answers = ["cat", "dog", "cat"]
+right = 0
+for i in range(len(answers)):
+    if guesses[i] == answers[i]:
+        right += 1
+print(right)`,
+          language: 'python',
+          output: '2',
+        },
+        {
           kind: 'write',
           prompt: 'Measure a model. Its predictions are read from input as words separated by spaces. Count how many match `labels` at the same position and print the accuracy as a whole percentage, like `80%`.',
           language: 'python',
@@ -652,6 +776,16 @@ print(f"{percent}%")
           language: 'python',
           answer: 3,
           explain: 'It marks the model on the same emails it learned from. The score must come from `test`, the examples it never saw.',
+        },
+        {
+          kind: 'concept',
+          title: 'Slicing a list in two',
+          body: 'A **slice** copies part of a list. `letters[:2]` is everything before position 2, and `letters[2:]` is everything from position 2 onwards. Together they hold every item exactly once.',
+          code: `letters = ["a", "b", "c", "d", "e"]
+print(letters[:2])
+print(letters[2:])`,
+          language: 'python',
+          output: "['a', 'b']\n['c', 'd', 'e']",
         },
         {
           kind: 'write',
@@ -733,6 +867,21 @@ print(len(train), len(test))
           body: 'AI-written code often looks right and is nearly right. The fastest check is a tiny test where you already know the answer.\n\nIf the result surprises you, tell the AI exactly what you ran, what you expected and what you got.',
         },
         {
+          kind: 'concept',
+          title: 'A tiny test',
+          body: '`ch in "0123456789"` is true when the character is one of those ten. This function counts digits. One test with an answer you already know, 2, shows it works.',
+          code: `def count_digits(text):
+    count = 0
+    for ch in text:
+        if ch in "0123456789":
+            count += 1
+    return count
+
+print(count_digits("room 42"))`,
+          language: 'python',
+          output: '2',
+        },
+        {
           kind: 'type',
           prompt: 'You asked an AI for a vowel counter and it wrote this. "hello" has 2 vowels. What does the code actually print?',
           code: 'def count_vowels(word):\n    count = 0\n    for letter in word:\n        if letter in "aeiu":\n            count += 1\n    return count\n\nprint(count_vowels("hello"))',
@@ -769,6 +918,15 @@ print(count_vowels(input()))
 print(count_vowels(input()))
 `,
           explain: 'A one-letter fix, but you could only make it because you read the code and tested it instead of trusting it.',
+        },
+        {
+          kind: 'concept',
+          title: 'Test the awkward cases',
+          body: 'Bugs hide at the edges. Try the inputs the author may not have pictured: negative numbers, an empty list, the very last value.\n\nRemember that `range` stops just before its second number.',
+          code: `for i in range(1, 4):
+    print(i)`,
+          language: 'python',
+          output: '1\n2\n3',
         },
         {
           kind: 'spot',

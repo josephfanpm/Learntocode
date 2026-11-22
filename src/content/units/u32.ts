@@ -230,6 +230,27 @@ export const u32: Unit = {
           explain: 'It never ran the tests, so "all the tests pass" is a guess. A claim with no tool result behind it has no ground truth.',
         },
         {
+          kind: 'concept',
+          title: 'The loop, once more',
+          body: 'Here is the tool loop from the last chapter, with a pretend model.\n\nWhile the model asks for a tool, the code appends two messages: the model\'s request, then the result **inside a list**. Then it calls the model again. The result here is made up, so no real tool runs.',
+          language: 'python',
+          code: `def fake_model(messages):
+    if len(messages) < 5:
+        return {"stop_reason": "tool_use", "content": [{"name": "roll_dice"}]}
+    return {"stop_reason": "end_turn", "content": [{"text": "Rolled twice"}]}
+
+messages = [{"role": "user", "content": "Roll two dice."}]
+response = fake_model(messages)
+while response["stop_reason"] == "tool_use":
+    block = response["content"][0]
+    print("model asked for " + block["name"])
+    messages.append({"role": "assistant", "content": response["content"]})
+    messages.append({"role": "user", "content": ["rolled a 4"]})
+    response = fake_model(messages)
+print(response["content"][0]["text"])`,
+          output: 'model asked for roll_dice\nmodel asked for roll_dice\nRolled twice',
+        },
+        {
           kind: 'write',
           prompt: 'Run the agent. While the model\'s stop reason is `tool_use`: print `step`, the step number and the tool name (like `step 1: run_tests`), append the model\'s reply as an `assistant` message, run the tool with `run_tool`, append the result in a `user` message, and call `fake_model` again. Finally print the model\'s text.',
           language: 'python',
@@ -310,6 +331,26 @@ print(response["content"][0].get("text", "not finished"))
           body: 'The simplest workflow is a **chain**: the output of one model call becomes the input of the next. Each call has one small, easy job.\n\nBetween steps you can add a **gate**: a check in ordinary code. If step 1 produced nothing useful, stop there. Do not feed rubbish into step 2.',
         },
         {
+          kind: 'concept',
+          title: 'A chain in code',
+          body: 'Two functions stand in for two model calls. The output of step 1, `summary`, is the input of step 2.\n\nThe `if` between them is the gate: an empty summary stops the chain before step 2 runs.',
+          language: 'python',
+          code: `def shorten(text):
+    # Stand-in for model call 1: keep the first sentence.
+    return text.split(".")[0]
+
+def make_headline(summary):
+    # Stand-in for model call 2: write a headline.
+    return summary.upper()
+
+summary = shorten("Rain stops play. Fans go home.")
+if summary == "":
+    print("stopped: nothing to summarise")
+else:
+    print(make_headline(summary))`,
+          output: 'RAIN STOPS PLAY',
+        },
+        {
           kind: 'write',
           prompt: 'Chain two steps. `extract_name` and `write_reply` stand in for two model calls. Pass the message to step 1. Gate: if the name is an empty string, print `stopped: no name found`. Otherwise pass the name to step 2 and print the reply.',
           language: 'python',
@@ -334,6 +375,24 @@ else:
           kind: 'concept',
           title: 'Routing',
           body: '**Routing** sorts each input first, then sends it to a specialist.\n\nOne model call **classifies** the input: is this about billing, or a technical fault? Your code then picks the matching handler, each with its own focused prompt. One prompt no longer has to be good at everything.',
+        },
+        {
+          kind: 'concept',
+          title: 'Picking a handler',
+          body: '`HANDLERS` maps a label to a function. `HANDLERS.get(label, support)` looks the label up, and falls back to `support` when the label is not there.\n\nThen `handler(...)` calls whichever function came back.',
+          language: 'python',
+          code: `def sales(message):
+    return "Sales: here is our price list."
+
+def support(message):
+    return "Support: we will take a look."
+
+HANDLERS = {"price": sales}
+
+for label in ["price", "fault"]:
+    handler = HANDLERS.get(label, support)
+    print(handler("hello"))`,
+          output: 'Sales: here is our price list.\nSupport: we will take a look.',
         },
         {
           kind: 'write',
@@ -442,6 +501,24 @@ print(handler(message))
             { ask: 'The new draft gets the verdict "pass".', answer: 2 },
           ],
           explain: 'The two roles take turns until the evaluator is satisfied. Splitting writing from judging gives each call one clear job.',
+        },
+        {
+          kind: 'concept',
+          title: 'A loop with a cap',
+          body: '`range(1, 4)` gives attempts 1, 2 and 3, and no more.\n\nOn a success, `break` leaves the loop early and `found` remembers it. If the loop ends with `found` still False, every attempt failed, and the last line says so.',
+          language: 'python',
+          code: `guesses = ["tiger", "lion", "zebra"]
+found = False
+for attempt in range(1, 4):
+    guess = guesses[attempt - 1]
+    if guess == "lion":
+        print("attempt", attempt, "correct")
+        found = True
+        break
+    print("attempt", attempt, "wrong")
+if not found:
+    print("gave up")`,
+          output: 'attempt 1 wrong\nattempt 2 correct',
         },
         {
           kind: 'write',
@@ -570,6 +647,23 @@ if not passed:
           explain: 'The limit caps the damage. Five wasted steps is annoying. Five thousand is a bill and a mess.',
         },
         {
+          kind: 'concept',
+          title: 'Two reasons to stop',
+          body: 'This pretend model never stops asking: `wants_tool` stays True. The loop ends anyway, because `steps < max_steps` turns False after three rounds.\n\nAfter the loop, check **why** it ended before you print a result.',
+          language: 'python',
+          code: `wants_tool = True
+max_steps = 3
+steps = 0
+while wants_tool and steps < max_steps:
+    steps += 1
+    print("tool call", steps)
+if wants_tool:
+    print("gave up: limit reached")
+else:
+    print("finished")`,
+          output: 'tool call 1\ntool call 2\ntool call 3\ngave up: limit reached',
+        },
+        {
           kind: 'write',
           prompt: 'Add a step limit. Loop while the stop reason is `tool_use` **and** `steps` is below `max_steps`. Each time round: add 1 to `steps`, append the `assistant` message, run the tool with `run_tool`, append the result in a `user` message and call `fake_model` again. After the loop, print the final text if the stop reason is `end_turn`, or `stopped: step limit` if not. Then print `steps` and the count.',
           language: 'python',
@@ -656,6 +750,28 @@ print("steps", steps)
           ],
           answer: 1,
           explain: 'Good notes are short: what was learned, what was decided and what is left. Copying everything just moves the clutter.',
+        },
+        {
+          kind: 'concept',
+          title: 'A tool that remembers',
+          body: 'The list `shopping` lives outside the functions, so every call works on the same list. `len` counts the items and `", ".join(...)` glues them into one string.\n\nAn empty list counts as False, so `if not shopping:` means "nothing saved yet".',
+          language: 'python',
+          code: `shopping = []
+
+def add_item(inputs):
+    shopping.append(inputs["item"])
+    return "added, list has " + str(len(shopping))
+
+def show_list(inputs):
+    if not shopping:
+        return "list is empty"
+    return ", ".join(shopping)
+
+print(show_list({}))
+print(add_item({"item": "milk"}))
+print(add_item({"item": "tea"}))
+print(show_list({}))`,
+          output: 'list is empty\nadded, list has 1\nadded, list has 2\nmilk, tea',
         },
         {
           kind: 'write',

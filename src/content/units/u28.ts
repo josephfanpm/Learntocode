@@ -93,6 +93,19 @@ response = client.messages.create(
           explain: 'Your messages have the role `user`. The replies from the model have the role `assistant`.',
         },
         {
+          kind: 'concept',
+          title: 'A message is a dict in a list',
+          body: 'One message is a dict with two keys, `role` and `content`. `messages` is a list of them, even when there is only one.\n\n`messages[-1]` is the last item in the list.',
+          code: `message = {"role": "user", "content": "Name one planet."}
+messages = [message]
+
+print(len(messages))
+print(messages[-1]["role"])
+print(messages[-1]["content"])`,
+          language: 'python',
+          output: '1\nuser\nName one planet.',
+        },
+        {
           kind: 'order',
           prompt: 'Put this program in order.',
           lines: [
@@ -233,6 +246,19 @@ print(fake_model(messages))
           explain: 'The reply side of the conversation is always `assistant`. A name like `bot` or `ai` is rejected.',
         },
         {
+          kind: 'concept',
+          title: 'Grow the same list',
+          body: '`append` adds a turn to the end of the list you already have. The earlier turns stay where they are, so the next call can carry all of them.\n\nMaking a new list would throw the history away.',
+          code: `messages = [{"role": "user", "content": "Name a planet."}]
+messages.append({"role": "assistant", "content": "Saturn."})
+messages.append({"role": "user", "content": "How big is it?"})
+
+print(len(messages))
+print(messages[-1]["content"])`,
+          language: 'python',
+          output: '3\nHow big is it?',
+        },
+        {
           kind: 'write',
           prompt: 'Read two questions. Send the first and print the reply text. Then keep the conversation going: append the reply as an assistant turn, append the second question as a user turn, send the **whole list** and print the second reply text.',
           language: 'python',
@@ -323,6 +349,22 @@ print(reply)
           explain: 'A list leaves room for different kinds of block in one reply. You will meet more kinds when you reach tools.',
         },
         {
+          kind: 'concept',
+          title: 'The same loop, with dicts',
+          body: 'The real library gives objects, read with a dot: `block.type`. The practice code in this course uses dicts, read with square brackets: `block["type"]`. The loop is the same.\n\nNotice the first block here is not text.',
+          code: `content = [
+    {"type": "thinking", "thinking": "A short answer will do."},
+    {"type": "text", "text": "Saturn."},
+]
+for block in content:
+    if block["type"] == "text":
+        print("text block:", block["text"])
+    else:
+        print("skipped a", block["type"], "block")`,
+          language: 'python',
+          output: 'skipped a thinking block\ntext block: Saturn.',
+        },
+        {
           kind: 'write',
           prompt: 'The stand-in returns a dict shaped like a real response. Read a name, call `fake_model`, and print the text of every block whose type is `"text"`. The real library gives objects (`block.text`). Here they are dicts, so use `block["text"]`.',
           language: 'python',
@@ -406,6 +448,21 @@ print(response.usage.output_tokens)`,
           bank: ['input_tokens', 'output_tokens', 'words', 'max_tokens'],
           answers: ['input_tokens', 'output_tokens'],
           explain: 'What went in plus what came out. `max_tokens` is the cap you set, not a count of what was used.',
+        },
+        {
+          kind: 'concept',
+          title: 'A running total',
+          body: '`=` replaces the old value. `+=` adds to it.\n\nTo total something across several calls, start at 0 before the loop and use `+=` inside it. Here two calls used 12 and 30 input tokens.',
+          code: `calls = [
+    {"input_tokens": 12, "output_tokens": 9},
+    {"input_tokens": 30, "output_tokens": 15},
+]
+total_in = 0
+for usage in calls:
+    total_in += usage["input_tokens"]
+print(total_in)`,
+          language: 'python',
+          output: '42',
         },
         {
           kind: 'write',
@@ -545,6 +602,11 @@ client = anthropic.Anthropic()`,
           explain: '`anthropic.Anthropic()` with empty brackets looks for the key in the environment for you.',
         },
         {
+          kind: 'concept',
+          title: 'If a key leaks',
+          body: 'Suppose a key is saved in a file that other people can open. Removing it afterwards is not enough: someone may already have copied it.\n\nA leaked key has to be **revoked**, which means switched off so that it stops working. Then you create a new one and keep that one in the environment.',
+        },
+        {
           kind: 'choice',
           prompt: 'You realise you pushed a real API key to a public repository an hour ago. What do you do first?',
           options: [
@@ -640,6 +702,17 @@ client = anthropic.Anthropic()`,
           body: 'Retrying instantly, again and again, just adds to the pile-up. Wait a little, and wait **longer each time**: 1 second, then 2, then 4. This is **exponential backoff**.\n\nAlways cap the number of tries. The official library already retries a couple of times for you, and its `max_retries` setting changes how many.',
         },
         {
+          kind: 'concept',
+          title: 'Doubling in a loop',
+          body: 'To make a value twice as big on every trip round a loop, replace it with two times itself at the end of the loop body.',
+          code: `size = 3
+for i in range(4):
+    print(size)
+    size = size * 2`,
+          language: 'python',
+          output: '3\n6\n12\n24',
+        },
+        {
           kind: 'write',
           prompt: 'Read how many retries are planned. Print the wait before each one, in seconds, one per line. The first wait is 1 and each wait is double the one before.',
           language: 'python',
@@ -661,6 +734,21 @@ for i in range(retries):
     wait = wait * 2
 `,
           explain: 'Doubling gives a struggling service more room with every attempt. Real code would pause for that many seconds before trying again.',
+        },
+        {
+          kind: 'concept',
+          title: 'Several chances',
+          body: 'A `try` inside a loop gives a failing step more than one chance. A failure jumps to `except`, and the loop goes round again.\n\n`break` leaves the loop as soon as one try works. Here the third try does.',
+          code: `answers = ["later", "later", "7"]
+for attempt in range(3):
+    try:
+        number = int(answers[attempt])
+        print("got", number)
+        break
+    except ValueError:
+        print("not yet")`,
+          language: 'python',
+          output: 'not yet\nnot yet\ngot 7',
         },
         {
           kind: 'write',

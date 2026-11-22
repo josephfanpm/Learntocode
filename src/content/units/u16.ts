@@ -20,6 +20,7 @@ export const u16: Unit = {
           body: 'In Python you just write `name = "Ada"`. JavaScript wants you to **declare** a variable first.\n\n`const` is for a name that keeps its value. `let` is for one you will reassign. Reach for `const` by default.\n\nYou print with `console.log`, and lines usually end with `;`.',
           code: L('const name = "Ada";', 'let score = 0;', 'score = score + 5;', 'console.log(name, score); // Ada 5'),
           language: 'javascript',
+          output: 'Ada 5',
         },
         {
           kind: 'choice',
@@ -46,6 +47,7 @@ export const u16: Unit = {
           body: 'JavaScript has one **number** type (no int and float split), plus **string**, **boolean**, and two kinds of nothing: `undefined` (never set) and `null` (empty on purpose).\n\nA **template literal** is a string in backticks. `${ }` drops a value in, like a Python f-string.',
           code: L('const item = "tea";', 'const price = 2.5;', 'console.log(`One ${item} costs ${price * 2} for two`);', 'console.log(typeof price); // number'),
           language: 'javascript',
+          output: 'One tea costs 5 for two\nnumber',
         },
         {
           kind: 'blank',
@@ -55,6 +57,14 @@ export const u16: Unit = {
           bank: ['$', '#', '%', '@'],
           answers: ['$'],
           explain: 'Python f-strings use `{price}`. JavaScript template literals use `${price}`, and only inside backticks.',
+        },
+        {
+          kind: 'concept',
+          title: 'Text to number',
+          body: 'Anything a user types arrives as a string, and `+` glues strings together. So `"30" + 1` is the text `301`.\n\n`Number()` turns text into a number first. It is the JavaScript version of Python `int()` or `float()`.',
+          code: L('const typed = "30";', 'console.log(typed + 1);', 'console.log(Number(typed) + 1);'),
+          language: 'javascript',
+          output: '301\n31',
         },
         {
           kind: 'write',
@@ -71,10 +81,11 @@ export const u16: Unit = {
         },
         {
           kind: 'concept',
-          title: 'Three equals signs, and truthy values',
-          body: '`==` converts types before comparing, so `"5" == 5` is true. `===` also checks the type. Always use `===` and `!==`.\n\nIn an `if`, these count as false (**falsy**): `false`, `0`, `""`, `null`, `undefined`, `NaN`. Everything else is **truthy**, even an empty array `[]`. In Python an empty list is falsy.',
-          code: L('console.log("5" == 5);  // true', 'console.log("5" === 5); // false', '', 'const name = "";', 'if (name) {', '  console.log("has a name");', '} else {', '  console.log("empty");', '}'),
+          title: 'Three equals signs',
+          body: '`==` converts types before comparing, so `"5" == 5` is true. `===` also checks the type. Always use `===` and `!==`.',
+          code: L('console.log("5" == 5);  // true', 'console.log("5" === 5); // false'),
           language: 'javascript',
+          output: 'true\nfalse',
         },
         {
           kind: 'type',
@@ -83,6 +94,14 @@ export const u16: Unit = {
           language: 'javascript',
           accept: ['false'],
           explain: '`===` compares type as well as value. A string and a number are never strictly equal. Note the lowercase: JavaScript writes `true` and `false`.',
+        },
+        {
+          kind: 'concept',
+          title: 'if, and truthy values',
+          body: 'An `if` puts its condition in round brackets and its block in curly braces.\n\nThese count as false (**falsy**): `false`, `0`, `""`, `null`, `undefined`, `NaN`. Everything else is **truthy**, even an empty array `[]`. In Python an empty list is falsy.',
+          code: L('const basket = 0;', 'if (basket) {', '  console.log("has items");', '} else {', '  console.log("empty");', '}'),
+          language: 'javascript',
+          output: 'empty',
         },
         {
           kind: 'steps',
@@ -121,6 +140,7 @@ export const u16: Unit = {
           body: 'Python has `def`. JavaScript has `function`. The body sits inside curly braces `{ }`: indentation is only for humans.\n\nYou still hand a result back with `return`. Forget it and the function gives back `undefined`, the JavaScript version of `None`.',
           code: L('function add(a, b) {', '  return a + b;', '}', 'console.log(add(2, 3)); // 5'),
           language: 'javascript',
+          output: '5',
         },
         {
           kind: 'spot',
@@ -149,6 +169,7 @@ export const u16: Unit = {
           body: 'An **arrow function** is a shorter way to write a function: `(inputs) => result`.\n\nWith no braces, the expression after `=>` is returned for you. With braces, you must write `return` yourself.\n\nIt is like a Python `lambda`, but JavaScript developers use arrows everywhere.',
           code: L('const double = (n) => n * 2;', '', 'const greet = (name) => {', '  const message = `Hi ${name}`;', '  return message;', '};', 'console.log(double(4), greet("Ada")); // 8 Hi Ada'),
           language: 'javascript',
+          output: '8 Hi Ada',
         },
         {
           kind: 'blank',
@@ -179,6 +200,7 @@ export const u16: Unit = {
           body: 'The classic `for` has three parts: where to start; when to keep going; what to do after each lap. `i++` means "add 1 to i".\n\n`for...of` walks through the items of a list, like Python `for item in items`.',
           code: L('for (let i = 0; i < 3; i++) {', '  console.log(i); // 0, 1, 2', '}', '', 'const pets = ["cat", "dog"];', 'for (const pet of pets) {', '  console.log(pet);', '}'),
           language: 'javascript',
+          output: '0\n1\n2\ncat\ndog',
         },
         {
           kind: 'type',
@@ -227,6 +249,7 @@ export const u16: Unit = {
           body: 'A JavaScript **array** is a Python list: ordered, counted from 0, written with square brackets.\n\nThe names differ. The size is `.length` (no brackets). `push` adds to the end, like `append`. `includes` asks "is it in there?", like Python `in`.',
           code: L('const pets = ["cat", "dog"];', 'pets.push("fish");', 'console.log(pets.length);           // 3', 'console.log(pets.includes("dog")); // true', 'console.log(pets[0]);               // cat'),
           language: 'javascript',
+          output: '3\ntrue\ncat',
         },
         {
           kind: 'match',
@@ -238,6 +261,14 @@ export const u16: Unit = {
             ['print(xs)', 'console.log(xs)'],
           ],
           explain: 'Same ideas, new names. Note that `length` is a property, so it has no brackets after it.',
+        },
+        {
+          kind: 'concept',
+          title: 'Not',
+          body: 'An exclamation mark in front of a value flips it: `!true` is `false`. It is how JavaScript writes Python `not`.\n\nPut it in front of `includes` to ask "is it missing?".',
+          code: L('const pets = ["cat", "dog"];', 'console.log(pets.includes("fish"));', 'if (!pets.includes("fish")) {', '  console.log("no fish yet");', '}'),
+          language: 'javascript',
+          output: 'false\nno fish yet',
         },
         {
           kind: 'write',
@@ -258,6 +289,7 @@ export const u16: Unit = {
           body: '`map` makes a **new** array by running a function on every item. `filter` makes a new array with only the items where the function returns true.\n\nNeither changes the original. Together they do the job of a Python list comprehension.',
           code: L('const nums = [1, 2, 3, 4];', 'console.log(nums.map((n) => n * 10));   // [10,20,30,40]', 'console.log(nums.filter((n) => n > 2)); // [3,4]', 'console.log(nums);                      // [1,2,3,4]'),
           language: 'javascript',
+          output: '[10,20,30,40]\n[3,4]\n[1,2,3,4]',
         },
         {
           kind: 'type',
@@ -283,10 +315,11 @@ export const u16: Unit = {
         },
         {
           kind: 'concept',
-          title: 'reduce, find and forEach',
-          body: '`reduce` boils an array down to one value. You give it a function `(total, item) => new total` and a starting total.\n\n`find` returns the first item that passes a test, or `undefined` if none does.\n\n`forEach` just runs a function for each item. It returns nothing.',
-          code: L('const nums = [5, 3, 10];', 'console.log(nums.reduce((total, n) => total + n, 0)); // 18', 'console.log(nums.find((n) => n > 4));                 // 5', 'nums.forEach((n) => console.log(n));'),
+          title: 'reduce',
+          body: '`reduce` boils an array down to one value. You give it a function `(total, item) => new total` and a starting total, here `0`.\n\nIt calls the function once per item, feeding the last total back in each time.',
+          code: L('const nums = [5, 3, 10];', 'console.log(nums.reduce((total, n) => total + n, 0)); // 18'),
           language: 'javascript',
+          output: '18',
         },
         {
           kind: 'steps',
@@ -299,6 +332,14 @@ export const u16: Unit = {
             { ask: 'What does reduce return after the last item, 10?', answer: 5 },
           ],
           explain: 'The total starts at the second argument, 0. Each lap feeds the last total back in: 0, 5, 8, 18.',
+        },
+        {
+          kind: 'concept',
+          title: 'find and forEach',
+          body: '`find` returns the first item that passes a test, or `undefined` if none does.\n\n`forEach` just runs a function for each item. It returns nothing, so there is no result to store.',
+          code: L('const nums = [5, 3, 10];', 'console.log(nums.find((n) => n > 4));  // 5', 'console.log(nums.find((n) => n > 50)); // undefined', 'nums.forEach((n) => console.log(n * 2));'),
+          language: 'javascript',
+          output: '5\nundefined\n10\n6\n20',
         },
         {
           kind: 'spot',
@@ -355,6 +396,7 @@ export const u16: Unit = {
           body: 'A JavaScript **object** is like a Python dict: named values in curly braces. The names are called **properties** and need no quotes.\n\nRead one with a dot: `user.name`. Asking for a property that is not there gives `undefined`, not an error.',
           code: L('const user = { name: "Ada", age: 36 };', 'console.log(user.name); // Ada', 'user.age = 37;          // change a property', 'user.city = "London";   // add a new one', 'console.log(user.email); // undefined'),
           language: 'javascript',
+          output: 'Ada\nundefined',
         },
         {
           kind: 'choice',
@@ -380,10 +422,11 @@ export const u16: Unit = {
         },
         {
           kind: 'concept',
-          title: 'Unpack and copy',
-          body: '**Destructuring** pulls properties out into variables in one line: `const { name, age } = user;`.\n\n**Spread**, written `...`, pours everything from one object into a new one. Anything you list after it overrides the copy. The original stays untouched.',
-          code: L('const user = { name: "Ada", age: 36 };', 'const { name, age } = user;', 'console.log(name, age); // Ada 36', '', 'const older = { ...user, age: 37 };', 'console.log(older);    // {"name":"Ada","age":37}', 'console.log(user.age); // 36'),
+          title: 'Unpack',
+          body: '**Destructuring** pulls properties out into variables in one line: `const { name, age } = user;`.\n\nThe names in the braces must match the property names.',
+          code: L('const user = { name: "Ada", age: 36 };', 'const { name, age } = user;', 'console.log(name, age); // Ada 36'),
           language: 'javascript',
+          output: 'Ada 36',
         },
         {
           kind: 'blank',
@@ -393,6 +436,14 @@ export const u16: Unit = {
           bank: ['{', '}', '[', ']', '('],
           answers: ['{', '}'],
           explain: 'Curly braces on the left of `=` mean "take these properties out of the object". Square brackets do the same for arrays, by position.',
+        },
+        {
+          kind: 'concept',
+          title: 'Copy',
+          body: '**Spread**, written `...`, pours everything from one object into a new one. Anything you list after it overrides the copy. The original stays untouched.',
+          code: L('const user = { name: "Ada", age: 36 };', 'const older = { ...user, age: 37 };', 'console.log(older);    // {"name":"Ada","age":37}', 'console.log(user.age); // 36'),
+          language: 'javascript',
+          output: '{"name":"Ada","age":37}\n36',
         },
         {
           kind: 'type',
@@ -421,6 +472,7 @@ export const u16: Unit = {
           body: '**JSON** is a text format for sending data between programs. It looks like a JavaScript object, with every property name in double quotes.\n\n`JSON.stringify(value)` turns a value into JSON text. `JSON.parse(text)` turns the text back into a value. Python calls these `json.dumps` and `json.loads`.',
           code: L('const text = JSON.stringify({ name: "Ada", tags: ["a", "b"] });', 'console.log(text);        // {"name":"Ada","tags":["a","b"]}', 'console.log(text.length); // 31: it is just a string', '', 'const back = JSON.parse(text);', 'console.log(back.tags[0]); // a'),
           language: 'javascript',
+          output: '{"name":"Ada","tags":["a","b"]}\n31\na',
         },
         {
           kind: 'spot',
@@ -455,6 +507,7 @@ export const u16: Unit = {
           body: 'A `let` or `const` lives only inside the `{ }` where it was declared. That area is its **scope**.\n\nA function keeps access to the variables around it where it was created, even after that code has finished. This is a **closure**: a function carrying a backpack of remembered variables.',
           code: L('function makeCounter() {', '  let count = 0;', '  return () => {', '    count += 1;', '    return count;', '  };', '}', 'const next = makeCounter();', 'console.log(next()); // 1', 'console.log(next()); // 2'),
           language: 'javascript',
+          output: '1\n2',
         },
         {
           kind: 'type',
@@ -518,6 +571,7 @@ export const u16: Unit = {
           body: '`throw new Error("message")` stops the code, like Python `raise`.\n\n`try { } catch (err) { }` is Python `try` and `except`: if anything inside `try` throws, the code jumps to `catch`. The text you gave is in `err.message`.',
           code: L('try {', '  JSON.parse("not json");', '  console.log("skipped");', '} catch (err) {', '  console.log("Could not read that");', '}'),
           language: 'javascript',
+          output: 'Could not read that',
         },
         {
           kind: 'order',

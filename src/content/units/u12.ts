@@ -52,6 +52,11 @@ export const u12: Unit = {
           explain: 'Good comes first because it is the smallest thing that works. Better and best are added on top of it.',
         },
         {
+          kind: 'concept',
+          title: 'From outcome to steps',
+          body: 'Turn the good outcome into a list of small **steps**. A useful step names one thing you can build and check, like *print every book title*. A vague one, like *make it nice*, gives you nowhere to start.\n\nOrder them so each step only uses what is already built.',
+        },
+        {
           kind: 'order',
           prompt: 'Put the habit tracker\'s build steps in a sensible order.',
           lines: [
@@ -131,6 +136,32 @@ export const u12: Unit = {
           explain: '`habits[0]["days"]` is the list of days for Read, and it holds two dates.',
         },
         {
+          kind: 'concept',
+          title: 'Reminder: a list of dictionaries',
+          body: '`.append` adds one item to the end of a list, and that item can be a whole dictionary. Give every dictionary the same keys and the rest of the program can rely on them.',
+          code: `books = []
+books.append({"title": "Dune", "pages": 412})
+books.append({"title": "Emma", "pages": 320})
+print(len(books))
+print(books[1]["title"])`,
+          language: 'python',
+          output: '2\nEmma',
+        },
+        {
+          kind: 'concept',
+          title: 'Reminder: functions can change a list',
+          body: 'A function can change a list you pass in. `add_score` appends to the very list it was given, so the change is still there after the call. No `return` is needed.',
+          code: `def add_score(scores, points):
+    scores.append(points)
+
+scores = []
+add_score(scores, 7)
+add_score(scores, 9)
+print(scores)`,
+          language: 'python',
+          output: '[7, 9]',
+        },
+        {
           kind: 'write',
           prompt: 'Write `add_habit(habits, name)` so it adds a new habit dictionary with that name and an empty `"days"` list to the end of `habits`.',
           language: 'python',
@@ -165,6 +196,18 @@ export const u12: Unit = {
           body: 'To change one habit, loop through the list and compare names. When you find the match, change that dictionary. The list sees the change too, because it holds the very same dictionary.',
           code: 'for habit in habits:\n    if habit["name"] == "Read":\n        habit["days"].append("2025-03-03")',
           language: 'python',
+        },
+        {
+          kind: 'concept',
+          title: 'Reminder: not in',
+          body: '`not in` is true when a value is missing from a list. Check it before you append and nothing is ever added twice. Cal turns up twice here but is listed once.',
+          code: `guests = ["Ana", "Ben"]
+for name in ["Ben", "Cal", "Cal"]:
+    if name not in guests:
+        guests.append(name)
+print(guests)`,
+          language: 'python',
+          output: "['Ana', 'Ben', 'Cal']",
         },
         {
           kind: 'write',
@@ -228,6 +271,7 @@ export const u12: Unit = {
           body: 'Months have different lengths, so let Python do the date maths. `date.fromisoformat` turns a `"YYYY-MM-DD"` string into a date. Subtract two dates and `.days` gives the gap.',
           code: 'from datetime import date\n\na = date.fromisoformat("2025-03-01")\nb = date.fromisoformat("2025-03-05")\nprint((b - a).days)  # 4',
           language: 'python',
+          output: '4',
         },
         {
           kind: 'write',
@@ -263,6 +307,32 @@ export const u12: Unit = {
           language: 'python',
           accept: ['2', 'two'],
           explain: 'Walking back: the 13th, then the 12th. The 11th is missing, so the count stops at 2.',
+        },
+        {
+          kind: 'concept',
+          title: 'Reminder: an empty list',
+          body: 'An empty list counts as false, so `if not items:` catches it. Deal with that case first and leave early with `return`. The rest of the function can then trust there is at least one item.',
+          code: `def last_item(items):
+    if not items:
+        return "nothing"
+    return items[-1]
+
+print(last_item([]))
+print(last_item(["a", "b"]))`,
+          language: 'python',
+          output: 'nothing\nb',
+        },
+        {
+          kind: 'concept',
+          title: 'Reminder: walking a list backwards',
+          body: 'Start `i` at the last position and take 1 away each time round. `steps[i - 1]` is the item just before. `while i > 0` stops at the front, where there is no item before.',
+          code: `steps = [3, 4, 9, 10]
+i = len(steps) - 1
+while i > 0:
+    print(steps[i], "-", steps[i - 1], "=", steps[i] - steps[i - 1])
+    i -= 1`,
+          language: 'python',
+          output: '10 - 9 = 1\n9 - 4 = 5\n4 - 3 = 1',
         },
         {
           kind: 'write',
@@ -331,6 +401,23 @@ export const u12: Unit = {
           bank: ['w', 'dump', 'r', 'load'],
           answers: ['w', 'dump'],
           explain: '`"w"` opens the file for writing, and `dump` pours the data into it.',
+        },
+        {
+          kind: 'concept',
+          title: 'Reminder: reading inside a function',
+          body: 'A function can hand back what it read. `return json.load(f)` reads the file and returns the data in one step. Opening with no `"w"` means read only.',
+          code: `import json
+
+with open("scores.json", "w") as f:
+    json.dump([3, 5], f)
+
+def read_scores():
+    with open("scores.json") as f:
+        return json.load(f)
+
+print(read_scores())`,
+          language: 'python',
+          output: '[3, 5]',
         },
         {
           kind: 'write',
@@ -402,6 +489,21 @@ export const u12: Unit = {
           language: 'python',
           accept: ['2'],
           explain: 'Each `add` reads one more line as the name, so two habits are stored before `quit` prints the count.',
+        },
+        {
+          kind: 'concept',
+          title: 'Reminder: one branch per command',
+          body: 'One `if`/`elif` chain picks what to do for each command, and every command gets its own branch. In the menu, a branch that needs more details, like a name, reads them with `input()` inside that branch.',
+          code: `total = 0
+for command in ["add", "add", "show", "undo", "show"]:
+    if command == "add":
+        total += 5
+    elif command == "undo":
+        total -= 5
+    elif command == "show":
+        print(total)`,
+          language: 'python',
+          output: '10\n5',
         },
         {
           kind: 'write',

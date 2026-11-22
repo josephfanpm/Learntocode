@@ -8,6 +8,8 @@ import { practicedToday, streak } from '../engine/state'
 import { useDeviceReduces } from '../motion'
 import { useStore } from '../store'
 import { Scene, worldLook } from './scene'
+import { worldFor } from './worlds'
+import { WorldScene } from './worlds/WorldScene'
 import { Avatar } from './Avatar'
 import { Pip, type Mood } from './Pip'
 
@@ -129,9 +131,9 @@ export function Home({ go }: { go: Go }) {
     <div className="mx-auto max-w-xl px-4 pb-28">
       {deviceSaysReduce && s.motion === undefined && (
         <div className="mt-4 flex items-center gap-3 rounded-2xl border-2 border-rule bg-card p-3 text-sm">
-          <p className="flex-1 text-ink-2">Animations are off because your device is set to reduce motion.</p>
-          <button className="btn !min-h-0 shrink-0 !px-3 !py-2 text-sm" onClick={() => update((p) => ({ ...p, motion: 'on' }))}>Turn on</button>
-          <button className="shrink-0 font-semibold text-ink-3" onClick={() => update((p) => ({ ...p, motion: 'off' }))}>Keep off</button>
+          <p className="flex-1 text-ink-2">Your device is set to reduce motion. ByteQuest has animations on.</p>
+          <button className="btn btn-ghost !min-h-0 shrink-0 !px-3 !py-2 text-sm" onClick={() => update((p) => ({ ...p, motion: 'off' }))}>Turn off</button>
+          <button className="shrink-0 font-semibold text-ink-3" onClick={() => update((p) => ({ ...p, motion: 'on' }))}>Keep on</button>
         </div>
       )}
       <div className="mt-4 grid grid-cols-3 gap-2" role="tablist" aria-label="Course">
@@ -169,13 +171,25 @@ export function Home({ go }: { go: Go }) {
       {units.map((unit) => {
         const color = LINE_COLORS[allUnits.indexOf(unit) % LINE_COLORS.length]
         const prog = unitProgress(unit, s)
+        const world = worldFor(unit.id)
         const stations = p.filter((x) => x.unit.id === unit.id)
         const unitLocked = stations.every((x) => x.status === 'locked')
         const unitSkipped = stations.every((x) => x.status === 'skipped' || x.status === 'done') && stations.some((x) => x.status === 'skipped')
         return (
           <section key={unit.id} className="mt-8" style={{ contentVisibility: 'auto', containIntrinsicSize: '600px' }} aria-labelledby={`h-${unit.id}`}>
-            <Scene {...worldLook(allUnits.indexOf(unit))} dim={unitLocked} className="aspect-[16/7] w-full rounded-2xl border-[3px] border-outline">
-              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#060817] via-[#060817]/80 to-transparent px-4 pt-10 pb-3">
+            <div className="overflow-hidden rounded-2xl border-[3px] border-outline">
+              {world ? (
+                <WorldScene world={world} dim={unitLocked} className="aspect-[17/9] w-full">
+                  {!unitLocked && (
+                    <p className="absolute right-2 bottom-2 bg-[#060817]/80 px-2 py-1 text-[0.65rem] font-semibold text-white">
+                      {world.landmark} · {world.place}
+                    </p>
+                  )}
+                </WorldScene>
+              ) : (
+                <Scene {...worldLook(allUnits.indexOf(unit))} dim={unitLocked} className="aspect-[17/9] w-full" />
+              )}
+              <div className="border-t-[3px] border-outline bg-card px-4 py-3">
                 <p className="pixel text-[0.55rem] tracking-[0.2em]" style={{ color: unitLocked ? 'var(--color-ink-3)' : 'var(--color-gold)' }}>
                   {(unit.course ?? 'cs') === 'cs' ? 'WORLD' : 'CHAPTER'} {unit.week}
                 </p>
@@ -185,7 +199,7 @@ export function Home({ go }: { go: Go }) {
                   {unitSkipped ? 'Skipped by your placement test · open to review' : `${(unit.course ?? 'cs') !== 'cs' ? `Chapter ${unit.week} of ${units.length}` : unit.week <= 10 ? `Week ${unit.week} of CS50` : unit.week === 11 ? "CS50’s cybersecurity lecture" : unit.week === 12 ? "Beyond CS50" : "CS50’s final project"} · ${prog.done}/${prog.total} lessons`}
                 </p>
               </div>
-            </Scene>
+            </div>
             <ol className="relative py-6">
               {/* The line itself */}
               <div aria-hidden className="absolute top-0 bottom-0 left-1/2 w-2 -translate-x-1/2 rounded-full" style={{ background: unitLocked ? 'var(--color-rule)' : color, opacity: unitLocked ? 1 : 0.25 }} />

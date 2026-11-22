@@ -56,6 +56,14 @@ export const u4: Unit = {
           explain: '0x1F is one 16 plus F (15): 16 + 15 = 31. `print` shows numbers in decimal.',
         },
         {
+          kind: 'concept',
+          title: 'Python can convert for you',
+          body: '`hex(n)` turns a number into hex text. It starts with `0x` and uses small letters.\n\n`int(text, 16)` goes the other way: it reads text as a hex number and gives back the everyday number.',
+          code: py('n = 26', 'print(hex(n))', 'print(int("1a", 16))'),
+          language: 'python',
+          output: '0x1a\n26',
+        },
+        {
           kind: 'choice',
           prompt: 'What does this print?',
           code: py('print(hex(255))'),
@@ -65,11 +73,6 @@ export const u4: Unit = {
           explain: '`hex()` turns a number into hex text, starting with `0x` and using lowercase letters.',
         },
         {
-          kind: 'concept',
-          title: 'Why hex?',
-          body: 'Two hex digits cover exactly one byte: `0x00` to `0xFF` is 0 to 255. So hex lines up neatly with memory, and long addresses come out shorter and tidier than in decimal.',
-        },
-        {
           kind: 'blank',
           prompt: 'Fill the gaps so each line prints what its comment says. `int(text, 16)` reads text as a hex number.',
           code: py('print(hex(___))       # prints 0xa', 'print(int("ff", ___))  # prints 255'),
@@ -77,6 +80,11 @@ export const u4: Unit = {
           bank: ['10', '16', '2', '15'],
           answers: ['10', '16'],
           explain: '10 in hex is a. The 16 tells `int()` to read "ff" as a hex number, which is 255.',
+        },
+        {
+          kind: 'concept',
+          title: 'Why hex?',
+          body: 'Two hex digits cover exactly one byte: `0x00` to `0xFF` is 0 to 255. So hex lines up neatly with memory, and long addresses come out shorter and tidier than in decimal.',
         },
         {
           kind: 'choice',
@@ -190,6 +198,14 @@ export const u4: Unit = {
           explain: 'Names point at values. Aliasing happens when two names point at one value.',
         },
         {
+          kind: 'concept',
+          title: 'A function that changes a list',
+          body: 'A function can walk through the list it was given and change each item in place. `range(len(words))` gives every position, and `words[i] = ...` puts a new item there.\n\nNothing is returned. The caller\'s list is simply different afterwards.',
+          code: py('def shout_all(words):', '    for i in range(len(words)):', '        words[i] = words[i] + "!"', '', 'greetings = ["hi", "yo"]', 'shout_all(greetings)', 'print(greetings)'),
+          language: 'python',
+          output: '[\'hi!\', \'yo!\']',
+        },
+        {
           kind: 'write',
           prompt: 'Finish `double_all(nums)` so it changes the list it is given, doubling every item. Do not return anything; the code below prints the lists after.',
           language: 'python',
@@ -296,6 +312,14 @@ export const u4: Unit = {
           explain: 'Only a copy gives you a separate list. Plain `=` just adds another name.',
         },
         {
+          kind: 'concept',
+          title: 'Copy first, then change the copy',
+          body: '`.append(x)` adds `x` to the end of a list. Append to a **copy** and the original keeps its old items.',
+          code: py('scores = [7, 9]', 'backup = scores.copy()', 'backup.append(4)', 'print(scores)', 'print(backup)'),
+          language: 'python',
+          output: '[7, 9]\n[7, 9, 4]',
+        },
+        {
           kind: 'order',
           prompt: "`.append(x)` adds `x` to the end of a list. Put the lines in order so it prints `['Ann', 'Bo']` and then `['Ann', 'Bo', 'Cy']`.",
           lines: [
@@ -358,6 +382,14 @@ export const u4: Unit = {
           explain: 'None means "nothing", which is different from the number 0.',
         },
         {
+          kind: 'concept',
+          title: 'Asking "is it None?"',
+          body: 'To check whether you got nothing back, compare with `is None`.\n\nHere `shout()` prints but has no `return`, so `answer` is None.',
+          code: py('def shout():', '    print("hey")', '', 'answer = shout()', 'if answer is None:', '    print("nothing came back")'),
+          language: 'python',
+          output: 'hey\nnothing came back',
+        },
+        {
           kind: 'blank',
           prompt: 'This search returns None when it finds nothing. Fill the gaps. (Check for None with `is`.)',
           code: py(
@@ -414,6 +446,14 @@ export const u4: Unit = {
             ['ZeroDivisionError', 'dividing by zero'],
           ],
           explain: 'The error name is your first clue when a program crashes.',
+        },
+        {
+          kind: 'concept',
+          title: 'Check before you reach',
+          body: 'You can avoid an IndexError by checking the position first. A position is safe when it is less than `len()` of the list.',
+          code: py('days = ["Mon", "Tue"]', 'pos = 5', 'if pos < len(days):', '    print(days[pos])', 'else:', '    print("no such day")'),
+          language: 'python',
+          output: 'no such day',
         },
         {
           kind: 'write',
@@ -523,6 +563,15 @@ export const u4: Unit = {
           kind: 'concept',
           title: 'Reading line by line',
           body: 'You can loop over a file: `for line in f:` gives you one line at a time.\n\nEach line still ends with its new-line character, so use `line.strip()` to trim it off before printing.',
+          code: py(
+            'with open("pets.txt", "w") as f:',
+            '    f.write("cat\\ndog\\n")',
+            'with open("pets.txt", "r") as f:',
+            '    for line in f:',
+            '        print(line.strip())',
+          ),
+          language: 'python',
+          output: 'cat\ndog',
         },
         {
           kind: 'order',
@@ -537,6 +586,14 @@ export const u4: Unit = {
           ],
           language: 'python',
           explain: 'You must write the file before you can read it back. The loop then prints each saved line.',
+        },
+        {
+          kind: 'concept',
+          title: 'Writing numbers',
+          body: '`write` only accepts text. To save a number, turn it into text with `str()` first, then add the new-line.\n\nA loop inside the `with` block writes one line each time round.',
+          code: py('with open("nums.txt", "w") as f:', '    for i in range(3):', '        f.write(str(i) + "\\n")', 'with open("nums.txt", "r") as f:', '    print(f.read())'),
+          language: 'python',
+          output: '0\n1\n2',
         },
         {
           kind: 'write',
@@ -633,6 +690,14 @@ export const u4: Unit = {
           options: ['2 False', '3 True', '2 True', '3 False'],
           answer: 1,
           explain: '`b = a` copies the address, not the list. Both names lead to the same list, so `a` sees the new item and `a is b` is True.',
+        },
+        {
+          kind: 'concept',
+          title: 'Swapping needs a spare name',
+          body: 'To swap two items, keep one safe under a spare name first. Otherwise the first assignment wipes it out before you can move it.',
+          code: py('pair = ["left", "right"]', 'temp = pair[0]', 'pair[0] = pair[1]', 'pair[1] = temp', 'print(pair)'),
+          language: 'python',
+          output: '[\'right\', \'left\']',
         },
         {
           kind: 'write',
@@ -746,6 +811,14 @@ export const u4: Unit = {
           explain: 'Python still uses the heap. It just does the asking and the giving back itself, and it checks list positions too, so these bugs are rare.',
         },
         {
+          kind: 'concept',
+          title: 'Taking an item out by name',
+          body: '`.append(x)` adds `x` to a list. `.remove(x)` does the opposite: it finds the first item equal to `x` and takes it out.',
+          code: py('borrowed = []', 'borrowed.append("book")', 'borrowed.append("pen")', 'borrowed.remove("book")', 'print(borrowed)'),
+          language: 'python',
+          output: '[\'pen\']',
+        },
+        {
           kind: 'write',
           prompt: 'Be the leak detector. The input is one line of events: `+a` means block `a` was asked for, and `-a` means it was given back. Print the list of blocks still in use at the end.',
           language: 'python',
@@ -819,6 +892,7 @@ export const u4: Unit = {
           body: 'A **filter** changes a picture by visiting every pixel and applying one rule.\n\n**Grayscale** rule: replace red, green and blue with their average. Equal amounts of all three always make a shade of gray. `//` divides and drops the remainder, so the result stays a whole number.',
           code: py('r, g, b = (90, 120, 150)', 'avg = (r + g + b) // 3', 'gray = (avg, avg, avg)', 'print(gray)   # (120, 120, 120)'),
           language: 'python',
+          output: '(120, 120, 120)',
         },
         {
           kind: 'choice',
@@ -852,6 +926,14 @@ export const u4: Unit = {
           explain: '`for r, g, b in row` unpacks each pixel into its three parts. A real filter runs this same loop over every row of the picture.',
         },
         {
+          kind: 'concept',
+          title: 'Putting items at the front',
+          body: '`.append(x)` adds to the end of a list. `.insert(0, x)` puts `x` at position 0, the front, and everything else shifts along.\n\nInsert each item at the front and the list comes out backwards.',
+          code: py('order = []', 'for n in [1, 2, 3]:', '    order.insert(0, n)', 'print(order)'),
+          language: 'python',
+          output: '[3, 2, 1]',
+        },
+        {
           kind: 'write',
           prompt: 'A **reflect** filter mirrors the picture: each row is flipped left to right. Read one row of numbers and print the row reversed, as a list.',
           language: 'python',
@@ -874,6 +956,14 @@ export const u4: Unit = {
             'print(flipped)',
           ),
           explain: 'Putting each new item at the front leaves the first pixel at the far end. Do that to every row and the whole picture is mirrored.',
+        },
+        {
+          kind: 'concept',
+          title: 'Looking at the neighbors',
+          body: 'If `i` is a position, `i - 1` is the item just before it and `i + 1` is the item just after. Add all three and divide by 3 for their average.',
+          code: py('temps = [10, 20, 60]', 'i = 1', 'total = temps[i - 1] + temps[i] + temps[i + 1]', 'print(total // 3)'),
+          language: 'python',
+          output: '30',
         },
         {
           kind: 'spot',
@@ -932,6 +1022,14 @@ export const u4: Unit = {
           explain: '300 × 0.5 is 150. A factor below 1 makes every sample smaller, so the sound gets quieter.',
         },
         {
+          kind: 'concept',
+          title: 'Reminder: build a new list in a loop',
+          body: 'Start with an empty list. Visit each item, work out its new value, and `append` that to the new list.',
+          code: py('prices = [2, 5, 10]', 'with_tip = []', 'for p in prices:', '    with_tip.append(p + 1)', 'print(with_tip)'),
+          language: 'python',
+          output: '[3, 6, 11]',
+        },
+        {
           kind: 'write',
           prompt: 'Read a volume factor (a whole number). Multiply every sample by it, collect the results in `louder`, and print that list.',
           language: 'python',
@@ -956,6 +1054,14 @@ export const u4: Unit = {
             'print(louder)',
           ),
           explain: 'Samples can be negative because a speaker moves both ways. Multiplying keeps the shape of the sound and only changes its size.',
+        },
+        {
+          kind: 'concept',
+          title: 'Reminder: start part-way along',
+          body: '`range(2, len(letters))` starts counting at 2, so positions 0 and 1 are skipped.\n\nSetting `letters[i]` changes the list itself.',
+          code: py('letters = ["a", "b", "c", "d"]', 'for i in range(2, len(letters)):', '    letters[i] = letters[i].upper()', 'print(letters)'),
+          language: 'python',
+          output: '[\'a\', \'b\', \'C\', \'D\']',
         },
         {
           kind: 'write',
@@ -1022,6 +1128,14 @@ export const u4: Unit = {
           explain: '216 is 13 sixteens plus 8. The hex digit for 13 is d, so you get 0xd8. The signature in hex is ff d8 ff.',
         },
         {
+          kind: 'concept',
+          title: 'Reminder: checking items side by side',
+          body: '`and` is true only when both checks are true. Here it looks for a 1 followed by a 2.\n\nThe loop stops 1 early so `nums[i + 1]` never reaches past the end.',
+          code: py('nums = [3, 1, 2, 9, 1, 2]', 'for i in range(len(nums) - 1):', '    if nums[i] == 1 and nums[i + 1] == 2:', '        print("found at", i)'),
+          language: 'python',
+          output: 'found at 1\nfound at 4',
+        },
+        {
           kind: 'write',
           prompt: 'Find the lost photos. Look at every position `i`. If the three bytes starting there are 255, 216, 255, add `i` to `starts`. Then print `starts`.',
           language: 'python',
@@ -1044,6 +1158,14 @@ export const u4: Unit = {
             'print(starts)',
           ),
           explain: 'The loop stops 2 early so `data[i + 2]` never reaches past the end. The 255, 216 at the very end is cut off, so it does not count.',
+        },
+        {
+          kind: 'concept',
+          title: 'Reminder: is there a next item?',
+          body: 'Position `n + 1` only exists if it is less than the length of the list. Check that first, and use `else` for the last item, which has nothing after it.',
+          code: py('stops = [2, 5, 9]', 'for n in range(len(stops)):', '    if n + 1 < len(stops):', '        print(stops[n], "then", stops[n + 1])', '    else:', '        print(stops[n], "is the last")'),
+          language: 'python',
+          output: '2 then 5\n5 then 9\n9 is the last',
         },
         {
           kind: 'write',

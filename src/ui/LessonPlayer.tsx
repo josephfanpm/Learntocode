@@ -7,7 +7,7 @@ import { warmPython } from '../runners'
 import { play } from '../sound'
 import { useStore } from '../store'
 import { AfterLesson } from './AfterLesson'
-import { ExerciseView, type Grader } from './exercises'
+import { ExerciseView, ExampleOutput, type Grader } from './exercises'
 import { Pip } from './Pip'
 import { Code, Inline, Prose } from './text'
 
@@ -24,6 +24,8 @@ export function LessonPlayer({ lesson, unit, color, startAt = 0, onExit, onAvata
   const [pos, setPos] = useState(() => Math.min(startAt, total - 1))
   const [done, setDone] = useState<Set<number>>(new Set())
   const [missed, setMissed] = useState<Set<number>>(new Set())
+  // Wrong answers per exercise. After the second, the worked example opens by itself.
+  const misses = useRef(new Map<number, number>())
   const [status, setStatus] = useState<Status>('answering')
   const [tries, setTries] = useState(0)
   const [reveal, setReveal] = useState(false)
@@ -63,11 +65,12 @@ export function LessonPlayer({ lesson, unit, color, startAt = 0, onExit, onAvata
     setStatus('answering')
     setTries(0)
     setReveal(false)
-    setHintLevel(0)
     setGrader(null)
     setAttempt((a) => a + 1)
-    if (pos + 1 >= queueNow.length) finish(missed)
-    else setPos(pos + 1)
+    if (pos + 1 >= queueNow.length) return finish(missed)
+    // A question that has been missed twice comes back with its example already open.
+    setHintLevel((misses.current.get(queueNow[pos + 1]) ?? 0) >= 2 ? 1 : 0)
+    setPos(pos + 1)
   }
 
   const onCheck = async () => {
@@ -88,6 +91,10 @@ export function LessonPlayer({ lesson, unit, color, startAt = 0, onExit, onAvata
     setStatus('wrong')
     setTries((t) => t + 1)
     setMissed((m) => new Set(m).add(idx))
+    const n = (misses.current.get(idx) ?? 0) + 1
+    misses.current.set(idx, n)
+    // Code questions are retried in place, so the example opens right here.
+    if (ex.kind === 'write' && n >= 2) setHintLevel((h) => (h === 0 ? 1 : h))
     update((p) => ({ ...p, struggles: { ...p.struggles, [lesson.id]: (p.struggles[lesson.id] ?? 0) + 1 } }))
     if (ex.kind !== 'write') setReveal(true)
   }
@@ -165,6 +172,7 @@ export function LessonPlayer({ lesson, unit, color, startAt = 0, onExit, onAvata
                       <p className="font-display font-bold">{h.title}</p>
                       <Prose text={h.body} className="mt-1 text-ink-2" />
                       {h.code && <Code code={h.code} lang={h.language} className="mt-2 text-[0.82rem]" />}
+                      {h.output !== undefined && <ExampleOutput text={h.output} className="mt-2 text-[0.82rem]" />}
                     </div>
                   )
                 })}
@@ -195,7 +203,7 @@ export function LessonPlayer({ lesson, unit, color, startAt = 0, onExit, onAvata
                 <div>
                   <p className="font-display text-xl font-bold text-bad">{ex.kind === 'write' ? 'Not quite yet' : 'Not quite'}</p>
                   <p className="mt-0.5 text-sm text-ink-2">
-                    {ex.kind === 'write' ? 'Compare your output with the expected output above, then try again.' : 'explain' in ex ? <Inline text={ex.explain} /> : null}
+                    {ex.kind === 'write' ? (tries >= 2 ? 'A worked example is open below. Compare it with your code, then try again.' : 'Compare your output with the expected output above, then try again.') : 'explain' in ex ? <Inline text={ex.explain} /> : null}
                   </p>
                 </div>
               </div>

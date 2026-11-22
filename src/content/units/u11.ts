@@ -29,6 +29,16 @@ export const u11: Unit = {
           explain: 'You multiply 26 by itself 8 times, which is about 209 billion. Multiplying 26 × 8 is the common slip.',
         },
         {
+          kind: 'concept',
+          title: 'Powers in Python',
+          body: 'Multiplying a number by itself several times is a **power**. Python writes it with two stars: `10 ** 3` means 10 × 10 × 10, three tens multiplied together.',
+          code: `print(10 * 10 * 10)
+print(10 ** 3)
+print(2 ** 5)`,
+          language: 'python',
+          output: '1000\n1000\n32',
+        },
+        {
           kind: 'write',
           prompt: 'Read how many symbols are allowed, then the password length. Print how many passwords are possible: symbols to the power of length.',
           language: 'python',
@@ -46,6 +56,16 @@ export const u11: Unit = {
           kind: 'concept',
           title: 'Length beats cleverness',
           body: 'Every extra character multiplies the work for a guesser. One more lowercase letter makes it 26 times harder.\n\nSo a long password of plain words usually beats a short one full of symbols. Longer is stronger.',
+        },
+        {
+          kind: 'concept',
+          title: 'How long will it take?',
+          body: 'Time is the amount of work divided by the speed. `//` divides and drops the remainder, so you get whole hours only. Reading 900 pages at 40 pages an hour takes 22 whole hours.',
+          code: `pages = 900
+per_hour = 40
+print(pages // per_hour)`,
+          language: 'python',
+          output: '22',
         },
         {
           kind: 'write',
@@ -123,6 +143,7 @@ export const u11: Unit = {
           body: 'Python comes with `hashlib`. **SHA-256** is one well-known hash function.\n\n`.encode()` turns the text into bytes, and `.hexdigest()` gives the hash as 64 letters and digits.',
           code: 'import hashlib\n\ntext = "hello"\nprint(hashlib.sha256(text.encode()).hexdigest())',
           language: 'python',
+          output: '2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824',
         },
         {
           kind: 'write',
@@ -144,6 +165,18 @@ export const u11: Unit = {
           explain: 'Same input, same hash, every time. That is what lets a site compare hashes at login.',
         },
         {
+          kind: 'concept',
+          title: 'Comparing hashes',
+          body: 'To check a password without keeping it, hash the attempt and compare the two hashes. Same text gives the same hash, so `==` is true only when the attempt is right.',
+          code: `import hashlib
+
+saved = hashlib.sha256("kiwi".encode()).hexdigest()
+print(hashlib.sha256("kiwi".encode()).hexdigest() == saved)
+print(hashlib.sha256("kiwj".encode()).hexdigest() == saved)`,
+          language: 'python',
+          output: 'True\nFalse',
+        },
+        {
           kind: 'write',
           prompt: '`stored` is the hash a site saved at sign-up. Read a password attempt, hash it, and print `Welcome` if the hashes match or `Wrong password` if not.',
           language: 'python',
@@ -162,6 +195,19 @@ export const u11: Unit = {
           kind: 'concept',
           title: 'Salts',
           body: 'A **rainbow table** is a huge ready-made list of common passwords and their hashes. A thief looks a stolen hash up in it.\n\nThe defence is a **salt**: a few random characters, different for each user, added to the password before hashing. Now ready-made lists no longer match.',
+        },
+        {
+          kind: 'concept',
+          title: 'Salt, then hash',
+          body: '`+` joins two pieces of text. Join the salt to the word first, then hash the joined text. The brackets make sure `.encode()` works on the whole thing.\n\nOne word, with and without a salt: two unrelated hashes.',
+          code: `import hashlib
+
+salt = "q9"
+word = "kiwi"
+print(hashlib.sha256(word.encode()).hexdigest()[:8])
+print(hashlib.sha256((salt + word).encode()).hexdigest()[:8])`,
+          language: 'python',
+          output: '1a5afeda\nf635ada3',
         },
         {
           kind: 'write',
@@ -214,12 +260,38 @@ export const u11: Unit = {
           body: '**Encryption** scrambles a message so only someone with the **key** can read it. Unlike a hash, it can be undone.\n\nA toy example: shift every letter forward by the key. With key 1, `A` becomes `B`. To decrypt, shift back.',
           code: 'letter = "A"\nkey = 1\nprint(chr((ord(letter) - 65 + key) % 26 + 65))  # B',
           language: 'python',
+          output: 'B',
         },
         {
           kind: 'type',
           prompt: 'Encrypt `HI` by shifting each letter forward by 1. Type the result.',
           accept: ['IJ'],
           explain: 'H moves to I and I moves to J. Anyone who knows the key is 1 can shift back and read it.',
+        },
+        {
+          kind: 'concept',
+          title: 'Letters to numbers and back',
+          body: '`ord` gives a letter\'s code and `chr` turns a code back into a letter. `A` is 65, so taking 65 away makes A to Z into 0 to 25.\n\n`% 26` wraps past 25 back to 0. That is how Z shifts round to A.',
+          code: `print(ord("A"))
+print(ord("C") - 65)
+print(chr(2 + 65))
+print((25 + 1) % 26)`,
+          language: 'python',
+          output: '65\n2\nC\n0',
+        },
+        {
+          kind: 'concept',
+          title: 'Only change the letters',
+          body: '`"A" <= ch <= "Z"` is true only for capital letters. Use it to change the letters and pass everything else through untouched, building the result one character at a time.',
+          code: `result = ""
+for ch in "HI, YOU":
+    if "A" <= ch <= "Z":
+        result += ch.lower()
+    else:
+        result += ch
+print(result)`,
+          language: 'python',
+          output: 'hi, you',
         },
         {
           kind: 'write',
@@ -255,6 +327,17 @@ export const u11: Unit = {
           target: 9,
           bits: 4,
           explain: '1010 XOR 0011 = 1001, the original message. XOR with the same key undoes itself.',
+        },
+        {
+          kind: 'concept',
+          title: 'XOR in Python',
+          body: '`^` XORs two numbers bit by bit. 65 is the code for `A`. XOR it with the key 5 and you get 68. XOR 68 with the same key and 65 comes back.',
+          code: `secret = 65 ^ 5
+print(secret)
+print(secret ^ 5)
+print(chr(secret ^ 5))`,
+          language: 'python',
+          output: '68\n65\nA',
         },
         {
           kind: 'write',
@@ -322,6 +405,11 @@ export const u11: Unit = {
           ],
           answer: 3,
           explain: 'A rush plus a request for your password is the classic phishing pair. Real services do not ask for your password by message.',
+        },
+        {
+          kind: 'concept',
+          title: 'Reading a link',
+          body: 'Find the first single slash after `https://`. The real site is the last part just before it.\n\n`https://shop.example/sale` goes to `shop.example`.\n\n`https://shop.example.deals.example/sale` goes to `deals.example`. The shop\'s name is only stuck on the front.',
         },
         {
           kind: 'spot',
@@ -473,6 +561,17 @@ export const u11: Unit = {
           language: 'python',
           answer: 2,
           explain: 'The author is escaped but the comment goes in raw, so any tags inside it would become part of the page.',
+        },
+        {
+          kind: 'concept',
+          title: 'Swapping text with replace',
+          body: '`.replace(old, new)` gives back a copy of the text with every `old` swapped for `new`. Save the result into the variable again to make several swaps, one after another.',
+          code: `text = "cats and dogs"
+text = text.replace("cats", "birds")
+text = text.replace("dogs", "fish")
+print(text)`,
+          language: 'python',
+          output: 'birds and fish',
         },
         {
           kind: 'write',

@@ -66,6 +66,11 @@ export const u33: Unit = {
           explain: 'Start it in the wrong folder and it will explore the wrong project. `cd` first, then `claude`.',
         },
         {
+          kind: 'concept',
+          title: 'Tools at work',
+          body: 'Say you ask: "Why does the signup page crash?"\n\nClaude Code might **search** the project for the signup code, **read** the file it finds, then **run** the app to see the error for itself. Searching, reading and running are each a **built-in tool**: an action it can take in your project.',
+        },
+        {
           kind: 'match',
           prompt: 'Claude Code has built-in tools of several kinds. Match each kind to what it lets the agent do.',
           pairs: [

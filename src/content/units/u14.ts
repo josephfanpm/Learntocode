@@ -46,6 +46,12 @@ export const u14: Unit = {
           explain: 'Edits start in the working folder, `git add` stages them and `git commit` stores them. A new edit starts the trip again.',
         },
         {
+          kind: 'concept',
+          title: 'One save point, typed out',
+          body: 'Here is a whole save point in the terminal. `git status` only looks: it lists what is changed and what is staged. `-m` is followed by the commit message in quotes. `git log` then lists the commits made so far.',
+          code: 'git status\ngit add notes.txt\ngit commit -m "Add notes"\ngit log',
+        },
+        {
           kind: 'type',
           prompt: 'One command shows which files are changed and which are staged. It is `git` followed by the word `status`. Type the full command.',
           accept: ['git status'],
@@ -76,6 +82,20 @@ export const u14: Unit = {
           lines: ['fixed it', 'Update', 'Fix total when cart is empty', 'asdf', 'changes to file'],
           answer: 2,
           explain: 'It names what was fixed and when it happened. The others say nothing a reader could not guess.',
+        },
+        {
+          kind: 'concept',
+          title: 'Checking a length in Python',
+          body: 'A program can check text the way a reviewer would. `len` counts the characters. The checks run from the top, and the first true one wins, so the special case goes first.',
+          code: `title = "Hi"
+if len(title) == 0:
+    print("missing")
+elif len(title) < 5:
+    print("too short")
+else:
+    print("fine")`,
+          language: 'python',
+          output: 'too short',
         },
         {
           kind: 'write',
@@ -197,6 +217,12 @@ else:
           body: 'A **branch** is a named label that points at one commit. The usual first branch is `main`.\n\nMake a new branch to try something without touching `main`. When you commit, the label of the branch you are on moves forward to the new commit. Other labels stay put.',
         },
         {
+          kind: 'concept',
+          title: 'Branch commands',
+          body: '`git switch -c feature` creates a branch called `feature` and moves you onto it. `git switch main` moves you back to a branch that already exists.\n\n`git merge feature` brings the commits from `feature` into the branch you are standing on.',
+          code: 'git switch -c feature\ngit commit -m "Try a new layout"\ngit switch main\ngit merge feature',
+        },
+        {
           kind: 'steps',
           prompt: 'The history is A, B, C and `main` points at C. Tap the commit each label points at.',
           cells: ['A', 'B', 'C', 'D'],
@@ -267,6 +293,29 @@ else:
             'git commit',
           ],
           explain: 'You fix the file by hand, check it, then stage it to tell Git the conflict is solved. The commit completes the merge.',
+        },
+        {
+          kind: 'concept',
+          title: 'Does a line start with this?',
+          body: 'Conflict markers are plain text, so Python can look for them. `startswith` answers True or False: does this text begin with these characters?',
+          code: `line = ">>>>>>> login"
+print(line.startswith(">>>>>>>"))
+print(line.startswith("======="))`,
+          language: 'python',
+          output: 'True\nFalse',
+        },
+        {
+          kind: 'concept',
+          title: 'A switch that turns printing on',
+          body: 'To print only part of a list, keep a True/False variable as a switch. It starts off and flips on after `GO`, so only the later words print. Setting it back to `False` would stop the printing again.\n\nThe order of the two `if`s matters: `GO` itself is not printed.',
+          code: `keep = False
+for word in ["a", "GO", "b", "c"]:
+    if keep:
+        print(word)
+    if word == "GO":
+        keep = True`,
+          language: 'python',
+          output: 'b\nc',
         },
         {
           kind: 'write',
@@ -341,6 +390,12 @@ for line in lines:
           prompt: 'You have two new commits on your laptop. Type the command that sends them to the remote.',
           accept: ['git push', 'git push origin', 'git push origin main'],
           explain: 'Until you push, your commits exist in one place only. A push is also your backup.',
+        },
+        {
+          kind: 'concept',
+          title: 'Pull before you push',
+          body: 'If a teammate pushed while you were working, the remote holds commits you do not have. Git then refuses your push.\n\nNothing is lost. Run `git pull` to combine their commits with yours, then push again. Git\'s messages often end with a `hint:` line that says what to do.',
+          code: 'git pull\ngit push',
         },
         {
           kind: 'spot',
@@ -455,6 +510,12 @@ for line in lines:
           ],
           answer: 3,
           explain: 'Revert adds to history, so everyone simply pulls one more commit. Rewriting shared history leaves teammates with commits that no longer fit.',
+        },
+        {
+          kind: 'concept',
+          title: 'Naming the commit to undo',
+          body: '`git revert` needs to know which commit to undo. Find its short id with `git log --oneline`, then put the id after `git revert`.\n\n`git reset` takes an id too. With `--hard` it also wipes any edits you have not committed.',
+          code: 'git log --oneline\ngit revert c3d9a1f',
         },
         {
           kind: 'spot',

@@ -290,7 +290,7 @@ export function Settings({ go }: { go: Go }) {
             }}
           />
         </Row>
-        <Row title="Animations" note={deviceSaysReduce && s.motion === undefined ? 'Off because your device is set to reduce motion.' : 'Pip, confetti and screen transitions.'}>
+        <Row title="Animations" note={deviceSaysReduce ? 'Your device asks for reduced motion. Turn this off if movement bothers you.' : 'Pip, scenery, confetti and screen transitions.'}>
           <Toggle on={!motionReduced} label="Animations" onClick={() => update((p) => ({ ...p, motion: motionReduced ? 'on' : 'off' }))} />
         </Row>
         <Row title="Reminders" note="One a day, around the time you usually practice.">

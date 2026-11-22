@@ -98,9 +98,21 @@ function passes(ex: WriteExercise, code: string): string | null {
 function check(where: string, ex: Exercise) {
   const err = (m: string) => errors.push(`${where}: ${m}`)
   switch (ex.kind) {
-    case 'concept':
+    case 'concept': {
       if (ex.body.split(/\s+/).length > 80) warnings.push(`${where}: concept body over 80 words`)
+      if (ex.output === undefined) break
+      if (!ex.code) { err('output needs code'); break }
+      let r: { out: string; err: string } | null = null
+      if (ex.language === 'python') r = runPython(ex.code)
+      else if (ex.language === 'javascript') r = runJs(ex.code)
+      else if (ex.language === 'sql') {
+        if (!ex.setup) err('sql worked example needs setup')
+        else r = runSql(ex.setup, ex.code)
+      } else err('output needs language python, javascript or sql')
+      if (r && norm(r.out) !== norm(ex.output))
+        err(`worked example output is wrong: expected ${JSON.stringify(norm(ex.output))}, got ${JSON.stringify(norm(r.out))}${r.err ? ' / ' + r.err.trim().split('\n').pop() : ''}`)
       break
+    }
     case 'choice':
       if (ex.options.length < 2) err('needs 2+ options')
       if (!(ex.answer >= 0 && ex.answer < ex.options.length)) err('answer index out of range')
@@ -160,6 +172,21 @@ for (const unit of units) {
     if (!lesson.id.startsWith(unit.id + '-')) errors.push(`${lesson.id}: id must start with ${unit.id}-`)
     if (lesson.exercises.length < 5) warnings.push(`${lesson.id}: only ${lesson.exercises.length} exercises`)
     lesson.exercises.forEach((ex, i) => check(`${lesson.id}#${i} (${ex.kind})`, ex))
+    if (lesson.exercises.length > 14) warnings.push(`${lesson.id}: ${lesson.exercises.length} exercises (14 max)`)
+    // Show before you ask: a code question needs a card with code since the last code question's topic,
+    // and no more than four questions run without a teaching card.
+    let run = 0
+    let shown = false
+    lesson.exercises.forEach((ex, i) => {
+      if (ex.kind === 'concept') {
+        run = 0
+        if (ex.code) shown = true
+        return
+      }
+      run++
+      if (run === 5) warnings.push(`${lesson.id}#${i}: five questions in a row with no teaching card`)
+      if (ex.kind === 'write' && !shown) warnings.push(`${lesson.id}#${i}: write question before any worked example`)
+    })
   }
 }
 

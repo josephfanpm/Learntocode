@@ -1,10 +1,16 @@
 // Content schema. A course is a path of units (one per CS50 week); a unit is
-// a row of short lessons; a lesson is 6–10 bite-sized exercises.
+// a row of short lessons; a lesson is 6–14 bite-sized exercises.
 //
 // Writing rules for every exercise:
 // - One idea per exercise. A learner should finish it in under a minute.
 // - Plain words. Assume the learner has never written code.
 // - `explain` is shown after the answer (right or wrong). One or two sentences.
+// - Show before you ask. Every question that has the learner build or debug
+//   code (write, blank, order, spot) comes after a worked example of nearly
+//   the same problem: a concept card with `code` and the `output` it gives.
+// - Climb in small steps: recognise an idea (choice, match), then complete it
+//   (blank, order, spot), then write it. Never more than four questions in a
+//   row without a teaching card.
 
 export type Language = 'python' | 'sql' | 'html' | 'javascript'
 
@@ -16,6 +22,14 @@ export interface ConceptExercise {
   body: string
   code?: string
   language?: Language
+  /**
+   * Makes the card a worked example: exactly what `code` prints (python,
+   * javascript) or returns (sql, as rows of `|`-joined values). The content
+   * checker runs the code and compares, so it can never be wrong.
+   */
+  output?: string
+  /** sql worked examples only: the tables `code` runs against. */
+  setup?: string
 }
 
 /** Pick one answer. Use `code` for "what does this print?" questions. */

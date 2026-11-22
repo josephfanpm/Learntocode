@@ -137,6 +137,21 @@ export const u8: Unit = {
           explain: '`href` holds a link\'s address. `alt` describes an image for people who can\'t see it and shows up if it fails to load.',
         },
         {
+          kind: 'write',
+          prompt: 'Add a link to `https://example.com` (any link text) and an image with `src="dog.jpg"` and an `alt` description.',
+          language: 'html',
+          starter: '<p>My favourite site and my dog:</p>\n',
+          tests: [
+            { expected: "a[href='https://example.com']" },
+            { expected: "img[src='dog.jpg']" },
+            { expected: 'img[alt]' },
+          ],
+          hint: 'Use <a href="https://example.com">…</a> and <img src="dog.jpg" alt="…">.',
+          solution:
+            '<p>My favourite site and my dog:</p>\n<a href="https://example.com">Example</a>\n<img src="dog.jpg" alt="My dog in the park">',
+          explain: 'The attributes do the work: `href` sets where the link goes, `src` and `alt` say what picture to show and how to describe it.',
+        },
+        {
           kind: 'concept',
           title: 'Lists',
           body: '`<ul>` makes an **unordered list** (bullet points). `<ol>` makes an **ordered list** (numbered).\n\nEach item goes inside its own `<li>` (list item) element.',
@@ -159,21 +174,6 @@ export const u8: Unit = {
           hint: 'Open <ul>, add three <li>…</li> lines, then close with </ul>.',
           solution: '<h2>Things I like</h2>\n<ul>\n  <li>Tea</li>\n  <li>Long walks</li>\n  <li>Puzzles</li>\n</ul>',
           explain: 'Each `<li>` becomes one bullet, and the `<ul>` holds them together as one list.',
-        },
-        {
-          kind: 'write',
-          prompt: 'Add a link to `https://example.com` (any link text) and an image with `src="dog.jpg"` and an `alt` description.',
-          language: 'html',
-          starter: '<p>My favourite site and my dog:</p>\n',
-          tests: [
-            { expected: "a[href='https://example.com']" },
-            { expected: "img[src='dog.jpg']" },
-            { expected: 'img[alt]' },
-          ],
-          hint: 'Use <a href="https://example.com">…</a> and <img src="dog.jpg" alt="…">.',
-          solution:
-            '<p>My favourite site and my dog:</p>\n<a href="https://example.com">Example</a>\n<img src="dog.jpg" alt="My dog in the park">',
-          explain: 'The attributes do the work: `href` sets where the link goes, `src` and `alt` say what picture to show and how to describe it.',
         },
       ],
     },
@@ -375,8 +375,10 @@ export const u8: Unit = {
         {
           kind: 'concept',
           title: 'Variables with let and const',
-          body: 'In JavaScript you make a variable with `let` or `const`. Lines usually end with `;`.\n\n`let` can be changed later. `const` stays the same forever. It\'s like Python\'s `name = "Ana"`, with a keyword in front.',
-          code: 'const name = "Ana";\nlet score = 0;\nscore = score + 1;',
+          body: 'In JavaScript you make a variable with `let` or `const`. Lines usually end with `;`.\n\n`let` can be changed later. `const` stays the same forever. It\'s like Python\'s `name = "Ana"`, with a keyword in front.\n\n`console.log` prints a value, like Python\'s `print`.',
+          code: 'const name = "Ana";\nlet score = 0;\nscore = score + 1;\nconsole.log(name);\nconsole.log(score);',
+          language: 'javascript',
+          output: 'Ana\n1',
         },
         {
           kind: 'choice',
@@ -390,7 +392,9 @@ export const u8: Unit = {
           kind: 'concept',
           title: 'Functions',
           body: 'A JavaScript **function** works like a Python one, but its body goes inside curly braces `{ }` instead of being indented after a colon.',
-          code: 'function greet(name) {\n  return "Hi, " + name;\n}',
+          code: 'function greet(name) {\n  return "Hi, " + name;\n}\n\nconsole.log(greet("Ana"));',
+          language: 'javascript',
+          output: 'Hi, Ana',
         },
         {
           kind: 'blank',
@@ -403,7 +407,23 @@ export const u8: Unit = {
         {
           kind: 'concept',
           title: 'Finding and changing elements',
-          body: '`document` is the whole page. `document.querySelector("#msg")` finds the first element matching a CSS selector.\n\nAn **event** is something that happens, like a click. `addEventListener("click", ...)` runs a function when it happens. Setting `.textContent` changes an element\'s text.',
+          body: 'JavaScript goes inside a `<script>` element, below the HTML it works on.\n\n`document` is the whole page. `document.querySelector("#title")` finds the first element matching a CSS selector. Setting `.textContent` changes that element\'s text.',
+          code: '<h1 id="title">Hello</h1>\n<script>\n  const title = document.querySelector("#title");\n  title.textContent = "Welcome back";\n</script>',
+          language: 'html',
+        },
+        {
+          kind: 'choice',
+          prompt: 'Which selector finds `<p id="status">` with querySelector?',
+          options: ['"#status"', '".status"', '"status"', '"p.status"'],
+          answer: 0,
+          explain: 'querySelector uses CSS selectors, so an id needs the `#` in front, just like in a stylesheet.',
+        },
+        {
+          kind: 'concept',
+          title: 'Reacting to a click',
+          body: 'An **event** is something that happens on the page, like a click.\n\n`addEventListener("click", ...)` hands the element a function to run each time it is clicked. The code inside the function waits until then.',
+          code: '<button id="like">Like</button>\n<script>\n  const button = document.querySelector("#like");\n  button.addEventListener("click", function () {\n    button.textContent = "Liked";\n  });\n</script>',
+          language: 'html',
         },
         {
           kind: 'order',
@@ -415,13 +435,6 @@ export const u8: Unit = {
             '});',
           ],
           explain: 'First find the button, then attach a click listener, and inside it change the text. The `});` closes the function and the listener.',
-        },
-        {
-          kind: 'choice',
-          prompt: 'Which selector finds `<p id="status">` with querySelector?',
-          options: ['"#status"', '".status"', '"status"', '"p.status"'],
-          answer: 0,
-          explain: 'querySelector uses CSS selectors, so an id needs the `#` in front, just like in a stylesheet.',
         },
         {
           kind: 'write',
@@ -602,6 +615,13 @@ export const u8: Unit = {
           explain: 'The page looks the same, but now every part says what it is.',
         },
         {
+          kind: 'concept',
+          title: 'A plain box: div',
+          body: 'A `<div>` is a plain box with no meaning of its own. Wrap a group of elements in one and give it a class, and a single CSS rule styles the whole group together.',
+          code: '<style>\n  .tip { background-color: #ffff00; padding: 8px; }\n</style>\n<div class="tip">\n  <h3>Tip</h3>\n  <p>Water the plants in the morning.</p>\n</div>',
+          language: 'html',
+        },
+        {
           kind: 'write',
           prompt: 'The `.card` style is ready. Wrap the heading and paragraph in a `<div>` with the class `card` so they sit in one padded, bordered box.',
           language: 'html',
@@ -625,6 +645,13 @@ export const u8: Unit = {
           body: 'In this lab you build a small personal homepage, one piece at a time: a heading, an introduction, a list, a link, a picture and a table.\n\nEach step starts with what you built before. Use your own words for the text. Only the tags are checked.',
         },
         {
+          kind: 'concept',
+          title: 'Reminder: header and main',
+          body: '`<header>` holds the top of the page, usually the one `<h1>` title. `<main>` holds the main content. Each part goes between its own opening and closing tags.',
+          code: '<header>\n  <h1>Corner Cafe</h1>\n</header>\n<main>\n  <p>Fresh soup daily.</p>\n</main>',
+          language: 'html',
+        },
+        {
           kind: 'write',
           prompt: 'Start the page. Inside the `<header>`, add an `<h1>` with your name. Inside the `<main>`, add a `<p>` saying one thing about yourself.',
           language: 'html',
@@ -633,6 +660,13 @@ export const u8: Unit = {
           hint: 'Put <h1>Your name</h1> between the header tags and <p>…</p> between the main tags.',
           solution: '<header>\n  <h1>Robin Vale</h1>\n</header>\n<main>\n  <p>I grow tomatoes and I am learning to code.</p>\n</main>\n',
           explain: 'A header with one `<h1>` and a main area with your content is the backbone of most pages.',
+        },
+        {
+          kind: 'concept',
+          title: 'Reminder: a heading and a list',
+          body: 'An `<h2>` is a smaller heading for one section of the page. A `<ul>` is a bullet list, and every bullet is its own `<li>` inside it.',
+          code: '<h2>Open on</h2>\n<ul>\n  <li>Monday</li>\n  <li>Friday</li>\n</ul>',
+          language: 'html',
         },
         {
           kind: 'write',
@@ -655,6 +689,13 @@ export const u8: Unit = {
           explain: 'The closing tag is missing its slash, so the browser starts a new, empty list item. It should end with `</li>`.',
         },
         {
+          kind: 'concept',
+          title: 'Reminder: footer and links',
+          body: '`<footer>` holds the bottom of the page. A link is an `<a>` element: the `href` attribute is the address, and the text between the tags is what people click.',
+          code: '<footer>\n  <a href="https://example.org">See our menu</a>\n</footer>',
+          language: 'html',
+        },
+        {
           kind: 'write',
           prompt: 'Add a `<footer>` after `</main>`. Inside it, put a link to `https://example.com` with any link text.',
           language: 'html',
@@ -664,6 +705,13 @@ export const u8: Unit = {
           solution:
             '<main>\n  <p>I grow tomatoes and I am learning to code.</p>\n</main>\n<footer>\n  <a href="https://example.com">My favourite site</a>\n</footer>\n',
           explain: 'The `href` holds the address, and the text between the tags is what visitors click.',
+        },
+        {
+          kind: 'concept',
+          title: 'Reminder: describing a picture',
+          body: 'An `<img>` takes its attributes inside the one tag, separated by spaces. `src` names the picture file. `alt` describes the picture in words.',
+          code: '<img src="soup.jpg" alt="A bowl of leek soup">',
+          language: 'html',
         },
         {
           kind: 'write',
@@ -726,6 +774,13 @@ export const u8: Unit = {
           code: 'button.style.backgroundColor = "green";',
         },
         {
+          kind: 'concept',
+          title: 'Reminder: buttons with a class',
+          body: 'A `<button>` shows the text between its tags. A `class` is a label inside the opening tag. It changes nothing by itself, but a script can use it to find the button.',
+          code: '<button class="save">Save</button>\n<button class="cancel">Cancel</button>',
+          language: 'html',
+        },
+        {
           kind: 'write',
           prompt: 'Build the skeleton. Under the question, add two `<button>` elements: one with the class `correct` and one with the class `wrong`. Give each an answer as its text.',
           language: 'html',
@@ -735,6 +790,12 @@ export const u8: Unit = {
           solution:
             '<h1>Quick quiz</h1>\n<p>Which language sets the colours of a page?</p>\n<button class="correct">CSS</button>\n<button class="wrong">SQL</button>\n',
           explain: 'The classes do nothing yet. They are labels the script will use to find each button.',
+        },
+        {
+          kind: 'concept',
+          title: 'Reminder: colour on a click',
+          body: 'Three steps: find the element with `querySelector` (a class needs a dot, like `".save"`), listen for the click, and change the style inside the function.',
+          code: 'const save = document.querySelector(".save");\nsave.addEventListener("click", function () {\n  save.style.backgroundColor = "gold";\n});',
         },
         {
           kind: 'choice',
@@ -771,9 +832,17 @@ export const u8: Unit = {
         },
         {
           kind: 'concept',
+          title: 'if in JavaScript',
+          body: 'JavaScript has `if` and `else` too. The check goes in round brackets and each branch goes in curly braces.\n\n`===` asks whether two values are equal. A single `=` stores a value instead.',
+          code: 'const answer = "blue";\nif (answer === "blue") {\n  console.log("Correct");\n} else {\n  console.log("Try again");\n}',
+          language: 'javascript',
+          output: 'Correct',
+        },
+        {
+          kind: 'concept',
           title: 'Checking a typed answer',
-          body: 'Some questions need a typed answer. Put an `<input>` in a `<form>` and listen for the `submit` event.\n\n`event.preventDefault()` stops the page reloading. `input.value` is the text that was typed, and `===` checks whether two values are equal.',
-          code: 'if (input.value === "green") {\n  input.style.backgroundColor = "lightgreen";\n}',
+          body: 'Some questions need a typed answer. Put an `<input>` in a `<form>` and listen for the `submit` event, which happens when the form is sent.\n\n`event.preventDefault()` stops the page reloading. `.value` is the text that was typed into the box.',
+          code: 'const box = document.querySelector("#city");\ndocument.querySelector("form").addEventListener("submit", function (event) {\n  event.preventDefault();\n  if (box.value === "Lima") {\n    box.style.backgroundColor = "lightgreen";\n  }\n});',
         },
         {
           kind: 'order',
@@ -810,6 +879,13 @@ export const u8: Unit = {
           ],
           answer: 2,
           explain: 'A single `=` stores "green" in the box instead of comparing. Checking needs `===`.',
+        },
+        {
+          kind: 'concept',
+          title: 'Reminder: a form with a box',
+          body: 'A `<form>` wraps a typing box and a button. An `id` on the `<input>` lets a script find that one box with `"#city"`. Clicking the button sends the form.',
+          code: '<form>\n  <input type="text" id="city">\n  <button>Go</button>\n</form>',
+          language: 'html',
         },
         {
           kind: 'write',

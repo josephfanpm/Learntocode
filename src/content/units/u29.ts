@@ -57,6 +57,16 @@ export const u29: Unit = {
           explain: '200 + 1,500 + 3,000 + 300 = 5,000. Input and output share the same window.',
         },
         {
+          kind: 'concept',
+          title: 'Estimating in code',
+          body: '`len` counts the characters in a piece of text. `//` divides and throws away the remainder, so the result is a whole number.\n\n"strawberry" has 10 characters. At 3 characters per token, that is about 3 tokens.',
+          code: `word = "strawberry"
+print(len(word))
+print(len(word) // 3)`,
+          language: 'python',
+          output: '10\n3',
+        },
+        {
           kind: 'write',
           prompt: 'Read one line of text. Print the estimated number of tokens using the course rule: 3 characters per token, rounded down.',
           language: 'python',
@@ -73,6 +83,11 @@ print(len(text))
 print(len(text) // 3)
 `,
           explain: 'A rough estimate is enough for planning. The real count depends on the model and the language of the text.',
+        },
+        {
+          kind: 'concept',
+          title: 'An exact count',
+          body: 'The estimate is rough. For the real number, the API can count a request without running the model: `client.messages.count_tokens(...)`.\n\nGive it the model and the messages you plan to send. The answer comes back as `input_tokens`. No reply has been written, so there is no output to count.',
         },
         {
           kind: 'blank',
@@ -98,6 +113,20 @@ print(count.___)`,
           ],
           answer: 2,
           explain: 'One huge document dwarfs everything else. Later in this chapter you will send only the relevant pieces of it.',
+        },
+        {
+          kind: 'concept',
+          title: 'Check before you send',
+          body: 'Add up every part, **plus the room you are keeping for the reply**. Then compare the total with the budget.\n\n`<=` means "less than or equal to": a total that exactly equals the budget still fits.',
+          code: `budget = 15
+total = 5 + 4 + 10   # instructions + question + room for the reply
+print("total", total)
+if total <= budget:
+    print("fits")
+else:
+    print("too long")`,
+          language: 'python',
+          output: 'total 19\ntoo long',
         },
         {
           kind: 'write',
@@ -187,6 +216,16 @@ else:
           explain: 'Output tokens usually carry the higher price. A long reply can cost more than a long prompt.',
         },
         {
+          kind: 'concept',
+          title: 'Price times tokens',
+          body: 'When a price is per 1,000 tokens, multiply the tokens by the price and divide by 1,000.\n\nWith two prices, do that once for input and once for output, then add the two. The price below is made up.',
+          code: `PRICE = 2   # made-up price: cents per 1,000 tokens
+tokens = 5000
+print(tokens * PRICE / 1000)`,
+          language: 'python',
+          output: '10.0',
+        },
+        {
           kind: 'write',
           prompt: 'Read the input tokens, then the output tokens of one call. Using the **example** prices in the starter (made up, in cents per 1,000 tokens), print the cost in cents.',
           language: 'python',
@@ -247,6 +286,18 @@ print(cost)
             { ask: 'Call 4.', answer: 3 },
           ],
           explain: 'Each call carries everything before it plus one new question. Four calls sent 1,600 input tokens for only 400 tokens of questions.',
+        },
+        {
+          kind: 'concept',
+          title: 'Watching the history grow',
+          body: 'Here every question and every reply is 50 tokens. The question joins the history before the call. The reply joins after it.\n\nSo each call sends more than the one before.',
+          code: `history = 0
+for call in range(3):
+    history += 50      # the new question
+    print("call sends", history)
+    history += 50      # the reply`,
+          language: 'python',
+          output: 'call sends 50\ncall sends 150\ncall sends 250',
         },
         {
           kind: 'write',
@@ -339,6 +390,34 @@ print(total)
           kind: 'concept',
           title: 'Trim from the newest backwards',
           body: 'To trim to a budget: count the system prompt first, because it always stays. Then walk the history **from newest to oldest**, keeping each turn while there is room.\n\nStop at the first turn that does not fit. Skipping it and keeping older ones would leave a gap in the conversation.',
+        },
+        {
+          kind: 'concept',
+          title: 'Walking a list backwards',
+          body: '`reversed` walks a list from its last item to its first.\n\n`insert(0, ...)` puts an item at the **front** of a list. Use the two together and the new list ends up in the original order.',
+          code: `turns = ["one", "two", "three"]
+kept = []
+for text in reversed(turns):
+    print("looking at", text)
+    kept.insert(0, text)
+print(kept)`,
+          language: 'python',
+          output: "looking at three\nlooking at two\nlooking at one\n['one', 'two', 'three']",
+        },
+        {
+          kind: 'concept',
+          title: 'Stop when the budget is used',
+          body: 'Check **before** keeping: would this one push the total past the budget? If so, `break` leaves the loop at once.\n\nOtherwise keep it and add its size to the running total. Here the budget is 10.',
+          code: `sizes = [4, 6, 5, 3]
+used = 0
+for size in reversed(sizes):
+    if used + size > 10:
+        break
+    used += size
+    print("kept", size)
+print("used", used)`,
+          language: 'python',
+          output: 'kept 3\nkept 5\nused 8',
         },
         {
           kind: 'write',
@@ -480,6 +559,17 @@ for text in kept:
           explain: 'Two chunks are worth sending. The other three would only cost tokens and distract.',
         },
         {
+          kind: 'concept',
+          title: 'Words two texts share',
+          body: '`split` cuts a text into words, and `set` keeps each different word once.\n\n`&` between two sets gives the items that are in **both**. `len` then counts them.',
+          code: `a = set("the cat sat on the mat".split())
+b = set("a cat on a mat".split())
+print(sorted(a & b))
+print(len(a & b))`,
+          language: 'python',
+          output: "['cat', 'mat', 'on']\n3",
+        },
+        {
           kind: 'write',
           prompt: 'The simplest search scores a chunk by shared words. Read a question, then a chunk. Print how many different words from the question also appear in the chunk. Ignore upper and lower case.',
           language: 'python',
@@ -507,6 +597,17 @@ c_words = set(chunk.lower().split())
 print(len(q_words & c_words))
 `,
           explain: 'More shared words suggests the chunk is about the same thing. It is crude, but it is a real retrieval score.',
+        },
+        {
+          kind: 'concept',
+          title: 'Ranking by a score',
+          body: '`sorted` can rank a list by any function you pass as `key`. Here the score is `len`, the length of each word.\n\n`reverse=True` puts the highest score first. `[:2]` takes the first two.',
+          code: `words = ["fig", "banana", "kiwi", "apple"]
+ranked = sorted(words, key=len, reverse=True)
+print(ranked)
+print(ranked[:2])`,
+          language: 'python',
+          output: "['banana', 'apple', 'kiwi', 'fig']\n['banana', 'apple']",
         },
         {
           kind: 'write',
@@ -645,6 +746,17 @@ print(response.usage.cache_read_input_tokens)`,
           ],
           answer: 0,
           explain: 'The time changes every second and sits at the very top, so nothing after it ever matches. Move it to the end, or leave it out.',
+        },
+        {
+          kind: 'concept',
+          title: 'Two lists, side by side',
+          body: '`zip` walks two lists together, one pair at a time.\n\nLook at the third pair: it matches again. A cache would never get that far. It stops at the first difference, and stopping a loop early is the job of `break`.',
+          code: `first = ["red", "blue", "green"]
+second = ["red", "pink", "green"]
+for a, b in zip(first, second):
+    print(a, b, a == b)`,
+          language: 'python',
+          output: 'red red True\nblue pink False\ngreen green True',
         },
         {
           kind: 'write',

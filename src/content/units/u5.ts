@@ -73,6 +73,23 @@ export const u5: Unit = {
           explain: 'A stack always gives back the newest item still on it. Gold came and went, so blue is next.',
         },
         {
+          kind: 'choice',
+          prompt: 'What happens?',
+          code: py('s = []', 's.pop()'),
+          language: 'python',
+          options: ['It crashes: there is nothing to pop', 'It returns 0', 'It returns None', 'Nothing happens'],
+          answer: 0,
+          explain: 'Popping an empty list is an IndexError. Check `len(s) > 0` first if the stack might be empty.',
+        },
+        {
+          kind: 'concept',
+          title: 'Pop until it is empty',
+          body: 'A `while` loop can empty a stack. `len(pile) > 0` asks "is anything left?", so the loop stops before an empty pop can crash.',
+          code: py('pile = ["a", "b"]', 'while len(pile) > 0:', '    print(pile.pop())'),
+          language: 'python',
+          output: 'b\na',
+        },
+        {
           kind: 'blank',
           prompt: 'A browser remembers pages on a stack. Fill the gaps so "back" returns the latest page.',
           code: py('history = []', 'history.___("page1")', 'history.append("page2")', 'back = history.___()', 'print(back)   # page2'),
@@ -93,15 +110,6 @@ export const u5: Unit = {
           explain: 'A stack only lets you touch the top, which keeps it simple and fast.',
         },
         {
-          kind: 'choice',
-          prompt: 'What happens?',
-          code: py('s = []', 's.pop()'),
-          language: 'python',
-          options: ['It crashes: there is nothing to pop', 'It returns 0', 'It returns None', 'Nothing happens'],
-          answer: 0,
-          explain: 'Popping an empty list is an IndexError. Check `len(s) > 0` first if the stack might be empty.',
-        },
-        {
           kind: 'order',
           prompt: 'Put the lines in order. The program pushes each letter of "abc", then pops them off, printing c, b, a.',
           lines: [
@@ -113,6 +121,14 @@ export const u5: Unit = {
           ],
           language: 'python',
           explain: 'Everything is pushed first. Popping then gives the letters back in reverse order.',
+        },
+        {
+          kind: 'concept',
+          title: 'Building text from pops',
+          body: 'Start with empty text, `""`. Each time round, join the popped item onto the end with `+`.\n\nThe top of the stack comes off first, so it ends up at the front of the text.',
+          code: py('parts = ["sun", "set"]', 'result = ""', 'while len(parts) > 0:', '    result = result + parts.pop()', 'print(result)'),
+          language: 'python',
+          output: 'setsun',
         },
         {
           kind: 'write',
@@ -216,6 +232,14 @@ export const u5: Unit = {
           lines: ['queue = []', 'queue.append("first")', 'queue.append("second")', 'print(queue.pop(0))'],
           language: 'python',
           explain: 'Make the queue, add to the back twice, then remove from the front.',
+        },
+        {
+          kind: 'concept',
+          title: 'Serving a whole queue',
+          body: 'Loop while anyone is still waiting. `pop(0)` takes the person at the front each time, so they leave in the order they arrived.',
+          code: py('queue = ["Ann", "Bo"]', 'while len(queue) > 0:', '    print("Next: " + queue.pop(0))'),
+          language: 'python',
+          output: 'Next: Ann\nNext: Bo',
         },
         {
           kind: 'write',
@@ -327,6 +351,24 @@ export const u5: Unit = {
           explain: 'With just the head, you can reach every other node by following links.',
         },
         {
+          kind: 'concept',
+          title: 'Count while you walk',
+          body: 'The walk can do a job at each node. Keep a running number, change it inside the loop, then step to `node.next`.\n\nThis one counts the nodes.',
+          code: py(
+            ...NODE_CLASS,
+            '',
+            'head = Node("A", Node("B", Node("C")))   # A -> B -> C',
+            'count = 0',
+            'node = head',
+            'while node is not None:',
+            '    count = count + 1',
+            '    node = node.next',
+            'print(count)',
+          ),
+          language: 'python',
+          output: '3',
+        },
+        {
           kind: 'choice',
           prompt: 'To reach the 100th item in a linked list, what must you do?',
           options: [
@@ -395,6 +437,14 @@ export const u5: Unit = {
           explain: 'The key "cake" points to the value 5.',
         },
         {
+          kind: 'concept',
+          title: 'Adding a pair',
+          body: 'To add a pair, put the new key in square brackets and give it a value with `=`. If the key is already there, its value is replaced.',
+          code: py('ages = {"Ann": 31}', 'ages["Bo"] = 25', 'print(ages)'),
+          language: 'python',
+          output: '{\'Ann\': 31, \'Bo\': 25}',
+        },
+        {
           kind: 'blank',
           prompt: 'Fill the gap to add coffee at a price of 4.',
           code: py('prices = {"tea": 3}', 'prices[___] = 4', "print(prices)   # {'tea': 3, 'coffee': 4}"),
@@ -453,6 +503,14 @@ export const u5: Unit = {
             ['collision', 'two keys in the same bucket'],
           ],
           explain: 'Keys go through the hash function to find a bucket, and the bucket holds the value.',
+        },
+        {
+          kind: 'concept',
+          title: 'Check, then look up',
+          body: 'Looking up a key that is not there crashes the program. Ask `in` first, and only look up the key when the answer is yes.',
+          code: py('stock = {"pens": 12, "cups": 0}', 'item = "mugs"', 'if item in stock:', '    print(stock[item])', 'else:', '    print("not sold here")'),
+          language: 'python',
+          output: 'not sold here',
         },
         {
           kind: 'write',
@@ -578,6 +636,14 @@ export const u5: Unit = {
           explain: 'In a BST, the left-smaller, right-bigger rule is what makes searching fast.',
         },
         {
+          kind: 'concept',
+          title: 'Walking down one side',
+          body: '`TreeNode(value, left, right)` makes a node with up to two children.\n\nIn a BST the **biggest** value is as far right as you can go. Keep stepping right until there is no right child.',
+          code: py('class TreeNode:', '    def __init__(self, value, left=None, right=None):', '        self.value = value', '        self.left = left', '        self.right = right', '', 'node = TreeNode(8, TreeNode(3), TreeNode(10, None, TreeNode(14)))', 'while node.right is not None:', '    node = node.right', 'print(node.value)'),
+          language: 'python',
+          output: '14',
+        },
+        {
           kind: 'write',
           prompt: 'In a BST, the smallest value is found by going left until you cannot. Finish `smallest(node)` so it returns that value.',
           language: 'python',
@@ -669,6 +735,14 @@ export const u5: Unit = {
           language: 'python',
           accept: ['False'],
           explain: 'The path a, n exists, but that node has no `"*"` key. So "an" is only the start of a word here, not a stored word.',
+        },
+        {
+          kind: 'concept',
+          title: 'Stepping down, letter by letter',
+          body: 'Start with `node` at the top of the trie. For each letter, `node = node[letter]` moves down one level.\n\nAfter the last letter, `"*" in node` tells you whether a word ends there.',
+          code: py('trie = {"h": {"i": {"*": True}}}', 'node = trie', 'for letter in "hi":', '    node = node[letter]', 'print("*" in node)'),
+          language: 'python',
+          output: 'True',
         },
         {
           kind: 'blank',
@@ -812,6 +886,14 @@ export const u5: Unit = {
           body: 'Each parent is the top of a smaller family tree. So a question about a person can be answered by asking the **same question** about their parents. That is **recursion**: a function that calls itself.\n\nThe **base case**, where the calls stop, is a person with no parents listed.',
         },
         {
+          kind: 'concept',
+          title: 'Reminder: a function that calls itself',
+          body: 'Boxes inside boxes. An empty box counts as 1: that is the base case. Any other box is 1 plus whatever the box inside it answers.',
+          code: py('def depth(box):', '    if box["inside"] is None:', '        return 1', '    return 1 + depth(box["inside"])', '', 'small = {"inside": None}', 'big = {"inside": {"inside": small}}', 'print(depth(big))'),
+          language: 'python',
+          output: '3',
+        },
+        {
           kind: 'order',
           prompt: 'Put the lines in order. The function counts the generations above and including a person, following the first parent each time.',
           lines: [
@@ -835,6 +917,14 @@ export const u5: Unit = {
             { ask: 'Ana returns 1 + 1 = 2. Tap who receives that 2.', answer: 0 },
           ],
           explain: 'The calls go up the tree until the base case, then the answers travel back down. Mia ends with 1 + 2 = 3.',
+        },
+        {
+          kind: 'concept',
+          title: 'Reminder: keep the biggest',
+          body: 'To find the biggest of several numbers, keep the best one seen so far. Replace it whenever a bigger one turns up.',
+          code: py('best = 0', 'for n in [3, 7, 4]:', '    if n > best:', '        best = n', 'print(best)'),
+          language: 'python',
+          output: '7',
         },
         {
           kind: 'write',
@@ -896,6 +986,14 @@ export const u5: Unit = {
           explain: 'It calls itself on the same `person` again, so it never moves up the tree. It should be `count_people(parent)`.',
         },
         {
+          kind: 'concept',
+          title: 'Reminder: one item, or a whole list',
+          body: '`.append(x)` adds a single item to a list. `+` joins two lists into one longer list, which you can store back under the same name.',
+          code: py('names = ["Ana"]', 'names.append("Tom")', 'names = names + ["Rosa", "Luis"]', 'print(names)'),
+          language: 'python',
+          output: '[\'Ana\', \'Tom\', \'Rosa\', \'Luis\']',
+        },
+        {
           kind: 'write',
           prompt: 'Finish `ancestors(person)` so it returns a list with the names of everyone above that person. For each parent, add the parent\'s name, then add all of that parent\'s ancestors.',
           language: 'python',
@@ -940,6 +1038,14 @@ export const u5: Unit = {
             'print(ancestors(tom))',
           ),
           explain: 'Each call handles one person and trusts the recursive call to gather everyone above. It goes all the way up Ana\'s side before it reaches Tom.',
+        },
+        {
+          kind: 'concept',
+          title: 'Reminder: picking letters out of text',
+          body: 'Positions in text start at 0, so `first[0]` is the first letter and `second[2]` is the third. `+` joins letters into new text.',
+          code: py('first = "sun"', 'second = "hat"', 'print(first[0] + second[2])'),
+          language: 'python',
+          output: 'st',
         },
         {
           kind: 'write',
@@ -1017,6 +1123,14 @@ export const u5: Unit = {
           explain: 'Each missing word is compared with all 1,000 items: 50 × 1,000 = 50,000. With a set it would be about 50 jumps.',
         },
         {
+          kind: 'concept',
+          title: 'Reminder: filling a set',
+          body: '`set()` makes an empty set and `.add(x)` puts `x` in. A set keeps each value only once.\n\nLines read from a file end with a new-line, like these. `.strip()` trims it off.',
+          code: py('seen = set()', 'for line in ["red\\n", "blue\\n", "red\\n"]:', '    seen.add(line.strip())', 'print(len(seen))'),
+          language: 'python',
+          output: '2',
+        },
+        {
           kind: 'write',
           prompt: 'Step 1: load. The starter saves a small word list to `words.txt`. Read the file and add each line to the set `words`, without the new-line at the end. Then print how many words were loaded.',
           language: 'python',
@@ -1041,6 +1155,14 @@ export const u5: Unit = {
             'print(len(words))',
           ),
           explain: 'The file has 5 lines but "cat" appears twice, and a set keeps each value once. `strip()` matters: "cat" with a new-line stuck on is a different word.',
+        },
+        {
+          kind: 'concept',
+          title: 'Reminder: small letters',
+          body: '`.lower()` gives a copy of some text in small letters. Lowercase a word before you look it up, and capitals stop mattering.',
+          code: py('colors = {"red", "blue"}', 'pick = "RED"', 'print(pick.lower())', 'print(pick.lower() in colors)'),
+          language: 'python',
+          output: 'red\nTrue',
         },
         {
           kind: 'write',
@@ -1083,6 +1205,14 @@ export const u5: Unit = {
           explain: '"The" has a capital T, so it does not match "the". The check should be `if w.lower() not in words:`.',
         },
         {
+          kind: 'concept',
+          title: 'Reminder: count words in a loop',
+          body: '`.split()` cuts a line of text into a list of words. Loop over them and add 1 to a counter each time a word passes your check.',
+          code: py('count = 0', 'for w in "one two three".split():', '    if len(w) > 3:', '        count = count + 1', 'print("Long words:", count)'),
+          language: 'python',
+          output: 'Long words: 1',
+        },
+        {
           kind: 'write',
           prompt: 'Step 3: check a whole line. Read a line of text. Count the words that are not in `words` (ignore capitals). Print the count like `Misspelled: 2`.',
           language: 'python',
@@ -1109,6 +1239,14 @@ export const u5: Unit = {
             'print("Misspelled:", wrong)',
           ),
           explain: 'This loop is the heart of a spell checker. Each `in` check is one quick hash lookup, so even a whole book is checked in a blink.',
+        },
+        {
+          kind: 'concept',
+          title: 'Reminder: trimming punctuation',
+          body: '`.strip(".,!?")` removes any of those marks from both ends of a word. You can chain `.lower()` straight after it.',
+          code: py('w = "Hello!"', 'print(w.strip(".,!?"))', 'print(w.strip(".,!?").lower())'),
+          language: 'python',
+          output: 'Hello\nhello',
         },
         {
           kind: 'write',

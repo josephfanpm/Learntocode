@@ -79,6 +79,21 @@ export const u20: Unit = {
           explain: 'POST to the collection URL creates a new item inside it.',
         },
         {
+          kind: 'concept',
+          title: 'A handler in code',
+          body: 'A **handler** is a function that takes a request and returns the response. Here it returns a pair: a status code, then the body.\n\nIt checks the method and the path together. `200` means it worked. Anything it does not recognise falls through to the `404` (not found) at the bottom.',
+          code: r`def handle(method, path):
+    if method == "GET" and path == "/books":
+        return (200, ["Dune", "Emma"])
+    return (404, {"error": "not found"})
+
+print(handle("GET", "/books"))
+print(handle("GET", "/films"))`,
+          language: 'python',
+          output: r`(200, ['Dune', 'Emma'])
+(404, {'error': 'not found'})`,
+        },
+        {
           kind: 'write',
           prompt: 'Let\'s start a tiny API. Finish `handle` so that `GET` on `/tasks` returns `(200, TASKS)`, and anything else (for now) returns `(404, {"error": "not found"})`. The last lines read a request and print the result.',
           language: 'python',
@@ -195,6 +210,24 @@ print(status, json.dumps(result, sort_keys=True))
           explain: '5xx means the fault is on the server. The client did nothing wrong and may simply try again later.',
         },
         {
+          kind: 'concept',
+          title: 'Find one, or say 404',
+          body: 'To fetch one item, loop through the list and return as soon as an id matches.\n\nIf the loop ends with no match, the item does not exist, so return a 404 pair with a clear message.',
+          code: r`BOOKS = [{"id": 1, "title": "Dune"}, {"id": 2, "title": "Emma"}]
+
+def get_book(book_id):
+    for book in BOOKS:
+        if book["id"] == book_id:
+            return (200, book)
+    return (404, {"error": "book not found"})
+
+print(get_book(2))
+print(get_book(5))`,
+          language: 'python',
+          output: r`(200, {'id': 2, 'title': 'Emma'})
+(404, {'error': 'book not found'})`,
+        },
+        {
           kind: 'write',
           prompt: 'Add "get one task" to the API. For `GET /tasks/ID`, return `(200, the task)` if a task has that id, otherwise `(404, {"error": "task not found"})`.',
           language: 'python',
@@ -296,6 +329,34 @@ print(status, json.dumps(result, sort_keys=True))
           explain: 'It names the field and says what is wrong, so the fix is obvious. The others leave the developer guessing.',
         },
         {
+          kind: 'concept',
+          title: 'Missing or empty?',
+          body: '`body["age"]` crashes when the key is missing. `body.get("age")` gives `None` instead, or the second value if you pass one.\n\n`None` and `""` both count as false, so one `if not` catches a missing value and an empty one.',
+          code: r`body = {"name": ""}
+print(body.get("age"))
+print(body.get("age", 0))
+if not body.get("name"):
+    print("name is required")`,
+          language: 'python',
+          output: r`None
+0
+name is required`,
+        },
+        {
+          kind: 'concept',
+          title: 'Is it the right kind of value?',
+          body: '`isinstance(value, bool)` is `True` only when the value is a real `True` or `False`. The text `"yes"` does not count.\n\nTo check a field that is allowed to be missing, first ask whether the key is there with `in`.',
+          code: r`print(isinstance(False, bool))
+print(isinstance("yes", bool))
+body = {"age": "ten"}
+if "age" in body and not isinstance(body["age"], int):
+    print("age must be a number")`,
+          language: 'python',
+          output: r`True
+False
+age must be a number`,
+        },
+        {
           kind: 'write',
           prompt: 'Write `validate(body)`. It returns a list of error messages. Add `"title is required"` if `"title"` is missing or empty. Add `"done must be true or false"` if `"done"` is present but is not a bool. A good body returns an empty list.',
           language: 'python',
@@ -350,6 +411,23 @@ print(validate({"done": "yes"}))
             { ask: 'What carries 201 and the new task back to the client?', answer: 4 },
           ],
           explain: 'Route, validate, save, respond. Validation sits before storage so bad data never gets in.',
+        },
+        {
+          kind: 'concept',
+          title: 'Build it, save it, send it back',
+          body: 'The server chooses the id: one more than the number of notes so far. It builds the new dict, appends it to the list, and returns it with `201`.\n\n`.strip()` trims spaces from both ends, so text made only of spaces becomes empty.',
+          code: r`NOTES = [{"id": 1, "text": "Hi"}]
+
+def add_note(text):
+    note = {"id": len(NOTES) + 1, "text": text.strip()}
+    NOTES.append(note)
+    return (201, note)
+
+print(add_note("  Bye "))
+print(len(NOTES))`,
+          language: 'python',
+          output: r`(201, {'id': 2, 'text': 'Bye'})
+2`,
         },
         {
           kind: 'write',
@@ -466,6 +544,26 @@ print(len(TASKS))
           explain: 'First "who are you?" (401), then "does it exist?" (404), then "is it yours?" (403). Only then does the delete happen.',
         },
         {
+          kind: 'concept',
+          title: 'Looking up a token',
+          body: 'Keep the known tokens in a dict: token in, user name out.\n\n`.get` gives `None` for a token that is not there, and also when no token was sent at all. So one `is None` check covers both.',
+          code: r`KEYS = {"key-1": "lee", "key-2": "mia"}
+
+def who(key):
+    user = KEYS.get(key)
+    if user is None:
+        return "stranger"
+    return user
+
+print(who("key-2"))
+print(who("key-9"))
+print(who(None))`,
+          language: 'python',
+          output: r`mia
+stranger
+stranger`,
+        },
+        {
           kind: 'write',
           prompt: 'Write `check(token, owner)`. Return `401` if the token is not in `TOKENS`. Return `403` if the token\'s user is not the `owner`. Otherwise return `200`.',
           language: 'python',
@@ -513,6 +611,23 @@ print(check("tok-ana", "ana"))
           language: 'python',
           answer: 3,
           explain: 'An unknown caller gets 401. That tells the client to sign in again, while 403 says signing in will not help.',
+        },
+        {
+          kind: 'concept',
+          title: 'Find it, then remove it',
+          body: 'To delete from a list of dicts, first find the right one and keep it in a variable that starts as `None`.\n\nStill `None` after the loop? Nothing matched. Otherwise `.remove(found)` takes it out of the list.',
+          code: r`PETS = [{"id": 1, "name": "Rex"}, {"id": 2, "name": "Tom"}]
+
+found = None
+for pet in PETS:
+    if pet["id"] == 2:
+        found = pet
+print(found)
+PETS.remove(found)
+print(PETS)`,
+          language: 'python',
+          output: r`{'id': 2, 'name': 'Tom'}
+[{'id': 1, 'name': 'Rex'}]`,
         },
         {
           kind: 'write',
@@ -602,10 +717,38 @@ print([task["id"] for task in TASKS])
           body: 'Sending 50,000 tasks in one response is slow for everyone. **Pagination** sends a list in pages, like a book.\n\nThe client asks with the query string: `GET /tasks?page=2&per_page=20`. A good response also says how many items and pages there are in total, so the client knows when to stop.',
         },
         {
+          kind: 'concept',
+          title: 'Rounding up',
+          body: 'Seven items at two per page do not fit in 3.5 pages: the last one still needs a page of its own.\n\n`math.ceil` rounds any fraction **up** to the next whole number. A whole number stays as it is.',
+          code: r`import math
+
+print(7 / 2)
+print(math.ceil(7 / 2))
+print(math.ceil(8 / 2))`,
+          language: 'python',
+          output: r`3.5
+4
+4`,
+        },
+        {
           kind: 'type',
           prompt: 'There are 45 tasks and `per_page` is 20. How many pages are there? Type the number.',
           accept: ['3', 'three'],
           explain: 'Pages 1 and 2 hold 20 each, and page 3 holds the last 5. Always round up.',
+        },
+        {
+          kind: 'concept',
+          title: 'Cutting out one page',
+          body: 'A page is a slice of the list. Page 1 starts at index 0, so the start is `(page - 1) * per_page`, and the slice runs for `per_page` items.\n\nHere is page 2, with 2 per page.',
+          code: r`days = ["Mon", "Tue", "Wed", "Thu", "Fri"]
+page = 2
+per_page = 2
+start = (page - 1) * per_page
+print(start)
+print(days[start:start + per_page])`,
+          language: 'python',
+          output: r`2
+['Wed', 'Thu']`,
         },
         {
           kind: 'write',
@@ -649,6 +792,22 @@ print(json.dumps(paginate(letters, int(page), int(per_page)), sort_keys=True))
           kind: 'concept',
           title: 'Filtering',
           body: 'The query string can also narrow a list: `GET /tasks?done=true` asks for finished tasks only.\n\nThe resource is still `/tasks`. The filter just trims what comes back.\n\nRemember that query values arrive as text. `"true"` is a string, not the Python value `True`.',
+        },
+        {
+          kind: 'concept',
+          title: 'Text to bool, then filter',
+          body: 'Turn the query text into a real bool once: `text == "true"` is `True` only for that exact word.\n\nThen keep the items whose value equals it.',
+          code: r`PETS = [{"name": "Rex", "fed": True}, {"name": "Tom", "fed": False}]
+
+text = "false"
+wanted = text == "true"
+print(wanted)
+for pet in PETS:
+    if pet["fed"] == wanted:
+        print(pet["name"])`,
+          language: 'python',
+          output: r`False
+Tom`,
         },
         {
           kind: 'write',

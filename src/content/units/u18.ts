@@ -175,6 +175,14 @@ export const u18: Unit = {
           explain: 'Output flows left to right: `cat` prints the file, the pipe hands it to `grep`, and `>` catches what is left in a file.',
         },
         {
+          kind: 'concept',
+          title: 'A path is text you can cut up',
+          body: 'A path is folder names joined by `/`. In Python, `split("/")` cuts it into a list, `pop()` removes the last item, and `"/".join(...)` glues the rest back together.\n\nThat is one step up, like `cd ..`.',
+          code: 'path = "/usr/local/bin"\nparts = path.split("/")\nparts.pop()\nprint("/".join(parts))',
+          language: 'python',
+          output: '/usr/local',
+        },
+        {
           kind: 'write',
           prompt: 'Act out `cd`. Read the folder you are in (like `/home/sam`), then where to move. If the move is `..`, print the folder above. Otherwise print the path with the new folder added after a `/`.',
           language: 'python',
@@ -213,6 +221,14 @@ export const u18: Unit = {
           explain: 'Your laptop sets `dev`, the live server sets `production`, and the code stays exactly the same.',
         },
         {
+          kind: 'concept',
+          title: 'Reading a setting that may be missing',
+          body: 'To a program, the environment looks like a dictionary of names and values. Python reads the real one from `os.environ`.\n\nSquare brackets crash when a name is missing. `.get(name, default)` hands back the default instead.',
+          code: 'prices = {"tea": "2", "milk": "1"}\nprint(prices.get("tea", "unknown"))\nprint(prices.get("jam", "unknown"))',
+          language: 'python',
+          output: '2\nunknown',
+        },
+        {
           kind: 'write',
           prompt: '`env` stands in for the environment. Read a variable name. Print its value, or print `not set` if the name is missing.',
           language: 'python',
@@ -243,6 +259,12 @@ export const u18: Unit = {
             { ask: 'node is in both /usr/local/bin and /usr/bin. Which copy runs?', answer: 0 },
           ],
           explain: 'The shell walks PATH from left to right and stops at the first match. That is why two installed versions can surprise you.',
+        },
+        {
+          kind: 'concept',
+          title: 'Which copy did it find?',
+          body: 'Most programs print their version when you add the flag `--version`.\n\nIt is a quick way to check two things at once: that the shell can find the program on `PATH`, and which copy it found.',
+          code: 'git --version',
         },
         {
           kind: 'type',
@@ -320,6 +342,14 @@ export const u18: Unit = {
           lines: ['requests==2.31.0', 'flask==3.0.0', 'pip install pytest', 'rich==13.7.0'],
           answer: 2,
           explain: 'The file is a list of package names and versions, not commands. That line should read something like `pytest==8.0.0`.',
+        },
+        {
+          kind: 'concept',
+          title: 'Cutting a line in two',
+          body: '`split` cuts text at a separator and gives a list of the pieces. When there are exactly two pieces, you can unpack them into two names in one line.',
+          code: 'setting = "width=80"\nname, value = setting.split("=")\nprint(name)\nprint(value)',
+          language: 'python',
+          output: 'width\n80',
         },
         {
           kind: 'write',

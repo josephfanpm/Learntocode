@@ -69,6 +69,7 @@ print(prices.___(item, "unknown"))`,
 for name, score in scores.items():
     print(name, score)`,
           language: 'python',
+          output: 'Ana 9\nBen 7',
         },
         {
           kind: 'match',
@@ -80,6 +81,17 @@ for name, score in scores.items():
             ['.get(k, d)', 'The value for k, or d if k is missing'],
           ],
           explain: 'Pick the one that hands you exactly what your loop or lookup needs.',
+        },
+        {
+          kind: 'concept',
+          title: 'Counting with a dictionary',
+          body: 'Assigning to a key that is not there yet adds it. That makes a dictionary a handy tally sheet.\n\n`votes.get(pet, 0)` is the count so far, or 0 the first time a pet shows up. Add 1 and store it back.',
+          code: `votes = {}
+for pet in ["cat", "dog", "cat"]:
+    votes[pet] = votes.get(pet, 0) + 1
+print(votes)`,
+          language: 'python',
+          output: "{'cat': 2, 'dog': 1}",
         },
         {
           kind: 'order',
@@ -316,6 +328,19 @@ except ___:
           bank: ['KeyError', 'ValueError', 'IndexError', 'NameError'],
           answers: ['KeyError'],
           explain: 'A missing dictionary key raises KeyError, so that is the one to catch.',
+        },
+        {
+          kind: 'concept',
+          title: 'Loop until it works',
+          body: '`while True:` loops forever. `break` is the way out: it leaves the loop at once.\n\nTogether they mean "keep going until something works". Put a `try` inside and the loop can ask again after every failure.',
+          code: `n = 1
+while True:
+    n = n * 2
+    if n > 20:
+        break
+print(n)`,
+          language: 'python',
+          output: '32',
         },
         {
           kind: 'order',
@@ -570,6 +595,17 @@ with open("pets.csv") as f:
           explain: '`DictReader` gives each row as a dictionary, so you look up a column by its header name.',
         },
         {
+          kind: 'concept',
+          title: 'Keeping only some rows',
+          body: 'Each row from `DictReader` is a dictionary like the two below. To keep only some rows, turn the text into a number with `int()` and test it with `if`.',
+          code: `rows = [{"name": "cat", "legs": "4"}, {"name": "bird", "legs": "2"}]
+for row in rows:
+    if int(row["legs"]) > 2:
+        print(row["name"])`,
+          language: 'python',
+          output: 'cat',
+        },
+        {
           kind: 'write',
           prompt: 'The starter saves `scores.csv`. Read a minimum score from input, then print the name of every player with at least that many points, one per line, in file order.',
           language: 'python',
@@ -741,6 +777,25 @@ with open("scores.csv") as f:
           explain: 'The blueprint comes first, with `__init__` storing the name. Only then can you build a dog and call its method.',
         },
         {
+          kind: 'concept',
+          title: 'Methods that take a value',
+          body: 'A method can have more parameters after `self`. You pass them in the brackets when you call it.\n\nHere `spend` uses `cost` to change the data stored in the object.',
+          code: py(
+            'class Wallet:',
+            '    def __init__(self):',
+            '        self.coins = 10',
+            '',
+            '    def spend(self, cost):',
+            '        self.coins = self.coins - cost',
+            '',
+            'w = Wallet()',
+            'w.spend(3)',
+            'print(w.coins)',
+          ),
+          language: 'python',
+          output: '7',
+        },
+        {
           kind: 'write',
           prompt: 'Finish the `deposit` method so it adds `amount` to the account\'s balance. The program reads two amounts, deposits both and prints the balance.',
           language: 'python',
@@ -777,6 +832,24 @@ with open("scores.csv") as f:
             'print(acc.balance)',
           ),
           explain: 'The balance lives inside the object, so it is remembered between the two calls. `self` is how the method reaches it.',
+        },
+        {
+          kind: 'concept',
+          title: 'Methods that return a value',
+          body: 'A method can `return` an answer, just like any function. It works the answer out from the object\'s own data.\n\nThe call `s.perimeter()` then stands for that answer, so you can print it.',
+          code: py(
+            'class Square:',
+            '    def __init__(self, side):',
+            '        self.side = side',
+            '',
+            '    def perimeter(self):',
+            '        return self.side * 4',
+            '',
+            's = Square(5)',
+            'print(s.perimeter())',
+          ),
+          language: 'python',
+          output: '20',
         },
         {
           kind: 'write',
@@ -893,6 +966,14 @@ with open("scores.csv") as f:
           language: 'python',
         },
         {
+          kind: 'concept',
+          title: 'Lines and words',
+          body: 'In a file\'s text, each line ends with a hidden `\\n`. `.splitlines()` cuts there, giving a list of lines. `.split()` cuts at every gap, giving a list of words.\n\n`len()` of either list is the count.',
+          code: py('text = "Buy milk\\nCall Sam\\n"', 'print(text.splitlines())', 'print(len(text.split()))'),
+          language: 'python',
+          output: "['Buy milk', 'Call Sam']\n4",
+        },
+        {
           kind: 'write',
           prompt: 'The starter saves `story.txt`. Read the file, then print the number of lines like `Lines: 3` and the number of words like `Words: 9`.',
           language: 'python',
@@ -914,6 +995,22 @@ with open("scores.csv") as f:
             'print("Words:", len(text.split()))',
           ),
           explain: '`open` with no mode reads the file. You have rebuilt a tiny version of a classic terminal tool that counts lines and words.',
+        },
+        {
+          kind: 'concept',
+          title: 'Searching inside text',
+          body: '`"tea" in item` is True when the text `item` contains `tea` anywhere.\n\nTo know how many matches there were once the loop is over, count them as you go.',
+          code: py(
+            'menu = ["green tea", "black tea", "cocoa"]',
+            'matches = 0',
+            'for item in menu:',
+            '    if "tea" in item:',
+            '        print(item)',
+            '        matches = matches + 1',
+            'print("Matches:", matches)',
+          ),
+          language: 'python',
+          output: 'green tea\nblack tea\nMatches: 2',
         },
         {
           kind: 'write',
@@ -983,6 +1080,14 @@ with open("scores.csv") as f:
           explain: 'The first run has 2 repeats and the second has 3. The C between them breaks the run, so the answer for this DNA is 3.',
         },
         {
+          kind: 'concept',
+          title: 'Walking along a run',
+          body: '`text[i:i + 2]` is the 2 letters starting at position `i`.\n\nThis loop jumps forward 2 letters for as long as it still sees `la`. It stops at position 6, where the letters are `ly`.',
+          code: py('text = "lalalaly"', 'i = 0', 'while text[i:i + 2] == "la":', '    i = i + 2', 'print(i)'),
+          language: 'python',
+          output: '6',
+        },
+        {
           kind: 'write',
           prompt: 'Count a run from the very start. `dna[i:i + 4]` gives the 4 letters beginning at position `i`. While those letters are `AGAT`, add 1 to `count` and move `i` forward by 4. Print `count`.',
           language: 'python',
@@ -1024,6 +1129,22 @@ with open("scores.csv") as f:
           language: 'python',
           answer: 4,
           explain: 'Moving 1 letter lands on "GATA", which does not match, so the loop stops early. It must jump the whole pattern: `i = i + 4`.',
+        },
+        {
+          kind: 'concept',
+          title: 'Keeping the biggest so far',
+          body: 'To find the biggest of many values, keep a `best` that starts at 0. Look at each value in turn and replace `best` whenever you meet a bigger one.\n\n`range(len(scores))` gives every position: 0, 1, 2.',
+          code: py(
+            'scores = [4, 9, 6]',
+            'best = 0',
+            'for i in range(len(scores)):',
+            '    n = scores[i]',
+            '    if n > best:',
+            '        best = n',
+            'print(best)',
+          ),
+          language: 'python',
+          output: '9',
         },
         {
           kind: 'write',
@@ -1086,6 +1207,7 @@ with open("scores.csv") as f:
             '    print(row["name"], row["AGAT"])',
           ),
           language: 'python',
+          output: 'Ana 2\nBen 4',
         },
         {
           kind: 'type',
@@ -1125,6 +1247,21 @@ with open("scores.csv") as f:
             '        print(row["name"])',
           ),
           explain: 'One pattern is not enough to pick a person: Ana and Dev both have 2. That is why the real check compares several patterns at once.',
+        },
+        {
+          kind: 'concept',
+          title: 'Two tests at once',
+          body: '`and` passes only when both tests are true.\n\nStart with a fallback answer. Replace it when a row passes both tests. If no row does, the fallback is still there to print.',
+          code: py(
+            'pets = [{"name": "Rex", "legs": "4", "wings": "0"}, {"name": "Kiwi", "legs": "2", "wings": "2"}]',
+            'found = "Nobody"',
+            'for pet in pets:',
+            '    if int(pet["legs"]) == 2 and int(pet["wings"]) == 2:',
+            '        found = pet["name"]',
+            'print(found)',
+          ),
+          language: 'python',
+          output: 'Kiwi',
         },
         {
           kind: 'write',
@@ -1219,6 +1356,14 @@ with open("scores.csv") as f:
             { ask: '1 left. Tap the coin to take.', answer: 3 },
           ],
           explain: '25 + 10 + 5 + 1 = 41 with just 4 coins. Taking the biggest coin each time shrinks the amount fastest.',
+        },
+        {
+          kind: 'concept',
+          title: 'How many fit, and what is left',
+          body: '`68 // 25` is 2, because two 25s fit into 68. `68 % 25` is 18, the amount still to make with smaller coins.\n\nDo the same again with 18 and the next coin down.',
+          code: py('cents = 68', 'print(cents // 25)', 'print(cents % 25)'),
+          language: 'python',
+          output: '2\n18',
         },
         {
           kind: 'blank',

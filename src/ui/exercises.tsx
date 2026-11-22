@@ -48,6 +48,17 @@ export function Concept({ ex, register }: ExProps<ConceptExercise>) {
       <h2 className="text-3xl font-bold text-balance">{ex.title}</h2>
       <Prose text={ex.body} className="text-lg leading-relaxed text-ink-2" />
       {ex.code && <Code code={ex.code} lang={ex.language} />}
+      {ex.output !== undefined && <ExampleOutput text={ex.output} />}
+    </div>
+  )
+}
+
+/** What a worked example prints, shown under its code. */
+export function ExampleOutput({ text, className = '' }: { text: string; className?: string }) {
+  return (
+    <div className={className}>
+      <p className="mb-1 text-sm font-medium text-ink-3">Output</p>
+      <pre className="code !bg-outline/60 text-ink-2">{text}</pre>
     </div>
   )
 }

@@ -41,4 +41,4 @@ Checked by capturing the sample with the same tool: it reported eight twinkle an
 
 ## Reduced motion
 
-When animations are reduced, the clock freezes at the end state and the ambient loops stop. That happens when the device asks for reduced motion, unless the learner turns animations on in Settings. A notice says why nothing is moving and offers to turn them on.
+Animations are on by default. Settings has an Animations switch that freezes the clock at the end state and stops the ambient loops. When a device asks for reduced motion, the Learn tab says so once and offers to turn animations off.

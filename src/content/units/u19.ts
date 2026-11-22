@@ -147,6 +147,14 @@ export const u19: Unit = {
           explain: 'Square brackets crash when the variable is missing, which is right for something required. `.get` with a default suits optional settings.',
         },
         {
+          kind: 'concept',
+          title: 'Required or optional',
+          body: 'Two checks cover most config. `not in` asks whether a name is missing from a dictionary: use it for settings the app cannot run without. `.get` reads a value with a fallback: use it for settings that have a sensible default.',
+          code: 'settings = {"COLOUR": "blue"}\nif "SIZE" not in settings:\n    print("Missing SIZE")\nprint(settings.get("COLOUR", "red"))\nprint(settings.get("FONT", "plain"))',
+          language: 'python',
+          output: 'Missing SIZE\nblue\nplain',
+        },
+        {
           kind: 'write',
           prompt: 'The first input line holds `NAME=value` pairs separated by spaces. The starter turns them into `env`, a stand-in for the environment. `DATABASE_URL` is required: if it is missing, print only `Missing DATABASE_URL`. Otherwise print `db:` and its value, then `port:` and the `PORT` value on a second line, using `8000` when `PORT` is not set.',
           language: 'python',
@@ -265,6 +273,21 @@ export const u19: Unit = {
           explain: 'A stage that exits with a failure stops everything after it. That is the whole point: no broken release.',
         },
         {
+          kind: 'concept',
+          title: 'Stopping a loop early',
+          body: '`break` leaves a loop at once: `jam` is never looked at.\n\nThe variable `found` remembers what happened inside the loop, so the code after it can decide what to print.',
+          code: `found = False
+for word in ["tea", "milk", "jam"]:
+    print("look at", word)
+    if word == "milk":
+        found = True
+        break
+if not found:
+    print("no milk")`,
+          language: 'python',
+          output: 'look at tea\nlook at milk',
+        },
+        {
           kind: 'write',
           prompt: 'Write a tiny pipeline runner. Read one line of steps like `install:ok test:fail`. For each step in order print `run` and its name. If a step is `fail`, print `stopped at` and its name, and run nothing more. If every step is `ok`, print `deployed` at the end.',
           language: 'python',
@@ -321,6 +344,14 @@ export const u19: Unit = {
           code: "09:14:09 ERROR POST /pay 500 KeyError: 'card_id'",
           accept: ['500', '500 error', 'status 500'],
           explain: 'Codes starting with 5 mean the server itself failed. This line also tells you where to look: the code that reads `card_id`.',
+        },
+        {
+          kind: 'concept',
+          title: 'Picking one word out of a line',
+          body: 'A program can read a log line the way you do. `split()` cuts the line into words. Counting starts at 0, so `words[1]` is the second word: the level.',
+          code: 'line = "09:14 WARNING disk nearly full"\nwords = line.split()\nprint(words[1])\nprint(words[1] == "ERROR")',
+          language: 'python',
+          output: 'WARNING\nFalse',
         },
         {
           kind: 'write',

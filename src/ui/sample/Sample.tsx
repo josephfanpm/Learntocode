@@ -2,7 +2,7 @@ import '@fontsource/press-start-2p'
 import { Check, Lock } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { play } from '../../sound'
-import { setMotionPref, useDeviceReduces, useReducedMotion } from '../../motion'
+import { setMotionPref, useReducedMotion } from '../../motion'
 import { useStore } from '../../store'
 import { Pip } from '../Pip'
 import { DRIFT, drift, easeOut, HERO, progress, twinkle, typed } from './timeline'
@@ -308,9 +308,8 @@ function World({ art, t }: { art: Art; t: number }) {
 export function Sample() {
   const t = useClock()
   const [art, setArt] = useState<Art>('pack')
-  const { s, update } = useStore()
+  const { update } = useStore()
   const still = useReducedMotion()
-  const deviceSaysReduce = useDeviceReduces()
   const [run, setRun] = useState(0)
   const startedAt = useRef(0)
   // Replaying restarts the entrance beats without restarting the parallax.
@@ -330,7 +329,7 @@ export function Sample() {
         {still && (
           <div className="mt-5 flex flex-wrap items-center gap-3 border-2 border-[#ffc531] bg-[#1c2552] p-3 text-sm text-[#ffe9a0]">
             <p className="flex-1">
-              {deviceSaysReduce && s.motion !== 'off' ? 'Nothing is moving because your device is set to reduce motion.' : 'Animations are turned off in Settings.'}
+              Animations are turned off in Settings.
             </p>
             <button
               className="px-tab px-tab-on"

@@ -164,6 +164,17 @@ export const u23: Unit = {
           explain: 'It gives a number, names the unknown and says when the guess will get better. Nobody expects a junior to be exact, only to be honest.',
         },
         {
+          kind: 'concept',
+          title: 'Building a line of text',
+          body: 'An f-string drops values into text wherever you put `{ }`. You can call a method inside the braces, such as `.upper()` for capitals.\n\nEverything outside the braces, like the colon and the square brackets here, is printed exactly as typed.',
+          code: `code = "pr-48"
+title = "Add dark mode"
+state = "open"
+print(f"{code.upper()}: {title} [{state}]")`,
+          language: 'python',
+          output: 'PR-48: Add dark mode [open]',
+        },
+        {
           kind: 'write',
           prompt: 'Format a ticket for a status update. Read the ticket key, the title and the status on three lines. Print them as one line like `[SHOP-12] Fix cart total (in review)`. The key must be printed in capitals even if it was typed in small letters.',
           language: 'python',

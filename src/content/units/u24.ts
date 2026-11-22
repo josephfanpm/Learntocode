@@ -63,6 +63,8 @@ export const u24: Unit = {
           kind: 'concept',
           title: 'Headings in order',
           body: 'Headings are the outline of a page. Screen reader users skim by hopping from heading to heading.\n\nUse one `<h1>` for the page title, `<h2>` for each section, `<h3>` inside a section. Do not skip a level, and never pick a heading for its size. Size is a job for CSS.',
+          code: L('<h1>Our café</h1>', '<h2>Drinks</h2>', '<h3>Coffee</h3>', '<h3>Tea</h3>', '<h2>Food</h2>'),
+          language: 'html',
         },
         {
           kind: 'spot',
@@ -207,6 +209,8 @@ export const u24: Unit = {
           kind: 'concept',
           title: 'Buttons and links',
           body: 'A **link** (`<a href>`) goes somewhere. A **button** (`<button>`) does something.\n\nBoth work with a keyboard out of the box. A `<div>` with a click handler can look identical, but a keyboard cannot reach it and a screen reader does not announce it as something to press.',
+          code: L('<a href="/pricing">See prices</a>', '<button type="button">Add to basket</button>'),
+          language: 'html',
         },
         {
           kind: 'steps',
@@ -271,6 +275,13 @@ export const u24: Unit = {
           ],
           answer: 1,
           explain: 'Words work for people who cannot tell red from grey, and a screen reader can read them out. Colour can stay as an extra hint.',
+        },
+        {
+          kind: 'concept',
+          title: 'A form the keyboard can use',
+          body: 'Inside a form, `<button type="submit">` sends it. Pressing Enter in a field does the same.\n\nThe `<label>` is tied to its field by `for` and `id`, as in the last lesson. So this whole form works with no mouse.',
+          code: L('<form>', '  <label for="q">Search</label>', '  <input type="text" id="q">', '  <button type="submit">Go</button>', '</form>'),
+          language: 'html',
         },
         {
           kind: 'write',
@@ -443,6 +454,21 @@ export const u24: Unit = {
             { ask: 'An old browser that does not understand srcset.', answer: 1 },
           ],
           explain: 'The browser picks the best fit for the screen. One that ignores `srcset` falls back to plain `src`.',
+        },
+        {
+          kind: 'concept',
+          title: 'Three habits on one page',
+          body: 'A reminder of three things from this unit, on one small page.\n\nThe viewport meta tag lives in the `<head>`. Landmarks such as `<nav>` and `<main>` wrap the parts of the `<body>`. Every image that means something gets an `alt`.',
+          code: L(
+            '<head>',
+            '  <meta name="viewport" content="width=device-width, initial-scale=1">',
+            '</head>',
+            '<body>',
+            '  <nav><a href="/">Home</a></nav>',
+            '  <main><img src="map.png" alt="Map of the park"></main>',
+            '</body>',
+          ),
+          language: 'html',
         },
         {
           kind: 'write',

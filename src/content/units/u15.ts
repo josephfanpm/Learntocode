@@ -66,6 +66,19 @@ export const u15: Unit = {
           explain: '`==` compares two values. A single `=` would try to store a value, which is an error here.',
         },
         {
+          kind: 'concept',
+          title: 'A tiny test file',
+          body: 'Put a function at the top and a few asserts under it. Each assert calls the function and compares the answer with what you expect.\n\nThe print at the end is only reached if no assert stopped the program first.',
+          code: `def is_short(word):
+    return len(word) < 5
+
+assert is_short("cat") == True
+assert is_short("elephant") == False
+print("2 checks passed")`,
+          language: 'python',
+          output: '2 checks passed',
+        },
+        {
           kind: 'write',
           prompt: '`is_even` is already written. Under it, write three `assert` lines: `is_even(4)` is True, `is_even(7)` is False, and `is_even(0)` is True. Then print `3 checks passed`.',
           language: 'python',
@@ -97,6 +110,18 @@ print("3 checks passed")
           ],
           answer: 1,
           explain: 'A passing assert is silent. A failing one is loud: it stops the program with an error.',
+        },
+        {
+          kind: 'concept',
+          title: 'A comparison is a value',
+          body: 'A comparison such as `2 + 2 == 4` is worked out to `True` or `False` before the function is called. So a function can receive the result of a check, with a name for it, and decide what to do.',
+          code: `def show(name, condition):
+    print(name, condition)
+
+show("two plus two", 2 + 2 == 4)
+show("cat has 4 letters", len("cat") == 4)`,
+          language: 'python',
+          output: 'two plus two True\ncat has 4 letters False',
         },
         {
           kind: 'write',
@@ -205,6 +230,21 @@ check("empty text", shout("") == "!")
           options: ['test_total_of_empty_cart_is_zero', 'test1', 'test_total', 'test_it_works'],
           answer: 0,
           explain: 'A good name states the situation and the expected result. You know what broke before opening the file.',
+        },
+        {
+          kind: 'concept',
+          title: 'Handing a test to a runner',
+          body: 'A function can be handed to another function, like any value. Write its name with no brackets: `run(test_hello)`.\n\nInside `run`, `test()` calls it, and `test.__name__` is its name as text. This is how a test tool runs your tests for you.',
+          code: `def run(test):
+    test()
+    print("ran", test.__name__)
+
+def test_hello():
+    assert "hello".upper() == "HELLO"
+
+run(test_hello)`,
+          language: 'python',
+          output: 'ran test_hello',
         },
         {
           kind: 'write',
@@ -362,6 +402,21 @@ run(test_two_items)
           explain: 'The other three are the same ordinary situation. An empty list is where code like this tends to crash.',
         },
         {
+          kind: 'concept',
+          title: 'A check with a name',
+          body: 'This helper compares what the code **got** with what you **want**, and reports by name.\n\nHere the buggy rule `age > 18` is tried on the boundary itself. It gives False, you want True, so the check fails: the test has caught the bug.',
+          code: `def check(name, got, want):
+    if got == want:
+        print("PASS: " + name)
+    else:
+        print("FAIL: " + name)
+
+age = 18
+check("18 is adult", age > 18, True)`,
+          language: 'python',
+          output: 'FAIL: 18 is adult',
+        },
+        {
           kind: 'write',
           prompt: 'A score of 90 or more is an A, 80 or more is a B. `grade` has a boundary bug: catch it. Under the first check, add two more with exactly these names and values: `"90 is A"` and `"89 is B"`.',
           language: 'python',
@@ -446,6 +501,20 @@ check("11 is out", in_range(11), False)
           explain: 'A range has two boundaries, so it needs four tests: both ends and one step outside each.',
         },
         {
+          kind: 'concept',
+          title: 'Deal with the edge case first',
+          body: 'When one input needs special care, check for it at the top of the function and return straight away. The normal code below then never sees it.\n\nWithout the first two lines, the empty text would crash: there is no first word to pick.',
+          code: `def first_word(text):
+    if len(text) == 0:
+        return "none"
+    return text.split()[0]
+
+print(first_word("good morning"))
+print(first_word(""))`,
+          language: 'python',
+          output: 'good\nnone',
+        },
+        {
           kind: 'write',
           prompt: 'The third check crashes the program: you cannot divide by zero items. Change `average` so that an empty list gives 0 and all three checks pass.',
           language: 'python',
@@ -504,6 +573,7 @@ check("empty list", average([]), 0)
           body: 'Good code refuses bad input by raising an error, such as `ValueError`. That deserves a test too.\n\nCall the code with bad input inside `try`. The test passes only if the right error is raised. If the call finishes normally, the test fails.',
           code: 'try:\n    int("abc")\n    print("FAIL: no error")\nexcept ValueError:\n    print("PASS")',
           language: 'python',
+          output: 'PASS',
         },
         {
           kind: 'order',
@@ -531,8 +601,15 @@ check("empty list", average([]), 0)
           explain: 'With no error, the line after the call runs. That is why the FAIL print sits right under the call.',
         },
         {
+          kind: 'concept',
+          title: 'The pytest way',
+          body: 'pytest has a shorter way to say "this block must raise this error": `with pytest.raises(...)`, with the error name in the brackets.\n\nThe test passes if the indented block raises that error, and fails if it does not.',
+          code: 'import pytest\n\ndef test_text_is_not_a_number():\n    with pytest.raises(ValueError):\n        int("abc")',
+          language: 'python',
+        },
+        {
           kind: 'blank',
-          prompt: 'pytest has a shorter way to say "this block must raise this error". Fill the gaps.',
+          prompt: 'Now write the `set_age` test the pytest way. Fill the gaps.',
           code: 'import pytest\n\ndef test_negative_age_is_refused():\n    with pytest.___(___):\n        set_age(-5)',
           language: 'python',
           bank: ['raises', 'ValueError', 'assert', 'except'],
@@ -595,6 +672,22 @@ except ValueError:
           explain: 'Every new behaviour starts with a failing test. Seeing it fail first proves the test can actually catch something.',
         },
         {
+          kind: 'concept',
+          title: 'Raising an error yourself',
+          body: 'A function refuses bad input with `raise`, then the kind of error and a message. The function stops on that line, so the `return` below it is never reached.',
+          code: `def set_age(age):
+    if age < 0:
+        raise ValueError("age cannot be negative")
+    return age
+
+try:
+    set_age(-5)
+except ValueError:
+    print("refused")`,
+          language: 'python',
+          output: 'refused',
+        },
+        {
           kind: 'write',
           prompt: 'The tests are already written, and one fails. Make them all pass: change `withdraw` so it also raises `ValueError` when `amount` is more than `balance`. Do not change the tests.',
           language: 'python',
@@ -647,6 +740,17 @@ except ValueError:
     print("PASS: overdraw")
 `,
           explain: 'Red, then green. The "normal" test matters too: it shows your new check did not break ordinary withdrawals.',
+        },
+        {
+          kind: 'concept',
+          title: 'Reminder: building text in a loop',
+          body: '`split()` cuts text into a list of words. `word[0]` is the first letter of a word. Start with an empty string and add to it on each lap.',
+          code: `result = ""
+for word in "red green blue".split():
+    result += word[0]
+print(result)`,
+          language: 'python',
+          output: 'rgb',
         },
         {
           kind: 'write',
@@ -716,6 +820,22 @@ print("all tests passed")
           kind: 'concept',
           title: 'Fakes',
           body: 'Some code depends on things that are slow or keep changing: the clock, the network, a real database.\n\nIn a test, hand it a **fake**: a simple stand-in that gives fixed answers. A **mock** is a fake that also records how it was used. Now the test is fast and gives the same result every run.',
+        },
+        {
+          kind: 'concept',
+          title: 'A fake, written out',
+          body: 'A real dice gives a different number on every roll, so a test could not know what to expect. This fake is created with one number and always gives it back.\n\n`__init__` stores the number on `self`. The method reads it.',
+          code: `class FakeDice:
+    def __init__(self, number):
+        self.number = number
+
+    def roll(self):
+        return self.number
+
+dice = FakeDice(6)
+print(dice.roll(), dice.roll())`,
+          language: 'python',
+          output: '6 6',
         },
         {
           kind: 'write',
@@ -813,6 +933,21 @@ check("noon", greeting(FakeClock(12)), "Good afternoon")
           code: 'test_shapes.py::test_area FAILED\n    assert area(4, 5) == 20\nE   assert 9 == 20\n1 failed, 6 passed',
           accept: ['9', 'nine'],
           explain: 'The left side of the `E` line is what the code gave: 9. It looks like `area` adds where it should multiply.',
+        },
+        {
+          kind: 'concept',
+          title: 'Catching a failed test',
+          body: 'A failing assert raises `AssertionError`. Catch it with `try` and `except`, and the program can report the failure and carry on to the next test.\n\n`test_bad.__name__` is the name of the function as text.',
+          code: `def test_bad():
+    assert 1 + 1 == 3
+
+try:
+    test_bad()
+    print("PASS")
+except AssertionError:
+    print("FAIL: " + test_bad.__name__)`,
+          language: 'python',
+          output: 'FAIL: test_bad',
         },
         {
           kind: 'write',

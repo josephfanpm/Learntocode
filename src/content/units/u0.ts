@@ -180,6 +180,12 @@ export const u0: Unit = {
           explain: 'A byte is 8 bits. 256 is how many different values those 8 bits can hold, not how many bits there are.',
         },
         {
+          kind: 'concept',
+          title: 'Building a bigger number',
+          body: 'A byte has eight places: 128, 64, 32, 16, 8, 4, 2 and 1.\n\nTo make a number, turn on the biggest place that fits. Take it away, then do the same with what is left. Here is 37.',
+          code: 'make 37:   32 fits, leaving 5\nmake 5:     4 fits, leaving 1\nmake 1:     1 fits, leaving 0\n\nplaces:  128  64  32  16  8  4  2  1\nbinary:    0   0   1   0  0  1  0  1',
+        },
+        {
           kind: 'bits',
           prompt: 'Here is a whole byte. Its places are worth 128, 64, 32, 16, 8, 4, 2 and 1. Flip the switches to make 100.',
           target: 100,
@@ -321,6 +327,12 @@ export const u0: Unit = {
           body: 'A smarter way: open the book in the middle. If "Morgan" comes earlier in the alphabet, tear away the second half. If later, tear away the first half.\n\nRepeat with what is left. Each step throws away half the pages.',
         },
         {
+          kind: 'concept',
+          title: 'Halving shrinks fast',
+          body: 'Try it on a small book of 16 pages. Each step leaves half as many pages to search.\n\nAfter only 4 steps there is one page left. Going one page at a time could have taken 16.',
+          code: 'start:   16 pages\nstep 1:   8 pages left\nstep 2:   4 pages left\nstep 3:   2 pages left\nstep 4:   1 page left',
+        },
+        {
           kind: 'choice',
           prompt: 'With the split-in-half method, about how many steps does a 1,000-page book need?',
           options: [
@@ -357,7 +369,8 @@ export const u0: Unit = {
         {
           kind: 'concept',
           title: 'Pseudocode',
-          body: '**Pseudocode** is a plain-language outline of an algorithm. It is not a real programming language, so there are no strict rules. It helps you plan before you write code.\n\nEach line is one clear step. Indented lines belong to the line above them.',
+          body: '**Pseudocode** is a plain-language outline of an algorithm. It is not a real programming language, so there are no strict rules. It helps you plan before you write code.\n\nEach line is one clear step. Indented lines belong to the line above them: they only happen when that line is true.',
+          code: 'Taste the soup\nIf it is too bland\n    Add salt\nElse if it is too salty\n    Add water\nElse\n    Serve it',
         },
         {
           kind: 'order',
@@ -453,6 +466,12 @@ export const u0: Unit = {
           explain: 'Only the indented line is inside the loop, so it runs once each time round. "Goodbye" is said once, after the loop.',
         },
         {
+          kind: 'concept',
+          title: 'Keeping count',
+          body: 'A variable can keep count while a loop runs.\n\nSet it to 0 before the loop starts. Add 1 each time round. Use the total after the loop has ended.',
+          code: 'Set claps to 0\nRepeat 3 times\n    Clap\n    Add 1 to claps\nSay claps',
+        },
+        {
           kind: 'order',
           prompt: 'Put this pseudocode for counting sheep in order. The count should start at 0, and the loop should repeat until all sheep are counted.',
           lines: [
@@ -538,6 +557,12 @@ export const u0: Unit = {
           target: 72,
           bits: 8,
           explain: '72 is 64 + 8, so only those two switches are on: 01001000.',
+        },
+        {
+          kind: 'concept',
+          title: 'Counting the patterns',
+          body: 'A **pattern** is one way of setting the switches. One bit has 2 patterns: off or on.\n\nAdd a second bit and each of those can be followed by a 0 or a 1, so the count doubles to 4. Every extra bit doubles it again.',
+          code: '1 bit:    0   1                (2 patterns)\n2 bits:   00  01  10  11       (4 patterns)',
         },
         {
           kind: 'choice',
@@ -647,6 +672,12 @@ export const u0: Unit = {
           code: 'When the cat is clicked\n    Say "Meow"',
         },
         {
+          kind: 'concept',
+          title: 'Forever',
+          body: '`Forever` is a loop with no end. Its steps repeat until the program is stopped.\n\nA condition inside the loop is checked again every time round. Here the ball asks "am I touching the bat?" after every turn.',
+          code: 'When the start button is clicked\n    Forever\n        Turn 15 degrees\n        If touching the bat\n            Play a sound',
+        },
+        {
           kind: 'match',
           prompt: 'Match each line of pseudocode to the idea it shows.',
           pairs: [
@@ -706,6 +737,12 @@ export const u0: Unit = {
           ],
           answer: 1,
           explain: 'One named block is shorter to read, and if the jump needs changing you fix it in one place.',
+        },
+        {
+          kind: 'concept',
+          title: 'Blocks with an input',
+          body: 'A block can take an **input**: a value you hand over each time you use it.\n\nHere `n` stands for that value. Writing `hop 4` runs the block with `n` as 4, so the cat moves up 4 times.',
+          code: 'Define hop n\n    Repeat n times\n        Move up 10\n\nWhen the space key is pressed\n    hop 4',
         },
         {
           kind: 'type',

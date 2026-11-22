@@ -11,6 +11,8 @@ export interface Hint {
   body: string
   code?: string
   language?: 'python' | 'sql' | 'html' | 'javascript'
+  /** What `code` prints, when the hint is a worked example. */
+  output?: string
 }
 
 const oneLine = (s: string) => s.replace(/\s*\n\s*/g, ' / ').trim()
@@ -20,7 +22,7 @@ const quote = (s: string) => `"${oneLine(s)}"`
 export function conceptHint(lesson: Lesson, index: number): Hint {
   for (let i = index - 1; i >= 0; i--) {
     const ex = lesson.exercises[i]
-    if (ex.kind === 'concept') return { title: ex.title, body: ex.body, code: ex.code, language: ex.language }
+    if (ex.kind === 'concept') return { title: ex.title, body: ex.body, code: ex.code, language: ex.language, output: ex.output }
   }
   return { title: 'Take it one step at a time', body: 'Read the question again slowly, and say in your own words what it is asking for.' }
 }

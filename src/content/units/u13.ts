@@ -81,6 +81,17 @@ export const u13: Unit = {
           explain: '24 × 60 is the number of minutes in a day. Seconds need one more × 60, which gives 86,400.',
         },
         {
+          kind: 'concept',
+          title: 'A rough estimate',
+          body: 'A quick sum with round numbers tells you roughly how busy a server will be. A day has 24 × 60 × 60 = 86,400 seconds.\n\n`//` divides and drops the remainder, so 172,800 visits a day is about 2 a second.',
+          code: `visits = 172800
+seconds_per_day = 24 * 60 * 60
+print(seconds_per_day)
+print(visits // seconds_per_day)`,
+          language: 'python',
+          output: '86400\n2',
+        },
+        {
           kind: 'write',
           prompt: 'Read the number of daily users, then how many requests each user makes per day. Print the average requests per second as a whole number. A day has 86400 seconds.',
           language: 'python',
@@ -93,6 +104,19 @@ export const u13: Unit = {
           hint: 'Divide the daily total by 86400 with whole-number division: per_day // 86400.',
           solution: 'users = int(input())\nrequests_each = int(input())\nper_day = users * requests_each\nprint(per_day // 86400)\n',
           explain: 'A million users sounds huge, but it is only about 231 requests per second on average. Rough sums like this tell you how much machine you need.',
+        },
+        {
+          kind: 'concept',
+          title: 'Rounding up',
+          body: '`//` rounds down, but leftovers still need a box. `%` gives the remainder: what is left after dividing. If it is more than 0, add one more.\n\n14 eggs fill 2 boxes of 6 with 2 left over, so you need 3.',
+          code: `eggs = 14
+per_box = 6
+boxes = eggs // per_box
+if eggs % per_box > 0:
+    boxes += 1
+print(boxes)`,
+          language: 'python',
+          output: '3',
         },
         {
           kind: 'write',
@@ -133,6 +157,16 @@ export const u13: Unit = {
           explain: 'Round robin just takes turns. After the last server, it wraps around to the first.',
         },
         {
+          kind: 'concept',
+          title: 'Taking turns with a remainder',
+          body: 'The remainder `%` wraps a growing count back to the start: `i % 3` goes 0, 1, 2, then 0 again. Use it as a position in a list and the list takes turns for ever.',
+          code: `days = ["Mon", "Tue", "Wed"]
+for i in range(5):
+    print(i % 3, days[i % 3])`,
+          language: 'python',
+          output: '0 Mon\n1 Tue\n2 Wed\n0 Mon\n1 Tue',
+        },
+        {
           kind: 'blank',
           prompt: 'Request number `i` should go to the next server in turn, wrapping back to the start. Fill the gap.',
           code: 'servers = ["A", "B", "C"]\nchosen = servers[i ___ len(servers)]',
@@ -158,6 +192,19 @@ export const u13: Unit = {
           kind: 'concept',
           title: 'Smarter picking',
           body: 'Some requests are slow, so taking turns can overload one server. **Least busy** sends each request to the server with the fewest requests in progress.\n\nThe load balancer also runs **health checks**: every few seconds it asks each server "are you there?". A server that stops replying gets no more requests.',
+        },
+        {
+          kind: 'concept',
+          title: 'Best so far, in a dict',
+          body: 'Looping over a dict gives each key. Keep a best-so-far key, and swap it whenever another key\'s value beats it.\n\nHere the biggest wins. For the smallest, turn the comparison round.',
+          code: `heights = {"Ada": 150, "Bo": 172, "Cy": 165}
+tallest = "Ada"
+for name in heights:
+    if heights[name] > heights[tallest]:
+        tallest = name
+print(tallest)`,
+          language: 'python',
+          output: 'Bo',
         },
         {
           kind: 'write',
@@ -245,6 +292,20 @@ export const u13: Unit = {
           explain: 'Only the first request for a, b and c misses. The other three requests are hits.',
         },
         {
+          kind: 'concept',
+          title: 'Look before you work',
+          body: '`key in some_dict` asks whether a key is already stored. Check first. If it is missing, do the work and store it, so the next check finds it.',
+          code: `seen = {}
+for word in ["hi", "yo", "hi"]:
+    if word in seen:
+        print(word, "seen before")
+    else:
+        print(word, "new")
+        seen[word] = True`,
+          language: 'python',
+          output: 'hi new\nyo new\nhi seen before',
+        },
+        {
           kind: 'write',
           prompt: 'Read one line of keys separated by spaces. For each key: if it is already in `cache`, count a hit. If not, count a miss and save it in `cache`. Print `hits` and the number, then `misses` and the number on a second line.',
           language: 'python',
@@ -287,6 +348,19 @@ export const u13: Unit = {
             { ask: 'E arrives. Which item is evicted?', answer: 0 },
           ],
           explain: 'Reading an item counts as using it, so it moves to the back of the line. The item untouched for longest leaves first.',
+        },
+        {
+          kind: 'concept',
+          title: 'Moving to the back of the line',
+          body: '`.remove(x)` takes `x` out of a list and `.append(x)` puts it at the end. Together they move it to the back.\n\n`.pop(0)` removes whatever is at the front.',
+          code: `line = ["a", "b", "c"]
+line.remove("a")
+line.append("a")
+print(line)
+line.pop(0)
+print(line)`,
+          language: 'python',
+          output: "['b', 'c', 'a']\n['c', 'a']",
         },
         {
           kind: 'write',
@@ -363,6 +437,21 @@ export const u13: Unit = {
           explain: 'Writes have one home, the primary. Replicas share the reads but can be a moment behind, which is replication lag.',
         },
         {
+          kind: 'concept',
+          title: 'Turns for some, not for all',
+          body: 'A shop has one post desk and two tills. Post always goes to the desk. Everything else takes the next till in turn.\n\nThe counter `turn` only moves when a till is used, so the tills share the work evenly.',
+          code: `tills = ["till 1", "till 2"]
+turn = 0
+for item in ["bread", "post", "milk"]:
+    if item == "post":
+        print("post desk")
+    else:
+        print(tills[turn % 2])
+        turn += 1`,
+          language: 'python',
+          output: 'till 1\npost desk\ntill 2',
+        },
+        {
           kind: 'write',
           prompt: 'Read one line of operations, each `read` or `write`, separated by spaces. For each one print where it goes: `primary` for a write, or for a read the next replica in turn, starting with `replica 1`.',
           language: 'python',
@@ -388,6 +477,16 @@ export const u13: Unit = {
           prompt: 'There are 4 shards and the rule is `user_id % 4`. Which shard holds user 14? Type the number.',
           accept: ['2', 'two', 'shard 2'],
           explain: '14 divided by 4 is 3 remainder 2. User 14 lives on shard 2, today and every day after.',
+        },
+        {
+          kind: 'concept',
+          title: 'Text into a number',
+          body: '`ord` gives the number code of one character. Add the codes up and the same text always gives the same total. Then `%` turns that total into a shard number.',
+          code: `print(ord("a"))
+print(ord("b"))
+print((ord("a") + ord("b")) % 4)`,
+          language: 'python',
+          output: '97\n98\n3',
         },
         {
           kind: 'write',
@@ -507,6 +606,20 @@ export const u13: Unit = {
             { ask: 'Making small preview sizes takes 5 seconds. Where does that job wait so the upload feels instant?', answer: 4 },
           ],
           explain: 'The user gets a quick "done" while a worker resizes the photo in the background. You just designed a real system.',
+        },
+        {
+          kind: 'concept',
+          title: 'Stopping a loop early',
+          body: 'Now the retry idea in code. `break` leaves a loop at once. This loop tries each door and stops at the first open one, so the fourth door is never touched.',
+          code: `doors = ["locked", "locked", "open", "open"]
+tried = 0
+for door in doors:
+    tried += 1
+    if door == "open":
+        break
+print(tried)`,
+          language: 'python',
+          output: '3',
         },
         {
           kind: 'write',

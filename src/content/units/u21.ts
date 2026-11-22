@@ -104,6 +104,24 @@ export const u21: Unit = {
           body: 'In code you do not know well, change as little as you can. One purpose per change.\n\nRun the tests before you start and again after. A small change is easy to review, easy to test, and easy to undo if it turns out wrong.',
         },
         {
+          kind: 'concept',
+          title: 'One rule, one function',
+          body: 'New rule here: children under 12 pay 4. It went into `ticket_price` and nowhere else.\n\n`main` did not change at all, yet every call to `ticket_price` now gets the new rule.',
+          code: `def ticket_price(age):
+    if age < 12:
+        return 4
+    return 9
+
+def main():
+    print("Price:", ticket_price(8))
+    print("Price:", ticket_price(30))
+
+main()`,
+          language: 'python',
+          output: `Price: 4
+Price: 9`,
+        },
+        {
           kind: 'write',
           prompt: 'New rule: orders with a subtotal of 50 or more ship free. Follow the path from `main` to find the one function to change, and change only that one.',
           language: 'python',
@@ -200,6 +218,20 @@ main()
           explain: 'The function name says what it works out. The True/False name reads as a question: is it paid?',
         },
         {
+          kind: 'concept',
+          title: 'A rename, start to finish',
+          body: 'This used to be `def g(l):` with a `t` inside.\n\nA rename has to reach every place the name is used: the `def` line, each line of the body, and every call. Miss one and Python stops with a `NameError`. The answer it prints stays the same.',
+          code: `def total_price(prices):
+    total = 0
+    for price in prices:
+        total += price
+    return total
+
+print(total_price([3, 4]))`,
+          language: 'python',
+          output: '7',
+        },
+        {
           kind: 'write',
           prompt: 'This works, but the names say nothing. Rename the function `f` to `count_vowels`, and give `s` and `n` clearer names too. The last line already calls the new name.',
           language: 'python',
@@ -229,6 +261,12 @@ print(count_vowels("banana"))
           kind: 'concept',
           title: 'Magic numbers',
           body: 'A **magic number** is a bare number in the code with no explanation. What is the `0.2` in `price * 0.2`?\n\nGive it a name in capitals at the top of the file: `TAX_RATE = 0.2`. That is a **constant**. Readers learn what it means, and you change it in one place.',
+          code: `TAX_RATE = 0.2
+
+price = 50
+print(price * TAX_RATE)`,
+          language: 'python',
+          output: '10.0',
         },
         {
           kind: 'spot',
@@ -334,6 +372,19 @@ print(PRICE_EACH, DISCOUNT_FROM, DISCOUNT)
           explain: 'The same clean-up is written out twice. One function called twice would hold the rule in a single place.',
         },
         {
+          kind: 'concept',
+          title: 'Extracted',
+          body: 'Before, `.upper() + "!"` was written out once for each word.\n\nNow the rule has a name and lives in one place. Define the function at the top, then call it everywhere the lines were repeated.',
+          code: `def shout(word):
+    return word.upper() + "!"
+
+print(shout("hey"))
+print(shout("stop"))`,
+          language: 'python',
+          output: `HEY!
+STOP!`,
+        },
+        {
           kind: 'write',
           prompt: 'Extract the clean-up into a function named `tidy` that takes a name and returns it stripped and in title case. Call it for both names. The last line calls `tidy` directly, so it must exist.',
           language: 'python',
@@ -370,6 +421,22 @@ print(tidy("  zOE "))
             { ask: 'database.insert(order)', answer: 3 },
           ],
           explain: 'Each small function has one job and a name that says it. The big function becomes a readable list of five calls.',
+        },
+        {
+          kind: 'concept',
+          title: 'Extracting a rule with an if',
+          body: 'A rule with an `if` in it can be extracted too. The function returns the answer, and each caller adds it to its own sum.\n\nHere the delivery rule is written once, however many kinds of parcel use it.',
+          code: `def delivery(weight):
+    if weight < 5:
+        return 3
+    return 7
+
+def parcel(weight):
+    return 10 + delivery(weight)
+
+print(parcel(2), parcel(5))`,
+          language: 'python',
+          output: '13 17',
         },
         {
           kind: 'write',
@@ -478,6 +545,21 @@ print(booking_fee(10), booking_fee(20))
           explain: 'Each guard deals with one problem and leaves. The normal case sits at the bottom with no nesting at all.',
         },
         {
+          kind: 'concept',
+          title: 'Say the rule in one line',
+          body: 'The rule: under 5 is free. Under 16 is free for members.\n\n`or` joins the two ways to qualify. `and` joins the two parts of the second way. The brackets keep those two parts together.',
+          code: `def free_entry(age, is_member):
+    return age < 5 or (age < 16 and is_member)
+
+print(free_entry(3, False))
+print(free_entry(10, True))
+print(free_entry(10, False))`,
+          language: 'python',
+          output: `True
+True
+False`,
+        },
+        {
           kind: 'write',
           prompt: 'The rule: anyone 140 or taller can ride. Anyone 120 or taller can ride with an adult. The nesting hides a bug. Rewrite the body of `can_ride` as a single `return` line.',
           language: 'python',
@@ -543,6 +625,20 @@ print(can_ride(100, True))
           ],
           answer: 3,
           explain: 'A comment that lies is worse than no comment: the next reader will believe it. Keep comments true whenever you change the code under them.',
+        },
+        {
+          kind: 'concept',
+          title: 'Writing a docstring',
+          body: 'A docstring goes on the first line inside the function, in three double quotes on each side. Say what the function gives back.\n\nPython keeps it on the function as `__doc__`, so you can print it.',
+          code: `def is_even(number):
+    """Return True if the number is even."""
+    return number % 2 == 0
+
+print(is_even(4))
+print(is_even.__doc__)`,
+          language: 'python',
+          output: `True
+Return True if the number is even.`,
         },
         {
           kind: 'write',
@@ -667,6 +763,21 @@ print(days_left.__doc__)
           ],
           answer: 1,
           explain: 'If a reviewer was confused, the next reader may be too. Asking what was unclear turns a vague comment into something you can fix.',
+        },
+        {
+          kind: 'concept',
+          title: 'A review, applied',
+          body: 'The review said: "`m` does not say what it finds, and `max` crashes on an empty list."\n\nThe fix is a name that says what comes back, and a guard clause that deals with the empty list first.',
+          code: `def highest(scores):
+    if len(scores) == 0:
+        return 0
+    return max(scores)
+
+print(highest([4, 9, 6]))
+print(highest([]))`,
+          language: 'python',
+          output: `9
+0`,
         },
         {
           kind: 'write',
