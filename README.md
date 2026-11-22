@@ -208,7 +208,7 @@ npm test           # streak, unlock, reminder, hint, badge and save tests
 npx tsx scripts/check-content.ts   # validates every exercise; runs each Python, JavaScript and SQL answer against its tests
 ```
 
-Settings (the gear icon on the profile) has a **Prototype: unlock all lessons** switch, off by default. Any exercise can be opened directly with `#/lesson/<lesson-id>?at=<index>`, which does not save progress.
+Settings (the gear icon on the profile) has a **Prototype: unlock all lessons** switch, off by default. A sample of a pixel-adventure visual direction, not yet applied to the app, is at `#/sample`; its backdrops are CC0 art by Luis Zuno (see [public/art/CREDITS.md](public/art/CREDITS.md)). Any exercise can be opened directly with `#/lesson/<lesson-id>?at=<index>`, which does not save progress.
 
 Built with Vite, React, TypeScript and Tailwind. Python runs in [Pyodide](https://pyodide.org) inside a Web Worker, JavaScript in its own worker, and SQL in [sql.js](https://sql.js.org). Pip, the avatars and the sounds are generated in code: sprites as pixel grids ([src/ui/pixel/sprites.ts](src/ui/pixel/sprites.ts)), sounds with the Web Audio API ([src/sound.ts](src/sound.ts)). The reminder rules are in [src/engine/messaging.ts](src/engine/messaging.ts).
 

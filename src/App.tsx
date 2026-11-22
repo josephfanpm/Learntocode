@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { courseUnits, units, type CourseId } from './content'
 import { findLesson } from './engine/progress'
 import { StoreProvider, useStore } from './store'
@@ -8,6 +8,7 @@ import { LessonPlayer } from './ui/LessonPlayer'
 import { Onboarding } from './ui/Onboarding'
 import { Placement } from './ui/Placement'
 import { Profile, Settings } from './ui/Profile'
+import { Sample } from './ui/sample/Sample'
 
 function useRoute(): [string, Go] {
   const read = () => location.hash.replace(/^#/, '').split('#')[0] || '/'
@@ -27,7 +28,10 @@ function useRoute(): [string, Go] {
 function Screens() {
   const { s, update } = useStore()
   const [route, go] = useRoute()
+  const prevTab = useRef(0)
 
+  // The design sample is viewable without going through setup.
+  if (route === '/sample') return <Sample />
   if (!s.onboarded && !route.startsWith('/lesson/')) return <Onboarding go={go} />
 
   const place = route.match(/^\/place\/(cs|dev|ai)$/)
@@ -55,10 +59,17 @@ function Screens() {
       return <LessonPlayer key={m[1]} lesson={found.lesson} unit={found.unit} color={color} startAt={Number(m[2] ?? 0)} onExit={() => go('/')} onAvatar={() => go('/avatar')} />
     }
   }
+  // Learn is the left tab and Profile the right: slide the new screen in from the side it lives on.
+  const tab = route.startsWith('/me') || route === '/settings' || route === '/avatar' ? 1 : 0
+  const slide = tab === prevTab.current ? '' : tab > prevTab.current ? 'screen-right' : 'screen-left'
+  prevTab.current = tab
+
   return (
     <>
       <TopBar go={go} />
-      {route.startsWith('/me') ? <Profile go={go} /> : route === '/settings' ? <Settings go={go} /> : route === '/avatar' ? <AvatarBuilder go={go} /> : <Home go={go} />}
+      <div key={tab} className={slide}>
+        {route.startsWith('/me') ? <Profile go={go} /> : route === '/settings' ? <Settings go={go} /> : route === '/avatar' ? <AvatarBuilder go={go} /> : <Home go={go} />}
+      </div>
       <BottomNav route={route} go={go} />
     </>
   )

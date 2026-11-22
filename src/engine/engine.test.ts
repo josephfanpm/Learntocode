@@ -179,6 +179,23 @@ describe('more badges', () => {
   })
 })
 
+describe('sample timeline', () => {
+  it('beats run from 0 to 1 and the two title lines are staggered', async () => {
+    const { HERO, progress, typed, drift, easeOut } = await import('../ui/sample/timeline')
+    expect(progress(0, HERO.line1)).toBe(0)
+    expect(progress(HERO.line1[0] + HERO.line1[1], HERO.line1)).toBe(1)
+    expect(HERO.line2[0] - HERO.line1[0]).toBe(90)
+    expect(easeOut(0)).toBe(0)
+    expect(easeOut(1)).toBe(1)
+    expect(typed('Hello', 0.4)).toBe('He')
+    expect(typed('Hello', 2)).toBe('Hello')
+    // Layers loop without a jump and only ever move by whole pixels.
+    expect(drift(0, 5, 272)).toBe(0)
+    expect(drift(272_000 / 5, 5, 272)).toBe(0)
+    expect(Number.isInteger(drift(1234, 9, 272))).toBe(true)
+  })
+})
+
 describe('save codes', () => {
   it('a save code restores the same progress', () => {
     const s = { ...practicedOn(['2026-11-01', '2026-11-02']), name: 'Zoë' }

@@ -300,6 +300,7 @@ export function Settings({ go }: { go: Go }) {
         <Row dashed title="Unlock all lessons" note="Open every lesson on the path so you can try any of them.">
           <Toggle on={!!s.unlockAll} label="Unlock all lessons" onClick={() => update((p) => ({ ...p, unlockAll: !p.unlockAll }))} />
         </Row>
+        <button className="btn btn-ghost text-sm" onClick={() => go('/sample')}>See the pixel-adventure design sample</button>
         {!confirmReset ? (
           <button className="btn btn-ghost text-sm" onClick={() => setConfirmReset(true)}>Reset progress</button>
         ) : (

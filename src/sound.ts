@@ -119,8 +119,17 @@ const C7 = 27
  * sound climbs one semitone per answer in a row, up to five, so a run feels like
  * it's building.
  */
+/** A short vibration on meaningful moments only. Android browsers support it; iPhones ignore it. */
+const BUZZ: Partial<Record<Sound, number | number[]>> = { correct: 12, wrong: [18, 40, 18], complete: [14, 30, 14, 30, 40] }
+
 export function play(sound: Sound, combo = 1) {
   if (!enabled) return
+  try {
+    const pattern = BUZZ[sound]
+    if (pattern && typeof navigator !== 'undefined' && 'vibrate' in navigator) navigator.vibrate(pattern)
+  } catch {
+    /* vibration is a nicety; never let it break a lesson */
+  }
   const a = audio()
   if (!a) return
   const { ac, out } = a
