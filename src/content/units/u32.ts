@@ -157,6 +157,8 @@ def evaluate(draft):
 export const u32: Unit = {
   id: 'u32',
   week: 7,
+  lecture: 'https://www.youtube.com/watch?v=D7_ipDqhtwk',
+  lectureFrom: 'Anthropic: How we build effective agents',
   course: 'ai',
   title: 'Agents from the ground up',
   summary: 'The loop, workflows and when not to use one',

@@ -34,6 +34,8 @@ UPDATE users SET email = 'dee@example.com' WHERE id = 4;`
 export const u22: Unit = {
   id: 'u22',
   week: 9,
+  lecture: 'https://cs50.harvard.edu/web/weeks/4/',
+  lectureFrom: 'CS50 Web: SQL, models and migrations',
   course: 'dev',
   title: 'Databases in practice',
   summary: 'Migrations, transactions and beyond SQL',

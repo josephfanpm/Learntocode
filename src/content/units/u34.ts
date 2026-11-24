@@ -3,6 +3,8 @@ import type { Unit } from '../types'
 export const u34: Unit = {
   id: 'u34',
   week: 9,
+  lecture: 'https://www.youtube.com/watch?v=gv0WHhKelSE',
+  lectureFrom: 'Anthropic: Claude Code best practices',
   course: 'ai',
   title: 'Claude Code in depth',
   summary: 'Memory, commands, skills, subagents and hooks',

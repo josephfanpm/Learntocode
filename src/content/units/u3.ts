@@ -5,6 +5,7 @@ const py = (...lines: string[]) => lines.join('\n')
 export const u3: Unit = {
   id: 'u3',
   week: 3,
+  lecture: 'https://cs50.harvard.edu/x/weeks/3/',
   title: 'Algorithms',
   summary: 'Searching, sorting and how fast it runs',
   lessons: [

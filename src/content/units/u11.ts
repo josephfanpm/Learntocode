@@ -3,6 +3,7 @@ import type { Unit } from '../types'
 export const u11: Unit = {
   id: 'u11',
   week: 11,
+  lecture: 'https://cs50.harvard.edu/cybersecurity/',
   title: 'Cybersecurity',
   summary: 'Passwords, encryption and staying safe',
   lessons: [

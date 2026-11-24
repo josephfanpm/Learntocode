@@ -3,6 +3,8 @@ import type { Unit } from '../types'
 export const u18: Unit = {
   id: 'u18',
   week: 5,
+  lecture: 'https://missing.csail.mit.edu/2026/development-environment/',
+  lectureFrom: 'MIT Missing Semester: Development environment',
   course: 'dev',
   title: 'Your developer setup',
   summary: 'Editor, terminal, packages and the debugger',

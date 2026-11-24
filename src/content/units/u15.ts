@@ -3,6 +3,8 @@ import type { Unit } from '../types'
 export const u15: Unit = {
   id: 'u15',
   week: 2,
+  lecture: 'https://cs50.harvard.edu/web/weeks/7/',
+  lectureFrom: 'CS50 Web: Testing and CI/CD',
   course: 'dev',
   title: 'Testing',
   summary: 'Proving your code works, and keeping it working',

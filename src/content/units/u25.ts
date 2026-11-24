@@ -7,6 +7,8 @@ const r = String.raw
 export const u25: Unit = {
   id: 'u25',
   week: 12,
+  lecture: 'https://missing.csail.mit.edu/2020/data-wrangling/',
+  lectureFrom: 'MIT Missing Semester: Data wrangling',
   course: 'dev',
   title: 'Everyday tools',
   summary: 'Text patterns, dates and type hints',

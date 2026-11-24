@@ -34,6 +34,8 @@ def fake_model(messages):
 export const u31: Unit = {
   id: 'u31',
   week: 6,
+  lecture: 'https://anthropic.skilljar.com/claude-with-the-anthropic-api',
+  lectureFrom: 'Anthropic course: Building with the Claude API',
   course: 'ai',
   title: 'Tools',
   summary: 'Letting a model call your code',

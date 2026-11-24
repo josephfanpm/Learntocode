@@ -3,6 +3,7 @@ import type { Unit } from '../types'
 export const u0: Unit = {
   id: 'u0',
   week: 0,
+  lecture: 'https://cs50.harvard.edu/x/weeks/0/',
   title: 'Thinking like a computer',
   summary: 'Bits, text and step-by-step instructions',
   lessons: [

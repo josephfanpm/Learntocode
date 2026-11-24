@@ -196,6 +196,10 @@ export interface Unit {
    * 'ai' = Building with AI: LLMs, prompting, the Claude API, agents, Claude Code.
    */
   course?: 'cs' | 'dev' | 'ai'
+  /** A matching lecture or video, linked from the unit card. CS units: the CS50 week. */
+  lecture?: string
+  /** Who made it, shown as the link text, e.g. "MIT Missing Semester: Version control". Unset = CS50x. */
+  lectureFrom?: string
   title: string
   /** One short line shown on the path, e.g. "Variables, input and decisions". */
   summary: string

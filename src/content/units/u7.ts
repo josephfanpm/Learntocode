@@ -169,6 +169,7 @@ const TOWN_COLS =
 export const u7: Unit = {
   id: 'u7',
   week: 7,
+  lecture: 'https://cs50.harvard.edu/x/weeks/7/',
   title: 'Databases with SQL',
   summary: 'Asking questions of data',
   lessons: [

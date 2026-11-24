@@ -3,6 +3,8 @@ import type { Unit } from '../types'
 export const u33: Unit = {
   id: 'u33',
   week: 8,
+  lecture: 'https://anthropic.skilljar.com/claude-code-in-action',
+  lectureFrom: 'Anthropic course: Claude Code in Action',
   course: 'ai',
   title: 'Claude Code basics',
   summary: 'An agent that works in your project',

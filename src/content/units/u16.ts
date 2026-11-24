@@ -6,6 +6,8 @@ const L = (...lines: string[]) => lines.join('\n')
 export const u16: Unit = {
   id: 'u16',
   week: 3,
+  lecture: 'https://cs50.harvard.edu/web/weeks/5/',
+  lectureFrom: 'CS50 Web: JavaScript',
   course: 'dev',
   title: 'Real JavaScript',
   summary: 'The language of the browser, written and run',

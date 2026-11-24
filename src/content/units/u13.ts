@@ -3,6 +3,8 @@ import type { Unit } from '../types'
 export const u13: Unit = {
   id: 'u13',
   week: 12,
+  lecture: 'https://cs50.harvard.edu/web/weeks/8/',
+  lectureFrom: 'CS50 Web: Scalability and Security',
   title: 'Systems design',
   summary: 'How big apps stay fast and stay up',
   lessons: [

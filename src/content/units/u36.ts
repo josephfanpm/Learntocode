@@ -3,6 +3,8 @@ import type { Unit } from '../types'
 export const u36: Unit = {
   id: 'u36',
   week: 11,
+  lecture: 'https://missing.csail.mit.edu/2026/agentic-coding/',
+  lectureFrom: 'MIT Missing Semester: Agentic coding',
   course: 'ai',
   title: 'Working with coding agents',
   summary: 'Good tasks, review and guard rails',

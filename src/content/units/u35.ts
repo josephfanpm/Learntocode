@@ -23,6 +23,8 @@ register("shout", "Turn text into capital letters.", ["text"], shout)
 export const u35: Unit = {
   id: 'u35',
   week: 10,
+  lecture: 'https://anthropic.skilljar.com/introduction-to-model-context-protocol',
+  lectureFrom: 'Anthropic course: Introduction to MCP',
   course: 'ai',
   title: 'Connecting things with MCP',
   summary: 'Giving agents access to tools and data',

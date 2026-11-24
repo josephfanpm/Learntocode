@@ -6,6 +6,7 @@ const MENU_HELPERS =
 export const u12: Unit = {
   id: 'u12',
   week: 13,
+  lecture: 'https://cs50.harvard.edu/x/project/',
   title: 'Final project',
   summary: 'Plan, build and ship something of your own',
   lessons: [

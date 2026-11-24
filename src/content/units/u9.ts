@@ -3,6 +3,7 @@ import type { Unit } from '../types'
 export const u9: Unit = {
   id: 'u9',
   week: 9,
+  lecture: 'https://cs50.harvard.edu/x/weeks/9/',
   title: 'Web apps',
   summary: 'Routes, forms and pages that respond',
   lessons: [

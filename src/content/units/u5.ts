@@ -12,6 +12,7 @@ const NODE_CLASS = [
 export const u5: Unit = {
   id: 'u5',
   week: 5,
+  lecture: 'https://cs50.harvard.edu/x/weeks/5/',
   title: 'Data structures',
   summary: 'Stacks, queues, links and lookups',
   lessons: [

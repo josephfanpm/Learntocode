@@ -3,6 +3,8 @@ import type { Unit } from '../types'
 export const u27: Unit = {
   id: 'u27',
   week: 2,
+  lecture: 'https://www.youtube.com/watch?v=T9aRN5JkmL8',
+  lectureFrom: 'Anthropic: Prompt engineering deep dive',
   course: 'ai',
   title: 'Prompting well',
   summary: 'Clear instructions, examples and structure',

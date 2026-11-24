@@ -1,4 +1,4 @@
-import { Check, FastForward, Flame, Map, Play, Gem, Lock, Snowflake, X } from 'lucide-react'
+import { Check, ExternalLink, FastForward, Flame, Map, Play, Gem, Lock, Snowflake, X } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 import { COURSES, courseUnits, units as allUnits } from '../content'
 import { dayKey } from '../engine/dates'
@@ -196,8 +196,21 @@ export function Home({ go }: { go: Go }) {
                 <h2 id={`h-${unit.id}`} className="mt-1.5 text-xl leading-tight font-bold text-white">{unit.title}</h2>
                 <p className="text-sm text-white/80">{unit.summary}</p>
                 <p className="mt-1 text-xs text-white/65">
-                  {unitSkipped ? 'Skipped by your placement test · open to review' : `${(unit.course ?? 'cs') !== 'cs' ? `Chapter ${unit.week} of ${units.length}` : unit.week <= 10 ? `Week ${unit.week} of CS50` : unit.week === 11 ? "CS50’s cybersecurity lecture" : unit.week === 12 ? "Beyond CS50" : "CS50’s final project"} · ${prog.done}/${prog.total} lessons`}
+                  {unitSkipped ? 'Skipped by your placement test · open to review' : `${(unit.course ?? 'cs') !== 'cs' ? `Chapter ${unit.week} of ${units.length}` : unit.week < 10 ? `Week ${unit.week} of CS50` : unit.week === 10 ? 'CS50’s AI lecture' : unit.week === 11 ? 'From CS50 Cybersecurity' : unit.week === 12 ? 'Beyond CS50' : 'CS50’s final project'} · ${prog.done}/${prog.total} lessons`}
                 </p>
+                {unit.lecture && (
+                  <a
+                    href={unit.lecture}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-2 inline-flex items-center gap-1.5 text-sm font-semibold text-gold hover:underline"
+                  >
+                    <Play size={14} aria-hidden />
+                    {unit.lectureFrom ?? (unit.week === 13 ? 'CS50 final project' : unit.week === 11 ? 'CS50 Cybersecurity' : 'Watch the CS50 lecture')}
+                    {!unit.lectureFrom && unit.week >= 1 && unit.week <= 5 && <span className="font-normal text-white/65">(in C)</span>}
+                    <ExternalLink size={13} aria-hidden className="text-white/65" />
+                  </a>
+                )}
               </div>
             </div>
             <ol className="relative py-6">

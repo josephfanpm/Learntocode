@@ -3,6 +3,7 @@ import type { Unit } from '../types'
 export const u10: Unit = {
   id: 'u10',
   week: 10,
+  lecture: 'https://cs50.harvard.edu/x/weeks/ai/',
   title: 'Artificial intelligence',
   summary: 'How machines learn and how to use them well',
   lessons: [

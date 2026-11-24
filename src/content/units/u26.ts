@@ -3,6 +3,8 @@ import type { Unit } from '../types'
 export const u26: Unit = {
   id: 'u26',
   week: 1,
+  lecture: 'https://www.youtube.com/watch?v=zjkBMFhNj_g',
+  lectureFrom: 'Andrej Karpathy: Intro to large language models',
   course: 'ai',
   title: 'How language models work',
   summary: 'Tokens, prediction and why models make things up',
