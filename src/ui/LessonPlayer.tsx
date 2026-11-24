@@ -2,7 +2,9 @@ import { Lightbulb, Volume2, VolumeX, X } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { Lesson, Unit } from '../content/types'
 import { hintFor } from '../engine/hints'
-import { completeLesson, type LessonResult } from '../engine/state'
+import { dayKey } from '../engine/dates'
+import { addMistake, LEGENDARY_GEMS, LEGENDARY_MISTAKES, recordQuest, reviewable, reviewMistake, winLegendary, type MistakeItem } from '../engine/gamify'
+import { completeLesson, completeReview, type LessonResult } from '../engine/state'
 import { warmPython } from '../runners'
 import { play } from '../sound'
 import { useStore } from '../store'
@@ -15,7 +17,34 @@ type Status = 'answering' | 'right' | 'wrong'
 
 const PRAISE = ['Nice.', 'Correct.', 'That’s it.', 'Right.', 'Good work.']
 
-export function LessonPlayer({ lesson, unit, color, startAt = 0, onExit, onAvatar }: { lesson: Lesson; unit: Unit; color: string; startAt?: number; onExit: () => void; onAvatar: () => void }) {
+/**
+ * lesson: the normal run. legendary: a finished lesson replayed with no hints
+ * and at most LEGENDARY_MISTAKES wrong answers. review: due mistakes from
+ * many lessons (`reviewItems[i]` is where exercise i came from).
+ */
+export type PlayMode = 'lesson' | 'legendary' | 'review'
+
+export function LessonPlayer({
+  lesson,
+  unit,
+  color,
+  startAt = 0,
+  mode = 'lesson',
+  reviewItems = [],
+  onExit,
+  onAvatar,
+  onRetry,
+}: {
+  lesson: Lesson
+  unit?: Unit
+  color: string
+  startAt?: number
+  mode?: PlayMode
+  reviewItems?: MistakeItem[]
+  onExit: () => void
+  onAvatar: () => void
+  onRetry?: () => void
+}) {
   const { update, s } = useStore()
   const total = lesson.exercises.length
   // Queue of exercise indices; wrong answers go to the back for another try.
@@ -31,7 +60,11 @@ export function LessonPlayer({ lesson, unit, color, startAt = 0, onExit, onAvata
   const [reveal, setReveal] = useState(false)
   const [grader, setGrader] = useState<Grader | null>(null)
   const [checking, setChecking] = useState(false)
-  const [result, setResult] = useState<{ r: LessonResult; accuracy: number } | null>(null)
+  const [result, setResult] = useState<{ r: LessonResult; accuracy: number; notes: string[] } | null>(null)
+  const [failed, setFailed] = useState(false)
+  const wrongs = useRef(0)
+  const bestCombo = useRef(0)
+  const usedHint = useRef(false)
   const [confirmQuit, setConfirmQuit] = useState(false)
   const [attempt, setAttempt] = useState(0)
   // Hints shown for the current exercise: 0 none, 1 the concept, 2 a nudge as well.
@@ -52,10 +85,43 @@ export function LessonPlayer({ lesson, unit, color, startAt = 0, onExit, onAvata
   const finish = (finalMissed: Set<number>) => {
     const gradable = lesson.exercises.filter((e) => e.kind !== 'concept').length
     const accuracy = gradable ? (gradable - finalMissed.size) / gradable : 1
-    const [nextState, r] = completeLesson(s, lesson.id, accuracy, new Date())
+    const now = new Date()
+    const today = dayKey(now)
+    const notes: string[] = []
+    let nextState: typeof s
+    let r: LessonResult
+    if (mode === 'review') {
+      // Right first time moves a question further out; a miss brings it back tomorrow.
+      let st = s
+      reviewItems.forEach((item, i) => (st = reviewMistake(st, item, !finalMissed.has(i), today)))
+      const fixed = reviewItems.length - finalMissed.size
+      ;[nextState, r] = completeReview(st, fixed, now)
+      nextState = recordQuest(nextState, { mistakesFixed: fixed, bestCombo: bestCombo.current, xp: r.xp }, today)
+      notes.push(fixed === reviewItems.length ? 'Every mistake fixed.' : `${fixed} of ${reviewItems.length} fixed. The rest come back tomorrow.`)
+    } else {
+      ;[nextState, r] = completeLesson(s, lesson.id, accuracy, now)
+      nextState = recordQuest(
+        nextState,
+        {
+          lessonsDone: 1,
+          perfectLessons: accuracy === 1 ? 1 : 0,
+          bestCombo: bestCombo.current,
+          xp: r.xp,
+          codeLessons: lesson.exercises.some((e) => e.kind === 'write') ? 1 : 0,
+          noHintLessons: usedHint.current ? 0 : 1,
+        },
+        today,
+      )
+      if (mode === 'legendary' && !s.legendary?.[lesson.id]) {
+        nextState = winLegendary(nextState, lesson.id)
+        notes.push(`Legendary. +${LEGENDARY_GEMS} gems.`)
+      }
+    }
+    if (r.milestoneGems) notes.push(`${r.streakAfter}-day streak. +${r.milestoneGems} gems.`)
+    if (r.boosted) notes.push('Double XP was on.')
     // Jumping in part-way (content review) doesn't count as finishing.
     if (startAt === 0) update(() => nextState)
-    setResult({ r, accuracy })
+    setResult({ r, accuracy, notes })
   }
 
   const next = (wasRight: boolean, queueNow = queue) => {
@@ -82,6 +148,7 @@ export function LessonPlayer({ lesson, unit, color, startAt = 0, onExit, onAvata
     praise.current = PRAISE[Math.floor(Math.random() * PRAISE.length)]
     if (ok) {
       combo.current++
+      bestCombo.current = Math.max(bestCombo.current, combo.current)
       play('correct', combo.current)
       setStatus('right')
       return
@@ -93,9 +160,20 @@ export function LessonPlayer({ lesson, unit, color, startAt = 0, onExit, onAvata
     setMissed((m) => new Set(m).add(idx))
     const n = (misses.current.get(idx) ?? 0) + 1
     misses.current.set(idx, n)
-    // Code questions are retried in place, so the example opens right here.
-    if (ex.kind === 'write' && n >= 2) setHintLevel((h) => (h === 0 ? 1 : h))
-    update((p) => ({ ...p, struggles: { ...p.struggles, [lesson.id]: (p.struggles[lesson.id] ?? 0) + 1 } }))
+    // Code questions are retried in place, so the example opens right here (not in legendary).
+    if (ex.kind === 'write' && n >= 2 && mode !== 'legendary') setHintLevel((h) => (h === 0 ? 1 : h))
+    if (startAt === 0 && mode !== 'review') {
+      // First miss on a question queues it for spaced review.
+      const first = n === 1 && reviewable(ex)
+      update((p) => {
+        const q = first ? addMistake(p, lesson.id, idx, dayKey(new Date())) : p
+        return mode === 'lesson' ? { ...q, struggles: { ...q.struggles, [lesson.id]: (q.struggles[lesson.id] ?? 0) + 1 } } : q
+      })
+    }
+    if (mode === 'legendary') {
+      wrongs.current++
+      if (wrongs.current > LEGENDARY_MISTAKES) setFailed(true)
+    }
     if (ex.kind !== 'write') setReveal(true)
   }
 
@@ -131,6 +209,21 @@ export function LessonPlayer({ lesson, unit, color, startAt = 0, onExit, onAvata
 
   if (result) return <AfterLesson result={result} lesson={lesson} saved={startAt === 0} onExit={onExit} onAvatar={onAvatar} />
 
+  if (failed)
+    return (
+      <div className="mx-auto flex min-h-dvh max-w-md flex-col px-5 py-10">
+        <div className="flex flex-1 flex-col items-center justify-center text-center">
+          <Pip mood="oops" size={110} className="mb-4" />
+          <h1 className="text-3xl font-bold">Out of tries</h1>
+          <p className="mt-2 text-ink-2">Legendary allows {LEGENDARY_MISTAKES} mistakes. Your progress is safe.</p>
+        </div>
+        <div className="grid gap-3">
+          {onRetry && <button className="btn" autoFocus onClick={onRetry}>Try again</button>}
+          <button className="btn btn-ghost" onClick={onExit}>Leave</button>
+        </div>
+      </div>
+    )
+
   const progress = done.size / total
 
   return (
@@ -153,8 +246,13 @@ export function LessonPlayer({ lesson, unit, color, startAt = 0, onExit, onAvata
       </header>
 
       <main className="flex-1 px-4 pt-4 pb-56">
-        <p className="mb-3 text-sm font-medium text-ink-3">
-          {unit.title} · {lesson.title}
+        <p className="mb-3 flex flex-wrap items-center gap-x-2 text-sm font-medium text-ink-3">
+          <span>{unit ? `${unit.title} · ` : ''}{lesson.title}</span>
+          {mode === 'legendary' && (
+            <span className="pixel text-[0.55rem] text-gold" aria-label={`Legendary, ${LEGENDARY_MISTAKES - wrongs.current} mistakes left`}>
+              LEGENDARY · {LEGENDARY_MISTAKES - wrongs.current} LEFT
+            </span>
+          )}
         </p>
         <div key={`${idx}-${attempt}`}>
           <ExerciseView ex={ex} locked={status !== 'answering'} reveal={reveal} register={register} />
@@ -210,12 +308,14 @@ export function LessonPlayer({ lesson, unit, color, startAt = 0, onExit, onAvata
             )}
           </div>
           <div className="flex gap-2 sm:w-auto">
-            {status === 'answering' && ex.kind !== 'concept' && (
+            {/* Hints quote the lesson's own cards, so only a normal lesson has them. */}
+            {status === 'answering' && ex.kind !== 'concept' && mode === 'lesson' && (
               <button
                 className="btn btn-ghost shrink-0 !px-4"
                 disabled={hintLevel >= 2}
                 onClick={() => {
                   play('tap')
+                  usedHint.current = true
                   setHintLevel((h) => (h === 0 ? 1 : 2))
                   requestAnimationFrame(() => document.querySelector('aside[aria-label="Hint"]')?.scrollIntoView({ block: 'nearest', behavior: 'smooth' }))
                 }}

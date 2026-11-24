@@ -1,7 +1,8 @@
-import { ArrowLeft, Award, Copy, Download, Flame, Gem, Pencil, Settings as SettingsIcon, Snowflake, Upload } from 'lucide-react'
+import { ArrowLeft, Award, Copy, Download, Flame, Gem, Pencil, Settings as SettingsIcon, Snowflake, Upload, Zap } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { units } from '../content'
 import { addDays, dayKey, parseDay } from '../engine/dates'
+import { BOOST_MINUTES, BOOST_PRICE, buyBoost } from '../engine/gamify'
 import { badges } from '../engine/progress'
 import { buyFreeze, exportSave, FREEZE_PRICE, importSave, longestStreak, MAX_FREEZES, practicedToday, reset, streak } from '../engine/state'
 import { useDeviceReduces, useReducedMotion } from '../motion'
@@ -12,6 +13,7 @@ import { badgeBackground, badgePixels } from './pixel/icons'
 import { PixelSprite } from './pixel/PixelSprite'
 import { GOALS } from './Onboarding'
 import type { Go } from './Home'
+import { useBoostLeft } from './Today'
 
 export function Profile({ go }: { go: Go }) {
   const { s, update } = useStore()
@@ -19,6 +21,7 @@ export function Profile({ go }: { go: Go }) {
   const best = longestStreak(s)
   const xpToday = s.activity[today]?.xp ?? 0
   const all = badges(units, s, best)
+  const boostLeft = useBoostLeft()
 
   useEffect(() => {
     const id = location.hash.split('#')[2]
@@ -104,6 +107,16 @@ export function Profile({ go }: { go: Go }) {
           </div>
           <button className="btn !px-3 !py-2 text-sm" disabled={s.gems < FREEZE_PRICE || s.freezes >= MAX_FREEZES} onClick={() => update((p) => buyFreeze(p) ?? p)}>
             <Gem size={15} /> {FREEZE_PRICE}
+          </button>
+        </div>
+        <div className="mt-3 flex items-center gap-4 rounded-2xl border-2 border-rule bg-card p-4">
+          <Zap size={36} className="shrink-0 text-gold" fill="currentColor" />
+          <div className="flex-1">
+            <p className="font-semibold">Double XP</p>
+            <p className="text-sm text-ink-2">{boostLeft ? `On for ${boostLeft} more ${boostLeft === 1 ? 'minute' : 'minutes'}.` : `Twice the XP for ${BOOST_MINUTES} minutes.`}</p>
+          </div>
+          <button className="btn !px-3 !py-2 text-sm" disabled={s.gems < BOOST_PRICE || boostLeft > 0} onClick={() => update((p) => buyBoost(p, new Date()) ?? p)}>
+            <Gem size={15} /> {BOOST_PRICE}
           </button>
         </div>
       </section>

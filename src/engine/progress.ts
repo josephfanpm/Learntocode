@@ -133,6 +133,7 @@ export function badges(units: Unit[], s: LearnerState, bestStreak: number): Badg
     tiered('streak', 'flame', 'On Fire', bestStreak, [3, 7, 30], (n) => `Reach a ${n}-day streak`),
     tiered('lessons', 'shield', 'Adventurer', lessons, [10, 30, 100], (n) => `Finish ${n} lessons`),
     tiered('perfect', 'star', 'Flawless', perfect, [1, 10, 30], (n) => `Finish ${n} ${n === 1 ? 'lesson' : 'lessons'} with no mistakes`),
+    tiered('legendary', 'trophy', 'Legend', Object.keys(s.legendary ?? {}).length, [1, 10, 30], (n) => `Pass ${n} ${n === 1 ? 'lesson' : 'lessons'} on legendary`),
     tiered('xp', 'gem', 'Treasure Hunter', s.xp, [100, 500, 1500], (n) => `Earn ${n.toLocaleString('en-US')} XP`),
     tiered('goal', 'target', 'Goal Getter', goalDays, [3, 10, 30], (n) => `Hit your daily goal on ${n} days`),
     tiered('marathon', 'bolt', 'Marathon', busiestDay, [3, 5, 10], (n) => `Finish ${n} lessons in one day`),

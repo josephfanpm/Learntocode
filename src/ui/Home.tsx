@@ -1,9 +1,10 @@
-import { Check, ExternalLink, FastForward, Flame, Map, Play, Gem, Lock, Snowflake, X } from 'lucide-react'
-import { useEffect, useRef } from 'react'
+import { Check, Crown, ExternalLink, FastForward, Flame, Map, Play, Gem, Lock, Snowflake, X } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
 import { COURSES, courseUnits, units as allUnits } from '../content'
 import { dayKey } from '../engine/dates'
 import type { Message } from '../engine/messaging'
-import { path, unitProgress } from '../engine/progress'
+import { LEGENDARY_GEMS, LEGENDARY_MISTAKES } from '../engine/gamify'
+import { path, unitProgress, type PathLesson } from '../engine/progress'
 import { practicedToday, streak } from '../engine/state'
 import { useDeviceReduces } from '../motion'
 import { useStore } from '../store'
@@ -12,6 +13,7 @@ import { worldFor } from './worlds'
 import { WorldScene } from './worlds/WorldScene'
 import { Avatar } from './Avatar'
 import { Pip, type Mood } from './Pip'
+import { BoostChip, Today } from './Today'
 
 /** One transit-line colour per unit. */
 export const LINE_COLORS = ['#5b8cff', '#ff8a2a', '#25c4d4', '#a98bff', '#f062b0', '#3ddc84', '#ffc531', '#ff6b72', '#69b0ff', '#e0a36a', '#9bd1c0']
@@ -33,6 +35,7 @@ export function TopBar({ go }: { go: Go }) {
           <Flame size={22} className={lit ? 'text-flame' : 'text-ink-3'} fill={lit ? 'currentColor' : 'none'} />
           {st}
         </button>
+        <BoostChip />
         {s.freezes > 0 && (
           <span className="flex items-center gap-1 px-1 font-semibold text-[#7cc4f5]" aria-label={`${s.freezes} streak freezes`}>
             <Snowflake size={18} /> {s.freezes}
@@ -122,6 +125,8 @@ export function Home({ go }: { go: Go }) {
   const units = courseUnits(course)
   const p = path(units, s)
   const current = useRef<HTMLButtonElement>(null)
+  // A finished lesson tapped on the path: practice it again or go legendary.
+  const [pick, setPick] = useState<PathLesson | null>(null)
   useEffect(() => {
     // On first load, jump to the current lesson unless it is the first one on the path.
     if (p[0]?.status !== 'current') current.current?.scrollIntoView({ block: 'center' })
@@ -161,6 +166,7 @@ export function Home({ go }: { go: Go }) {
           Know some of this already? Find my level
         </button>
       )}
+      <Today go={go} />
       {banners.length > 0 && (
         <div className="mt-4 space-y-3">
           {banners.map((m) => (
@@ -226,13 +232,15 @@ export function Home({ go }: { go: Go }) {
                       <button
                         ref={isCur ? current : undefined}
                         disabled={st.status === 'locked'}
-                        onClick={() => go(`/lesson/${st.lesson.id}`)}
-                        aria-label={`${st.lesson.title}${st.status === 'done' ? ', done, practice again' : st.status === 'locked' ? ', locked' : st.status === 'skipped' ? ', skipped, open to review' : st.status === 'open' ? ', open' : ', start'}`}
+                        onClick={() => (st.status === 'done' ? setPick(st) : go(`/lesson/${st.lesson.id}`))}
+                        aria-label={`${st.lesson.title}${st.status === 'done' ? s.legendary?.[st.lesson.id] ? ', legendary' : ', done' : st.status === 'locked' ? ', locked' : st.status === 'skipped' ? ', skipped, open to review' : st.status === 'open' ? ', open' : ', start'}`}
                         className={`grid place-items-center rounded-full border-4 transition-transform active:translate-y-1 ${
                           isCur ? 'anim-pulse size-20 bg-card' : 'size-16'
                         } ${st.status === 'done' ? 'text-white' : ''} ${st.status === 'locked' ? 'border-rule bg-card text-ink-3' : ''} ${st.status === 'skipped' ? 'border-dashed bg-card' : ''} ${st.status === 'open' ? 'bg-card' : ''}`}
                         style={
-                          st.status === 'done'
+                          st.status === 'done' && s.legendary?.[st.lesson.id]
+                            ? { background: color, borderColor: '#ffc531', boxShadow: '0 5px 0 #a87a00' }
+                            : st.status === 'done'
                             ? { background: color, borderColor: color, boxShadow: `0 5px 0 color-mix(in srgb, ${color} 70%, black)` }
                             : isCur
                               ? { borderColor: color, color, boxShadow: `0 5px 0 color-mix(in srgb, ${color} 70%, black)` }
@@ -241,7 +249,7 @@ export function Home({ go }: { go: Go }) {
                               : { boxShadow: '0 5px 0 var(--color-rule)' }
                         }
                       >
-                        {st.status === 'done' ? <Check size={28} strokeWidth={3} /> : st.status === 'skipped' ? <FastForward size={24} /> : st.status === 'open' ? <Play size={24} /> : st.status === 'locked' ? <Lock size={22} /> : <span className="font-display text-lg font-extrabold">Start</span>}
+                        {st.status === 'done' && s.legendary?.[st.lesson.id] ? <Crown size={26} strokeWidth={2.5} /> : st.status === 'done' ? <Check size={28} strokeWidth={3} /> : st.status === 'skipped' ? <FastForward size={24} /> : st.status === 'open' ? <Play size={24} /> : st.status === 'locked' ? <Lock size={22} /> : <span className="font-display text-lg font-extrabold">Start</span>}
                       </button>
                       <span className={`mt-2 max-w-40 rounded-lg bg-paper px-1.5 text-center text-sm leading-tight ${isCur ? 'font-semibold' : st.status === 'locked' ? 'text-ink-3' : 'text-ink-2'}`}>
                         {st.lesson.title}
@@ -254,6 +262,27 @@ export function Home({ go }: { go: Go }) {
           </section>
         )
       })}
+      {pick && (
+        <div className="fixed inset-0 z-20 grid place-items-end bg-ink/40 sm:place-items-center" onClick={() => setPick(null)}>
+          <div className="anim-rise w-full max-w-md rounded-t-3xl bg-card p-6 sm:rounded-3xl" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="pick-title">
+            <h2 id="pick-title" className="text-2xl font-bold">{pick.lesson.title}</h2>
+            {s.legendary?.[pick.lesson.id] ? (
+              <p className="mt-1 flex items-center gap-1.5 text-sm font-semibold text-gold"><Crown size={16} /> Legendary</p>
+            ) : (
+              <p className="mt-1 text-sm text-ink-2">Legendary: no hints, {LEGENDARY_MISTAKES} mistakes allowed. Win a gold crown and {LEGENDARY_GEMS} gems.</p>
+            )}
+            <div className="mt-5 grid gap-3">
+              {!s.legendary?.[pick.lesson.id] && (
+                <button className="btn" autoFocus onClick={() => go(`/lesson/${pick.lesson.id}?mode=legendary`)}>
+                  <Crown size={18} /> Go legendary
+                </button>
+              )}
+              <button className={`btn ${s.legendary?.[pick.lesson.id] ? '' : 'btn-ghost'}`} onClick={() => go(`/lesson/${pick.lesson.id}`)}>Practice again</button>
+              <button className="btn btn-ghost" onClick={() => setPick(null)}>Close</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -1,4 +1,5 @@
 import { addDays, dayKey, daysBetween } from './dates'
+import { boosted, milestoneReward, type MistakeItem, type QuestDay } from './gamify'
 
 export interface AvatarSpec {
   animal: 'redpanda' | 'cat' | 'bunny' | 'bear'
@@ -82,6 +83,16 @@ export interface LearnerState {
   freezesUsedUnseen: number
   messages: SentMessage[]
   dismissed: Record<string, string>
+  /** Today's quests and progress (replaced when the day changes). */
+  quests?: QuestDay
+  /** Questions answered wrong, waiting for spaced review. */
+  mistakes?: MistakeItem[]
+  /** Lessons passed in legendary mode. */
+  legendary?: Record<string, true>
+  /** Streak milestones already rewarded with gems. */
+  milestones?: number[]
+  /** Double XP runs until this time. */
+  boostUntil?: string
 }
 
 export const MAX_FREEZES = 2
@@ -212,6 +223,10 @@ export interface LessonResult {
   goalHit: boolean
   streakBefore: number
   streakAfter: number
+  /** Gems for reaching a streak milestone with this lesson (0 if none). */
+  milestoneGems: number
+  /** Double XP was on. */
+  boosted: boolean
 }
 
 export function completeLesson(
@@ -222,7 +237,8 @@ export function completeLesson(
 ): [LearnerState, LessonResult] {
   const today = dayKey(now)
   const prev = s.completed[lessonId]
-  const xp = lessonXp(!prev, accuracy)
+  const baseXp = lessonXp(!prev, accuracy)
+  const xp = boosted(s, now, baseXp)
   const day = s.activity[today] ?? { xp: 0, lessons: 0 }
   const goalBefore = day.xp >= s.dailyGoal
   const newDay = { xp: day.xp + xp, lessons: day.lessons + 1 }
@@ -249,7 +265,31 @@ export function completeLesson(
     lostStreak: undefined,
     freezesUsedUnseen: 0,
   }
-  return [next, { xp, gems, goalHit, streakBefore, streakAfter: streak(next, today) }]
+  const streakAfter = streak(next, today)
+  const [rewarded, milestoneGems] = milestoneReward(next, streakBefore, streakAfter)
+  return [rewarded, { xp, gems, goalHit, streakBefore, streakAfter, milestoneGems, boosted: xp > baseXp }]
+}
+
+/** A mistake-review session: XP and a practice day, but no lesson record. */
+export function completeReview(s: LearnerState, fixed: number, now: Date): [LearnerState, LessonResult] {
+  const today = dayKey(now)
+  const baseXp = 5 + fixed * 2
+  const xp = boosted(s, now, baseXp)
+  const day = s.activity[today] ?? { xp: 0, lessons: 0 }
+  const goalHit = day.xp < s.dailyGoal && day.xp + xp >= s.dailyGoal
+  const gems = goalHit ? 20 : 0
+  const streakBefore = streak(s, today)
+  const next: LearnerState = {
+    ...s,
+    xp: s.xp + xp,
+    gems: s.gems + gems,
+    activity: { ...s.activity, [today]: { ...day, xp: day.xp + xp } },
+    lostStreak: undefined,
+    freezesUsedUnseen: 0,
+  }
+  const streakAfter = streak(next, today)
+  const [rewarded, milestoneGems] = milestoneReward(next, streakBefore, streakAfter)
+  return [rewarded, { xp, gems, goalHit, streakBefore, streakAfter, milestoneGems, boosted: xp > baseXp }]
 }
 
 export function buyFreeze(s: LearnerState): LearnerState | null {

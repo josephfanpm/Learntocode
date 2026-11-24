@@ -350,3 +350,84 @@ describe('simulation', () => {
     expect(addDays('2026-11-02', 13)).toBe(days.at(-1)!.date)
   })
 })
+
+describe('daily quests, review, legendary, milestones and boost', () => {
+  const g = () => import('./gamify')
+  const fresh = () => ({ ...newLearner(at('2026-03-02')), onboarded: true })
+
+  it('gives three different quests a day, the same ones all day, new ones the next', async () => {
+    const { questsFor } = await g()
+    const s = fresh()
+    const a = questsFor(s, '2026-03-02')
+    expect(new Set(a.ids).size).toBe(3)
+    expect(questsFor({ ...s, quests: a }, '2026-03-02')).toBe(a)
+    expect(questsFor({ ...s, quests: a }, '2026-03-03').day).toBe('2026-03-03')
+  })
+
+  it('fills quests from events, caps at the goal, and pays the chest once', async () => {
+    const { questsFor, recordQuest, claimChest, questsDone, QUEST_CHEST } = await g()
+    let s: LearnerState = fresh()
+    const day = '2026-03-02'
+    expect(claimChest(s, day)).toBeNull()
+    for (let i = 0; i < 3; i++)
+      s = recordQuest(s, { lessonsDone: 1, perfectLessons: 1, bestCombo: 9, xp: 30, codeLessons: 1, noHintLessons: 1, mistakesFixed: 3 }, day)
+    const q = questsFor(s, day)
+    expect(questsDone(q)).toBe(true)
+    const paid = claimChest(s, day)!
+    expect(paid.gems).toBe(s.gems + QUEST_CHEST)
+    expect(claimChest(paid, day)).toBeNull()
+  })
+
+  it('brings a mistake back after 1, 3 and 7 days, and resets it when missed again', async () => {
+    const { addMistake, dueMistakes, reviewMistake } = await g()
+    let s: LearnerState = addMistake(fresh(), 'u0-l1', 2, '2026-03-02')
+    expect(dueMistakes(s, '2026-03-02')).toHaveLength(0)
+    expect(dueMistakes(s, '2026-03-03')).toHaveLength(1)
+    s = reviewMistake(s, s.mistakes![0], true, '2026-03-03')
+    expect(s.mistakes![0].due).toBe('2026-03-06')
+    s = reviewMistake(s, s.mistakes![0], false, '2026-03-06')
+    expect(s.mistakes![0]).toMatchObject({ box: 0, due: '2026-03-07' })
+    s = reviewMistake(s, s.mistakes![0], true, '2026-03-07')
+    s = reviewMistake(s, s.mistakes![0], true, '2026-03-10')
+    s = reviewMistake(s, s.mistakes![0], true, '2026-03-17')
+    expect(s.mistakes).toHaveLength(0)
+  })
+
+  it('a review session counts as a practice day without recording a lesson', async () => {
+    const { completeReview } = await import('./state')
+    const [s, r] = completeReview(fresh(), 4, at('2026-03-02'))
+    expect(r.xp).toBe(13)
+    expect(r.streakAfter).toBe(1)
+    expect(Object.keys(s.completed)).toHaveLength(0)
+  })
+
+  it('pays legendary gems once per lesson', async () => {
+    const { winLegendary, LEGENDARY_GEMS } = await g()
+    const once = winLegendary(fresh(), 'u0-l1')
+    expect(once.gems).toBe(LEGENDARY_GEMS)
+    expect(winLegendary(once, 'u0-l1').gems).toBe(LEGENDARY_GEMS)
+  })
+
+  it('pays a streak milestone once, when the streak reaches it', () => {
+    let s: LearnerState = fresh()
+    const gems: number[] = []
+    for (let i = 0; i < 7; i++) {
+      const [n, r] = completeLesson(s, `u0-l1`, 1, at(addDays('2026-03-02', i)))
+      s = n
+      gems.push(r.milestoneGems)
+    }
+    expect(gems).toEqual([0, 0, 10, 0, 0, 0, 25])
+    expect(s.milestones).toEqual([3, 7])
+  })
+
+  it('double XP doubles lesson XP while it runs and can not stack', async () => {
+    const { buyBoost, BOOST_PRICE } = await g()
+    const now = at('2026-03-02', 10)
+    const rich = { ...fresh(), gems: 500 }
+    const s = buyBoost(rich, now)!
+    expect(s.gems).toBe(500 - BOOST_PRICE)
+    expect(buyBoost(s, now)).toBeNull()
+    expect(completeLesson(s, 'u0-l1', 1, now)[1].xp).toBe(30)
+    expect(completeLesson(s, 'u0-l1', 1, new Date(now.getTime() + 16 * 60_000))[1].xp).toBe(15)
+  })
+})

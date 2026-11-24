@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { courseUnits, units, type CourseId } from './content'
+import { dayKey } from './engine/dates'
+import { reviewLesson } from './engine/gamify'
 import { findLesson } from './engine/progress'
 import { StoreProvider, useStore } from './store'
 import { BottomNav, Home, LINE_COLORS, TopBar, type Go } from './ui/Home'
@@ -29,6 +31,8 @@ function Screens() {
   const { s, update } = useStore()
   const [route, go] = useRoute()
   const prevTab = useRef(0)
+  // Bumped to restart a run (legendary "Try again").
+  const [runKey, setRunKey] = useState(0)
 
   // The design sample is viewable without going through setup.
   if (route === '/sample') return <Sample />
@@ -51,12 +55,29 @@ function Screens() {
     )
   }
 
-  const m = route.match(/^\/lesson\/([^?]+)(?:\?at=(\d+))?$/)
+  // #/review: due mistakes. Built once per visit so finishing doesn't reshuffle it.
+  if (route === '/review') return <Review key={runKey} go={go} retry={() => setRunKey((k) => k + 1)} />
+
+  const m = route.match(/^\/lesson\/([^?]+)(?:\?(.*))?$/)
   if (m) {
     const found = findLesson(units, m[1])
+    const q = new URLSearchParams(m[2] ?? '')
     if (found) {
       const color = LINE_COLORS[units.indexOf(found.unit) % LINE_COLORS.length]
-      return <LessonPlayer key={m[1]} lesson={found.lesson} unit={found.unit} color={color} startAt={Number(m[2] ?? 0)} onExit={() => go('/')} onAvatar={() => go('/avatar')} />
+      const legendary = q.get('mode') === 'legendary'
+      return (
+        <LessonPlayer
+          key={`${m[1]}-${legendary}-${runKey}`}
+          lesson={found.lesson}
+          unit={found.unit}
+          color={color}
+          startAt={Number(q.get('at') ?? 0)}
+          mode={legendary ? 'legendary' : 'lesson'}
+          onExit={() => go('/')}
+          onAvatar={() => go('/avatar')}
+          onRetry={() => setRunKey((k) => k + 1)}
+        />
+      )
     }
   }
   // Learn is the left tab and Profile the right: slide the new screen in from the side it lives on.
@@ -73,6 +94,16 @@ function Screens() {
       <BottomNav route={route} go={go} />
     </>
   )
+}
+
+function Review({ go, retry }: { go: Go; retry: () => void }) {
+  const { s } = useStore()
+  const [session] = useState(() => reviewLesson(units, s, dayKey(new Date())))
+  useEffect(() => {
+    if (!session) go('/')
+  }, [session, go])
+  if (!session) return null
+  return <LessonPlayer lesson={session.lesson} color="#ffc531" mode="review" reviewItems={session.items} onExit={() => go('/')} onAvatar={() => go('/avatar')} onRetry={retry} />
 }
 
 export function App() {

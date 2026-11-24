@@ -59,7 +59,7 @@ function Confetti() {
 
 const stagger = (i: number) => ({ ['--i' as string]: i })
 
-function Done({ result, lesson, onNext }: { result: { r: LessonResult; accuracy: number }; lesson: Lesson; onNext: () => void }) {
+function Done({ result, lesson, onNext }: { result: { r: LessonResult; accuracy: number; notes?: string[] }; lesson: Lesson; onNext: () => void }) {
   const { r, accuracy } = result
   const { s } = useStore()
   const today = s.activity[dayKey(new Date())]?.xp ?? 0
@@ -93,6 +93,11 @@ function Done({ result, lesson, onNext }: { result: { r: LessonResult; accuracy:
           </div>
           {r.goalHit && <p className="mt-2 text-sm font-medium text-gem">Goal reached. +20 bonus gems.</p>}
         </div>
+        {!!result.notes?.length && (
+          <ul className="rise-in mt-3 w-full space-y-1 rounded-2xl border-2 border-gold/40 bg-card p-4 text-left text-sm font-medium text-gold" style={stagger(4)}>
+            {result.notes.map((n) => <li key={n}>{n}</li>)}
+          </ul>
+        )}
       </div>
       <button className="btn mt-8 w-full" autoFocus onClick={onNext}>Continue</button>
     </div>
@@ -185,7 +190,7 @@ export function AfterLesson({
   onExit,
   onAvatar,
 }: {
-  result: { r: LessonResult; accuracy: number }
+  result: { r: LessonResult; accuracy: number; notes?: string[] }
   lesson: Lesson
   /** False in review mode (?at=), where nothing was recorded. */
   saved: boolean
