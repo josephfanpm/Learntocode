@@ -579,7 +579,7 @@ export const u30: Unit = {
         },
         {
           kind: 'write',
-          prompt: 'Two functions stand in for two prompt versions that label a message `urgent` or `normal`. Finish `score` so it returns how many cases a version gets right. The program reads one extra case as `text|label`. Print `A` and its score, `B` and its score, then `winner` and the better version (or `tie`).',
+          prompt: 'Two functions stand in for two prompt versions that label a message `urgent` or `normal`. Finish `score` so it returns how many cases a version gets right. The program reads one extra case as `text|label`. Print `A` and its score, `B` and its score, then `winner` and the better version, or `winner tie`.',
           language: 'python',
           starter: `cases = [
     ("Server is down!", "urgent"),

@@ -81,7 +81,7 @@ export const u14: Unit = {
           prompt: 'Here are five commit messages. Tap the one that will still make sense in six months.',
           lines: ['fixed it', 'Update', 'Fix total when cart is empty', 'asdf', 'changes to file'],
           answer: 2,
-          explain: 'It names what was fixed and when it happened. The others say nothing a reader could not guess.',
+          explain: 'It names what was fixed and in which situation. The others say nothing a reader could not guess.',
         },
         {
           kind: 'concept',
@@ -292,7 +292,8 @@ else:
             'git add shop.py',
             'git commit',
           ],
-          explain: 'You fix the file by hand, check it, then stage it to tell Git the conflict is solved. The commit completes the merge.',
+          anyOrder: [[2, 3]],
+          explain: 'You fix the file by hand, check it, and stage it to tell Git the conflict is solved. The commit completes the merge.',
         },
         {
           kind: 'concept',
@@ -463,7 +464,7 @@ for line in lines:
         {
           kind: 'concept',
           title: 'Undo before a commit',
-          body: '`git restore app.py` throws away your uncommitted edits to that file and brings back the last committed version. The edits are gone for good, so check `git diff` first.\n\n`git restore --staged app.py` is gentler: it only takes the file out of the staging area. Your edits stay.',
+          body: '`git restore app.py` throws away the edits you have not staged. The file goes back to its staged version, or to the last commit if nothing is staged. Those edits are gone for good, so check `git diff` first.\n\n`git restore --staged app.py` is gentler: it only takes the file out of the staging area. Your edits stay.',
         },
         {
           kind: 'choice',
@@ -475,11 +476,11 @@ for line in lines:
             'Delete draft.txt',
           ],
           answer: 2,
-          explain: '`--staged` only un-stages. Plain `git restore draft.txt` would wipe your edits as well.',
+          explain: '`--staged` takes the file out of the next commit and keeps your edits. Plain `git restore draft.txt` copies from the staging area, which already holds your edits, so it would change nothing.',
         },
         {
           kind: 'type',
-          prompt: 'Your edits to `app.py` made things worse, and nothing is committed. Type the command that brings back the last committed version of that file.',
+          prompt: 'Your edits to `app.py` made things worse. You have not staged or committed them. Type the command that brings back the last committed version of that file.',
           accept: ['git restore app.py', 'git checkout app.py', 'git checkout -- app.py'],
           explain: 'With no `--staged`, restore replaces the file in your working folder with the committed version.',
         },

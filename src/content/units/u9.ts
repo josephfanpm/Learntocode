@@ -1270,7 +1270,7 @@ print(f"Trades: {len(history)}")
         },
         {
           kind: 'spot',
-          prompt: 'This sell route crashes because it compares text with a number. Tap the line where the fix belongs.',
+          prompt: 'This sell route crashes because it compares text with a number. The fix goes where `shares` is first read, so every later use gets a number. Tap that line.',
           lines: [
             '@app.route("/sell", methods=["POST"])',
             'def sell():',

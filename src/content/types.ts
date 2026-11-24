@@ -68,6 +68,13 @@ export interface OrderExercise {
   prompt: string
   lines: string[]
   language?: Language
+  /**
+   * Runs of lines that may go in any order among themselves, as lists of
+   * consecutive indices into `lines`, e.g. [[1, 2]] when lines 1 and 2 can
+   * swap. Use it when lines are truly independent; reword instead when a
+   * line could go anywhere.
+   */
+  anyOrder?: number[][]
   explain: string
 }
 

@@ -131,6 +131,7 @@ export const u36: Unit = {
             'Commit with a clear message',
             'Move on to the next small task',
           ],
+          anyOrder: [[2, 3]],
           explain: 'Each trip round the loop ends with a commit, so you are never more than one small step away from a state that works.',
         },
         {

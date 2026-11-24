@@ -128,6 +128,10 @@ function check(where: string, ex: Exercise) {
     case 'order':
       if (ex.lines.length < 3) err('order needs 3+ lines')
       if (new Set(ex.lines).size !== ex.lines.length) err('duplicate lines make order ambiguous')
+      for (const g of ex.anyOrder ?? []) {
+        if (g.length < 2) err('anyOrder run needs 2+ lines')
+        if (g.some((x, k) => x < 0 || x >= ex.lines.length || (k > 0 && x !== g[k - 1] + 1))) err('anyOrder run must be consecutive line indices')
+      }
       break
     case 'match':
       if (ex.pairs.length < 3 || ex.pairs.length > 5) err('match needs 3–5 pairs')

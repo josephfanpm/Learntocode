@@ -162,7 +162,17 @@ export function Steps({ ex, locked, reveal, register }: ExProps<StepsExercise>) 
 
 // ---------- Type: a short typed answer ----------
 
-const clean = (s: string) => s.trim().toLowerCase().replace(/\s+/g, ' ')
+// Forgiving compare: case, extra spaces, spaces around symbols ("x=5" vs
+// "x = 5"), hyphens between letters ("log-in" vs "log in"), a final full stop.
+const clean = (s: string) =>
+  s
+    .trim()
+    .toLowerCase()
+    .replace(/\.+$/, '')
+    .replace(/([a-z])-([a-z])/g, '$1 $2')
+    .replace(/\s+/g, ' ')
+    .replace(/ ?([^\w\s'"]) ?/g, '$1')
+    .trim()
 
 export function TypeAnswer({ ex, locked, reveal, register }: ExProps<TypeExercise>) {
   const [v, setV] = useState('')

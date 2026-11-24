@@ -314,7 +314,7 @@ print(PRICE_EACH, DISCOUNT_FROM, DISCOUNT)
         {
           kind: 'type',
           prompt: 'By convention, are Python constants like `MAX_TRIES` written in upper or lower case? Type the word.',
-          accept: ['upper', 'uppercase', 'upper case', 'capitals', 'caps'],
+          accept: ['upper', 'uppercase', 'upper case', 'capitals', 'caps', 'all caps', 'capital letters', 'all capitals'],
           explain: 'Capitals signal "this value is fixed: do not reassign it". Python does not enforce it, but every reader understands it.',
         },
       ],
@@ -359,7 +359,7 @@ print(PRICE_EACH, DISCOUNT_FROM, DISCOUNT)
         },
         {
           kind: 'spot',
-          prompt: 'Tap the line that repeats work already written higher up.',
+          prompt: 'Tap the line that repeats the clean-up already done higher up.',
           lines: [
             'first = input()',
             'first = first.strip().title()',

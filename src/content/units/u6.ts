@@ -763,7 +763,7 @@ with open("scores.csv") as f:
         },
         {
           kind: 'order',
-          prompt: 'Put the lines in order to make a class, build one dog and make it speak.',
+          prompt: 'Put the lines in order to make a class, build one dog and make it speak. Write `__init__` first, then `speak`.',
           lines: [
             'class Dog:',
             '    def __init__(self, name):',

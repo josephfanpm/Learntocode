@@ -7,6 +7,8 @@ import { Code, highlight, Inline } from './text'
 
 // Sortable list. Starts shuffled (never already right); drag a row to move it,
 // or use the up/down buttons (single-pointer and keyboard alternative).
+// Code lines wrap rather than scroll sideways: a scrolling box inside a row
+// takes the touch gesture on phones, and the row can't be dragged.
 
 function shuffledWrong(n: number): number[] {
   const a = Array.from({ length: n }, (_, i) => i)
@@ -34,7 +36,15 @@ export function Order({ ex, locked, reveal, register }: ExProps<OrderExercise>) 
   // JavaScript has no language tag in the schema, so also spot code by its punctuation.
   const isCode = !!ex.language || ex.lines.some((l) => /[;{}()=]/.test(l))
 
-  useEffect(() => register(() => order.every((id, i) => ex.lines[id] === ex.lines[i])), [order, ex, register])
+  // A row is right if it holds the expected line, or any line from the same
+  // `anyOrder` run as the expected one (those may swap freely).
+  const slot = useMemo(() => {
+    const m = ex.lines.map((_, i) => i)
+    for (const g of ex.anyOrder ?? []) for (const i of g) m[i] = g[0]
+    return m
+  }, [ex])
+  const rightAt = (id: number, i: number) => ex.lines[id] === ex.lines[i] || slot[id] === slot[i]
+  useEffect(() => register(() => order.every((id, i) => rightAt(id, i))), [order, ex, register, slot])
 
   // FLIP: rows that change position glide to their new place.
   useLayoutEffect(() => {
@@ -65,12 +75,26 @@ export function Order({ ex, locked, reveal, register }: ExProps<OrderExercise>) 
     const list = listRef.current!.getBoundingClientRect()
     const d = { id, grabDy: e.clientY - list.top - el.offsetTop, y: e.clientY, startY: e.clientY, moved: false }
     dragRef.current = d
-    e.currentTarget.setPointerCapture(e.pointerId)
+    // Listen on the window, not the row: React moves the row's DOM node when it
+    // swaps places, and that drops pointer capture mid-drag.
+    const pid = e.pointerId
+    const mv = (ev: PointerEvent) => ev.pointerId === pid && moveRef.current(ev)
+    const up = (ev: PointerEvent) => {
+      if (ev.pointerId !== pid) return
+      window.removeEventListener('pointermove', mv)
+      window.removeEventListener('pointerup', up)
+      window.removeEventListener('pointercancel', up)
+      end()
+    }
+    window.addEventListener('pointermove', mv)
+    window.addEventListener('pointerup', up)
+    window.addEventListener('pointercancel', up)
   }
 
-  const onMove = (e: React.PointerEvent) => {
+  const onMove = (e: PointerEvent) => {
     const d = dragRef.current
     if (!d) return
+    e.preventDefault()
     const moved = d.moved || Math.abs(e.clientY - d.startY) > 5
     const next = { ...d, y: e.clientY, moved }
     dragRef.current = next
@@ -89,6 +113,10 @@ export function Order({ ex, locked, reveal, register }: ExProps<OrderExercise>) 
     const from = order.indexOf(d.id)
     if (idx !== from) move(from, idx)
   }
+
+  // The window listener always calls the latest onMove (it reads `order`).
+  const moveRef = useRef(onMove)
+  moveRef.current = onMove
 
   const end = () => {
     dragRef.current = null
@@ -109,7 +137,7 @@ export function Order({ ex, locked, reveal, register }: ExProps<OrderExercise>) 
       </h2>
       <ol ref={listRef} className="relative space-y-2.5">
         {order.map((id, i) => {
-          const ok = ex.lines[id] === ex.lines[i]
+          const ok = rightAt(id, i)
           const dy = offset(id)
           const dragging = dy !== undefined
           return (
@@ -120,9 +148,6 @@ export function Order({ ex, locked, reveal, register }: ExProps<OrderExercise>) 
                 else els.current.delete(id)
               }}
               onPointerDown={(e) => onDown(e, id)}
-              onPointerMove={onMove}
-              onPointerUp={end}
-              onPointerCancel={end}
               style={{
                 touchAction: locked ? undefined : 'none',
                 transform: dragging ? `translateY(${dy}px) scale(1.02)` : undefined,
@@ -140,7 +165,7 @@ export function Order({ ex, locked, reveal, register }: ExProps<OrderExercise>) 
               >
                 {i + 1}
               </span>
-              <span className={`min-w-0 flex-1 py-1 ${isCode ? 'overflow-x-auto font-mono text-[0.92rem] whitespace-pre' : 'text-[0.97rem]'}`}>
+              <span className={`min-w-0 flex-1 py-1 ${isCode ? 'font-mono text-[0.92rem] whitespace-pre-wrap [overflow-wrap:anywhere]' :'text-[0.97rem]'}`}>
                 {isCode ? highlight(ex.lines[id], ex.language) : <Inline text={ex.lines[id]} />}
               </span>
               {!locked && (

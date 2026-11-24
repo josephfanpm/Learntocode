@@ -81,6 +81,7 @@ export const u27: Unit = {
             'Use two short sentences, friendly in tone.',
             'End with the name of the restaurant: Luigi\'s.',
           ],
+          anyOrder: [[1, 2, 3]],
           explain: 'Task, reader, format, finish. There is no single required order, but leading with the task keeps it from getting lost.',
         },
         {
@@ -193,6 +194,7 @@ export const u27: Unit = {
             'Nairobi → Kenya',
             'Lima →',
           ],
+          anyOrder: [[1, 2, 3]],
           explain: 'Instruction, then the examples, then the new input left open. The model continues the pattern.',
         },
       ],

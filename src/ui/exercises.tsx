@@ -114,10 +114,20 @@ export function Choice({ ex, locked, reveal, register }: ExProps<ChoiceExercise>
 // ---------- Blank ----------
 
 export function Blank({ ex, locked, reveal, register }: ExProps<BlankExercise>) {
-  const bank = useMemo(() => shuffle(ex.bank.map((w, i) => ({ w, i }))), [ex])
+  // Each tile is used once, so give a word as many tiles as the answer needs it
+  // (binary 6 is "1 1 0", yellow is "255, 255, 0").
+  const words = useMemo(() => {
+    const out = [...ex.bank]
+    for (const a of new Set(ex.answers)) {
+      const need = ex.answers.filter((x) => x === a).length
+      for (let k = out.filter((x) => x === a).length; k < need; k++) out.push(a)
+    }
+    return out
+  }, [ex])
+  const bank = useMemo(() => shuffle(words.map((w, i) => ({ w, i }))), [words])
   const [fill, setFill] = useState<(number | null)[]>(() => ex.answers.map(() => null))
   useEffect(
-    () => register(fill.every((f) => f !== null) ? () => fill.every((f, i) => ex.bank[f!] === ex.answers[i]) : null),
+    () => register(fill.every((f) => f !== null) ? () => fill.every((f, i) => words[f!] === ex.answers[i]) : null),
     [fill, ex, register],
   )
   const used = new Set(fill.filter((f) => f !== null))
@@ -141,16 +151,16 @@ export function Blank({ ex, locked, reveal, register }: ExProps<BlankExercise>) 
                   onClick={() => setFill(fill.map((f, j) => (j === i ? null : f)))}
                   className={`mx-0.5 inline-block min-w-14 rounded-t-md border-b-2 px-2 align-baseline font-mono ${
                     locked
-                      ? ex.bank[fill[i]!] === ex.answers[i]
+                      ? words[fill[i]!] === ex.answers[i]
                         ? 'border-good bg-good/25 text-white'
                         : 'border-bad bg-bad/30 text-white'
                       : fill[i] === null
                         ? 'border-dashed border-ink-3 bg-white/5 text-transparent'
                         : 'border-cobalt bg-cobalt/30 text-white'
                   }`}
-                  aria-label={fill[i] === null ? `Gap ${i + 1}, empty` : `Gap ${i + 1}: ${ex.bank[fill[i]!]}. Tap to remove.`}
+                  aria-label={fill[i] === null ? `Gap ${i + 1}, empty` : `Gap ${i + 1}: ${words[fill[i]!]}. Tap to remove.`}
                 >
-                  {fill[i] === null ? '____' : ex.bank[fill[i]!]}
+                  {fill[i] === null ? '____' : words[fill[i]!]}
                 </button>
               )}
             </span>

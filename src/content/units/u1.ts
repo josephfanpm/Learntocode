@@ -312,6 +312,7 @@ export const u1: Unit = {
           kind: 'order',
           prompt: 'Put the lines in order to read two numbers and print their total.',
           lines: ['a = int(input())', 'b = int(input())', 'total = a + b', 'print(total)'],
+          anyOrder: [[0, 1]],
           language: 'python',
           explain: 'Read the first number, then the second, then add them, then print. You cannot add before both are read.',
         },
@@ -776,7 +777,7 @@ export const u1: Unit = {
           prompt: 'What does this print?',
           code: 'print(int(7.99))',
           language: 'python',
-          accept: ['7'],
+          accept: ['7', 'seven'],
           explain: 'int() cuts off the .99 and keeps the 7. Truncating is not the same as rounding.',
         },
         {
@@ -1129,17 +1130,17 @@ export const u1: Unit = {
         },
         {
           kind: 'type',
-          prompt: 'One of the digits to double is 8. Doubling gives 16, which is more than 9, so you take away 9. What number goes into the total?',
+          prompt: 'Say a digit you have to double is 8. Doubling gives 16, which is more than 9, so you take away 9. What number goes into the total?',
           accept: ['7', 'seven'],
           explain: '8 doubled is 16, and 16 - 9 = 7. That is the same as adding the two digits of 16: 1 + 6.',
         },
         {
           kind: 'concept',
           title: 'Change it, then test it',
-          body: 'You can change a value on one line and test the new value with an `if` on the next.\n\nHere 8 doubles to 16. That is over 10, so the indented line runs and takes 10 away.',
-          code: 'price = 8\nprice = price * 2\nif price > 10:\n    price = price - 10\nprint(price)',
+          body: 'You can change a value on one line and test the new value with an `if` on the next.\n\nHere 8 doubles to 16. That is over 9, so the indented line runs and takes 9 away.',
+          code: 'price = 8\nprice = price * 2\nif price > 9:\n    price = price - 9\nprint(price)',
           language: 'python',
-          output: '6',
+          output: '7',
         },
         {
           kind: 'concept',

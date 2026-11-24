@@ -45,6 +45,7 @@ export const u33: Unit = {
             'Log in when asked (first time only)',
             'Type what you want in plain English',
           ],
+          anyOrder: [[1, 2]],
           explain: 'The folder comes before the command. Claude Code works with the project you start it in.',
         },
         {
@@ -374,6 +375,7 @@ export const u33: Unit = {
             'Have it run the tests',
             'Read the diff before you commit',
           ],
+          anyOrder: [[4, 5]],
           explain: 'A wrong plan costs a minute to fix. A wrong change across twenty files costs an afternoon.',
         },
         {

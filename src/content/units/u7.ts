@@ -820,7 +820,7 @@ db.execute(f"SELECT * FROM users WHERE name = '{name}'")`,
         },
         {
           kind: 'match',
-          prompt: 'Match each fact to the best type for its column.',
+          prompt: 'Match each fact to how it is stored.',
           pairs: [
             ['How many seats a bus has', 'INTEGER'],
             ['The name of a street', 'TEXT'],
@@ -897,7 +897,7 @@ db.execute(f"SELECT * FROM users WHERE name = '{name}'")`,
         },
         {
           kind: 'type',
-          prompt: 'Stock is 1. Ana and Ben both check it at the same moment, both see 1, and both run `stock = stock - 1`. What is the stock now? Type the number.',
+          prompt: 'Stock is 1. Ana and Ben both check it at the same moment and both see 1. Then the database runs each of their `stock = stock - 1` updates, one after the other. What is the stock now? Type the number.',
           accept: ['-1', '−1', 'minus 1', 'minus one'],
           explain: 'Each check passed before the other sale was saved, so the shop sold a cake it did not have. A transaction makes "check, then buy" one unbroken step.',
         },

@@ -493,7 +493,7 @@ print(" ".join(cleaned))
           steps: [
             { ask: 'On which day did something clearly change?', answer: 3 },
             { ask: 'A new prompt went live on Thursday morning. Which day is the last one before the change?', answer: 2 },
-            { ask: 'You go back to the old prompt. Which day\'s failed chats should you read first to learn what went wrong?', answer: 3 },
+            { ask: 'You go back to the old prompt. Which was the first day with the new prompt, and so the first day\'s failed chats to read?', answer: 3 },
           ],
           explain: 'Monitoring shows when things changed. Matching that to what you shipped shows why, and the failed chats become new test cases.',
         },

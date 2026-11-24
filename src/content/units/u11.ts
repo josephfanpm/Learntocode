@@ -83,7 +83,7 @@ print(pages // per_hour)`,
         {
           kind: 'type',
           prompt: 'You add one more digit to a PIN. The number of possible PINs is multiplied by what number?',
-          accept: ['10', 'ten', 'x10', '10x'],
+          accept: ['10', 'ten', 'x10', '10x', '×10', '10 times', 'ten times', 'times 10', 'by 10'],
           explain: 'The new digit has 10 choices for every PIN that existed before, so the total grows 10 times.',
         },
         {
@@ -461,11 +461,11 @@ print(chr(secret ^ 5))`,
         {
           kind: 'concept',
           title: 'Deleting is not erasing',
-          body: 'When you delete a file, the computer usually just forgets where it is. The data stays on the disk until something overwrites it.\n\n**Full-disk encryption** scrambles everything on the device. Without your password, a lost laptop or old phone is just noise.',
+          body: 'When you delete a file, the computer often just forgets where it is. The data stays on the disk until something overwrites it. Many newer drives do clear it soon after, but you cannot count on that.\n\n**Full-disk encryption** scrambles everything on the device. Without your password, a lost laptop or old phone is just noise.',
         },
         {
           kind: 'choice',
-          prompt: 'You delete a photo and empty the bin. What has most likely happened to the photo\'s data?',
+          prompt: 'You delete a photo from an old hard disk and empty the bin. What has most likely happened to the photo\'s data?',
           options: [
             'It was overwritten with zeros right away',
             'It was sent back to the camera',

@@ -242,7 +242,7 @@ export const u24: Unit = {
         {
           kind: 'type',
           prompt: 'The HTML order is: Email field, Password field, "Log in" button, "Help" link. Focus is on the Email field. You press Tab twice. What has focus now?',
-          accept: ['log in', 'log in button', 'the log in button', 'login', 'login button', 'button', 'the button', '"log in" button'],
+          accept: ['log in', 'log in button', 'the log in button', 'the login button', 'login', 'login button', 'button', 'the button', '"log in" button'],
           explain: 'One Tab moves to Password, the next to the Log in button. Shift and Tab together move backwards.',
         },
         {

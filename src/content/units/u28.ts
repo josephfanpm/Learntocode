@@ -411,7 +411,7 @@ for block in response["content"]:
         {
           kind: 'concept',
           title: 'Why did it stop?',
-          body: 'Every response has a `stop_reason`. Two you will see most:\n\n`"end_turn"`: the model finished what it wanted to say.\n\n`"max_tokens"`: the reply hit your cap and was **cut off**, possibly mid-sentence.\n\n`"tool_use"`: the model wants to use a tool, a topic for later.\n\nCheck it before trusting that a reply is complete.',
+          body: 'Every response has a `stop_reason`. Three you will see most:\n\n`"end_turn"`: the model finished what it wanted to say.\n\n`"max_tokens"`: the reply hit your cap and was **cut off**, possibly mid-sentence.\n\n`"tool_use"`: the model wants to use a tool, a topic for later.\n\nCheck it before trusting that a reply is complete.',
         },
         {
           kind: 'steps',
@@ -443,7 +443,7 @@ print(response.usage.output_tokens)`,
         {
           kind: 'blank',
           prompt: 'Add up the tokens one call used.',
-          code: 'total = response.usage.___ + response.usage.___',
+          code: 'sent = response.usage.___\nwritten = response.usage.___\ntotal = sent + written',
           language: 'python',
           bank: ['input_tokens', 'output_tokens', 'words', 'max_tokens'],
           answers: ['input_tokens', 'output_tokens'],

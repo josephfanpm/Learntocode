@@ -379,7 +379,7 @@ print(len(TOOLS), "tools")
           lines: [
             '"name": "send_email",',
             '"description": "Send an email to one address.",',
-            '"properties": {"to": "str", "subject": "str", "body": "str"},',
+            '"properties": {"to": {"type": "string"}, "subject": {"type": "string"}, "body": {"type": "string"}},',
             '"required": ["to", "subject", "message"]',
           ],
           answer: 3,
@@ -799,6 +799,7 @@ print(json.dumps(handle(request), sort_keys=True))
             'Require approval for tools that change or send things',
             'Remove the server when you no longer use it',
           ],
+          anyOrder: [[2, 3]],
           explain: 'Need first, then trust, then the smallest key, then a human check on risky actions. Unused access is risk with no benefit.',
         },
       ],

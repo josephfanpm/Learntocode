@@ -103,7 +103,7 @@ export const u31: Unit = {
         {
           kind: 'type',
           prompt: 'The model asks for `get_weather`. Who runs the function: the model, or your code? Type your answer.',
-          accept: ['code', 'your code', 'my code', 'the code', 'program', 'my program', 'your program'],
+          accept: ['code', 'your code', 'my code', 'the code', 'program', 'my program', 'your program', 'the program'],
           explain: 'Always your code. That is also what keeps you in control: nothing happens unless your program chooses to do it.',
         },
         {

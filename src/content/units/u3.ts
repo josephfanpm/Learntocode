@@ -19,7 +19,7 @@ export const u3: Unit = {
         },
         {
           kind: 'choice',
-          prompt: 'You use linear search to look for "pear". How many items do you check before you find it?',
+          prompt: 'You use linear search to look for "pear". How many items does it check, counting pear itself?',
           code: py('fruits = ["apple", "fig", "pear", "plum"]'),
           language: 'python',
           options: ['3', '1', '4', '2'],
@@ -285,6 +285,7 @@ export const u3: Unit = {
             'If the target is bigger, keep only the right half',
             'Repeat with the half you kept',
           ],
+          anyOrder: [[2, 3]],
           explain: 'Check the middle first, then decide which half to keep, then repeat on that half.',
         },
         {
@@ -1112,6 +1113,7 @@ export const u3: Unit = {
             '    right = merge_sort(nums[mid:])',
             '    return merge(left, right)',
           ],
+          anyOrder: [[4, 5]],
           language: 'python',
           explain: 'The base case stops the recursion. Each half is sorted by the same function, and merge joins the two sorted halves.',
         },

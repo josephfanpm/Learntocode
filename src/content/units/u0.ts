@@ -72,8 +72,7 @@ export const u0: Unit = {
           lines: [
             'Fill the kettle with water',
             'Boil the water',
-            'Put a tea bag in a cup',
-            'Pour the hot water into the cup',
+            'Pour the hot water over a tea bag in a cup',
             'Wait three minutes, then remove the tea bag',
           ],
           explain: 'Order matters. Pouring water before boiling it, or removing the tea bag first, gives the wrong result.',
@@ -481,6 +480,7 @@ export const u0: Unit = {
             '    Add 1 to count',
             'Say count',
           ],
+          anyOrder: [[2, 3]],
           explain: 'The variable starts at 0 before the loop. Inside the loop, each sheep adds 1. The total is said only after the loop ends.',
         },
         {
@@ -517,7 +517,7 @@ export const u0: Unit = {
         {
           kind: 'type',
           prompt: 'What number is binary `1100`? Type it as an everyday number.',
-          accept: ['12'],
+          accept: ['12', 'twelve'],
           explain: 'The 8 and the 4 are on, and 8 + 4 = 12.',
         },
         {
@@ -637,7 +637,7 @@ export const u0: Unit = {
           options: [
             'Video pixels use bigger numbers',
             'Videos are not made of bits',
-            'It holds hundreds of full pictures, plus sound',
+            'It holds thousands of full pictures, plus sound',
             'Video files are never bigger',
           ],
           answer: 2,
@@ -690,7 +690,7 @@ export const u0: Unit = {
         },
         {
           kind: 'order',
-          prompt: 'Put this program in order. The cat should walk without stopping, and turn around whenever it reaches the edge.',
+          prompt: 'Put this program in order. The cat should walk without stopping. After each move, it checks the edge and turns around if it is there.',
           lines: [
             'When the start button is clicked',
             '    Forever',

@@ -165,6 +165,7 @@ export const u18: Unit = {
             'cat app.log | grep "ERROR"',
             "cat app.log | grep 'ERROR'",
             'cat app.log|grep ERROR',
+            'grep ERROR < app.log',
           ],
           explain: '`grep` keeps the lines that contain your word and drops the rest. It is the quickest way to find a needle in a long log.',
         },
@@ -466,6 +467,7 @@ export const u18: Unit = {
             'Create and save hello.py in your editor',
             'python hello.py',
           ],
+          anyOrder: [[1, 2]],
           explain: 'The terminal must be inside the folder that holds the file, and the file must be saved, before Python can run it.',
         },
         {

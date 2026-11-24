@@ -513,8 +513,7 @@ for text in kept:
           lines: [
             'Split the history into old turns and recent turns',
             'Ask a model to summarise the old turns',
-            'Replace the old turns with that summary',
-            'Keep the recent turns exactly as they were',
+            'Replace the old turns with that summary, and keep the recent turns as they were',
             'Send the system prompt, summary, recent turns and new question',
           ],
           explain: 'The gist of the past travels as a short summary, and the recent turns stay word for word.',

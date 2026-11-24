@@ -616,7 +616,7 @@ if not passed:
             { ask: 'Pull the date and total out of a receipt as JSON.', answer: 0 },
             { ask: 'Classify each ticket, then answer it with the prompt for that category.', answer: 1 },
             { ask: 'A bug report says "checkout sometimes fails". Find the cause in a large codebase and fix it.', answer: 2 },
-            { ask: 'Summarise a meeting transcript, then turn the summary into action items.', answer: 1 },
+            { ask: 'Summarise a meeting transcript. Check in code that the summary is under 100 words. Then turn it into action items.', answer: 1 },
           ],
           explain: 'Three of the four have steps you can write down. Reach for an agent only when you cannot.',
         },

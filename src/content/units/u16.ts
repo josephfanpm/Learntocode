@@ -113,7 +113,7 @@ export const u16: Unit = {
             { ask: 'Which is truthy in JavaScript but would be falsy in Python?', answer: 3 },
             { ask: 'Which means "empty on purpose"?', answer: 4 },
           ],
-          explain: 'Only six values are falsy. An empty array and the string "0" are both truthy, which surprises people coming from Python.',
+          explain: 'Only a handful of values are falsy. An empty array and the string "0" are both truthy, which surprises people coming from Python.',
         },
         {
           kind: 'write',

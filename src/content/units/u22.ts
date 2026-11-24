@@ -455,13 +455,13 @@ print(db.execute("SELECT COUNT(*) FROM users").fetchone()[0])
           kind: 'order',
           prompt: 'Put these migrations in an order that works.',
           lines: [
-            '001: CREATE TABLE users (id, name)',
-            '002: ALTER TABLE users ADD COLUMN email',
-            '003: CREATE UNIQUE INDEX on users (email)',
-            '004: CREATE TABLE posts (id, user_id REFERENCES users)',
+            'CREATE TABLE users (id, name)',
+            'ALTER TABLE users ADD COLUMN email',
+            'CREATE UNIQUE INDEX on users (email)',
+            'CREATE TABLE posts (id, author_email REFERENCES users (email))',
           ],
           language: 'sql',
-          explain: 'Each step builds on the one before: the table must exist before it gains a column, and the column before it is indexed.',
+          explain: 'Each step builds on the one before: the table must exist before it gains a column, the column before it is indexed, and a column must be unique before another table can point at it.',
         },
         {
           kind: 'steps',

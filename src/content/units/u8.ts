@@ -747,6 +747,7 @@ export const u8: Unit = {
             '  <tr><td>Zucchini</td><td>May</td></tr>',
             '</table>',
           ],
+          anyOrder: [[2, 3]],
           language: 'html',
           explain: 'The heading row comes first, then one `<tr>` per row of data, all inside `<table>`.',
         },
@@ -846,7 +847,7 @@ export const u8: Unit = {
         },
         {
           kind: 'order',
-          prompt: 'Order the script. The question is "What colour do blue and yellow make?" and the right answer is green.',
+          prompt: 'Order the script. Find the box first, then listen for submit. The question is "What colour do blue and yellow make?" and the right answer is green.',
           lines: [
             'const input = document.querySelector("#answer");',
             'document.querySelector("form").addEventListener("submit", function (event) {',

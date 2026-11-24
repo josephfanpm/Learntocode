@@ -103,7 +103,7 @@ export const u4: Unit = {
         {
           kind: 'type',
           prompt: 'What is 0x20 as an everyday (decimal) number?',
-          accept: ['32'],
+          accept: ['32', 'thirty-two'],
           explain: 'The left digit counts 16s. 0x20 is two 16s and zero 1s: 32.',
         },
         {
@@ -321,7 +321,7 @@ export const u4: Unit = {
         },
         {
           kind: 'order',
-          prompt: "`.append(x)` adds `x` to the end of a list. Put the lines in order so it prints `['Ann', 'Bo']` and then `['Ann', 'Bo', 'Cy']`.",
+          prompt: "`.append(x)` adds `x` to the end of a list. Put the lines in order: copy the team, add Cy to the copy, then print `team` and then the copy at the end.",
           lines: [
             'team = ["Ann", "Bo"]',
             'new_team = team.copy()',
@@ -656,7 +656,7 @@ export const u4: Unit = {
           kind: 'type',
           prompt: 'Read this C code. After it runs, what number is in `n`?',
           code: py('int n = 50;', 'int *p = &n;', '*p = 7;'),
-          accept: ['7'],
+          accept: ['7', 'seven'],
           explain: '`*p = 7` goes to the address in `p`, which is where `n` lives, and puts 7 there. `n` changed without its name being used.',
         },
         {
@@ -883,7 +883,7 @@ export const u4: Unit = {
         {
           kind: 'type',
           prompt: 'A tiny image is 2 pixels wide and 2 pixels tall. Each pixel needs 3 bytes. How many bytes hold all its pixels?',
-          accept: ['12'],
+          accept: ['12', 'twelve'],
           explain: '2 × 2 is 4 pixels, and 4 × 3 bytes is 12. A phone photo has millions of pixels, which is why photo files are big.',
         },
         {

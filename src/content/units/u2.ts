@@ -164,6 +164,7 @@ export const u2: Unit = {
             '    total = total + p',
             'print(total)',
           ],
+          anyOrder: [[0, 1]],
           language: 'python',
           explain: 'The total starts at 0 before the loop, grows inside it, and is printed after it. If print were indented, it would run every time round.',
         },
@@ -638,7 +639,7 @@ export const u2: Unit = {
           kind: 'concept',
           title: 'Read the error',
           body: 'When Python hits a problem it stops and prints an **error message**. It looks scary, but it is trying to help.\n\nRead the **last line** first. It names the kind of error and says what went wrong. The message also gives the line number where Python stopped.',
-          code: 'Traceback (most recent call last):\n  File "prog.py", line 3\nNameError: name "totl" is not defined',
+          code: 'Traceback (most recent call last):\n  File "prog.py", line 3\nNameError: name \'totl\' is not defined',
         },
         {
           kind: 'match',
@@ -653,7 +654,7 @@ export const u2: Unit = {
         },
         {
           kind: 'spot',
-          prompt: 'Python says: NameError: name "totl" is not defined. Tap the line with the bug.',
+          prompt: 'Python says: NameError: name \'totl\' is not defined. Tap the line with the bug.',
           lines: ['total = 0', 'for s in [4, 8, 6]:', '    total = totl + s', 'print(total)'],
           language: 'python',
           answer: 2,
@@ -684,7 +685,7 @@ export const u2: Unit = {
           prompt: 'A debugging print shows the total each time round. What is the last number it prints?',
           code: 'total = 10\nfor n in [1, 2, 3]:\n    total = total * n\n    print(total)',
           language: 'python',
-          accept: ['60'],
+          accept: ['60', 'sixty'],
           explain: 'The total goes 10, then 20, then 60. Seeing each step makes it easy to spot where a value first goes wrong.',
         },
         {
